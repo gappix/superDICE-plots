@@ -53,7 +53,7 @@ sanitizeISO3 = function(df){
   if("iso3" %in% colnames(df)){
     
     df$iso3 = toupper(df$iso3)
-    df = df %>% filter( iso3 != "ATA") %>% filter( iso3 != "GRL")#remove anctartica and greenland
+    df = df %>% dplyr::filter( iso3 != "ATA") %>% dplyr::filter( iso3 != "GRL")#remove anctartica and greenland
   }
   df
   

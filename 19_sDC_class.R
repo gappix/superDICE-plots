@@ -151,8 +151,9 @@ SuperDICE <- function(gdx_file_with_path){
     }
     
     
-    # SPECIFIC GETTERS ------------------
+    # SPECIFIC GETTERS :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     
+    my_TATM_ty              =  my_getVariable_ty("TATM")
     
     my_Emissions_nty       =  my_getVariable_nty("E")
 
@@ -165,7 +166,46 @@ SuperDICE <- function(gdx_file_with_path){
     
     my_WORLD_EmissionsFFI_ty   = my_getVariable_CUMLn_y(variable_name = "EIND")
     
-    my_CUML_DAMAGES_n      <- function(start_year= 0, end_year = 2300){
+    
+    # Evaluates total emissioni [GtCO2] per each region
+    # from start_year to end_year 
+    # multiplying 5 times each timestamp value
+    #
+    my_CUML_EMISSIONS_abs_n      <- function(start_year= 0, end_year = 2300){
+      
+      my_getVariable_CUML5y_n(variable_name = "E", 
+                              cumlyear_min  = start_year,
+                              cumlyear_max  = end_year)
+    }
+
+    
+    # Evaluates total abatement costs [%cmlGDP] per each region
+    # from start_year to end_year 
+    # (abatecosts and gdp are multiplied 5 times each timestamp value)
+    #
+    my_CUML_EMISSIONS_perc_n      <- function(start_year= 0, end_year = 2300){
+      
+      cum_emi        = my_getVariable_CUML5y_n(variable_name = "EMISSIONS", 
+                                               cumlyear_min  = start_year,
+                                               cumlyear_max  = end_year) %>%  rename("emissions" = "value") 
+      
+      
+      cum_gdp        = my_getVariable_CUML5y_n(variable_name = "YGROSS", 
+                                               cumlyear_min  = start_year,
+                                               cumlyear_max  = end_year)%>%  rename("ygross" = "value") 
+      
+      merge(cum_emi,cum_gdp, by = c("n")) %>% mutate(value = emissions/ygross) %>% dplyr::select(n,value)
+      
+      
+    }
+    
+    
+    
+    # Evaluates total damages [Trill USD] per each region
+    # from start_year to end_year 
+    # multiplying 5 times each timestamp value
+    #
+    my_CUML_DAMAGES_abs_n      <- function(start_year= 0, end_year = 2300){
       
       my_getVariable_CUML5y_n(variable_name = "DAMAGES", 
                               cumlyear_min  = start_year,
@@ -173,91 +213,114 @@ SuperDICE <- function(gdx_file_with_path){
     }
 
 
-    my_CUML_DAMAGES_iso3    <- function(start_year= 0, end_year = 2300){
+    # Evaluates total abatement costs [%cmlGDP] per each region
+    # from start_year to end_year 
+    # (abatecosts and gdp are multiplied 5 times each timestamp value)
+    #
+    my_CUML_DAMAGES_perc_n      <- function(start_year= 0, end_year = 2300){
       
-      d_n = my_getVariable_CUML5y_n(variable_name = "DAMAGES", cumlyear_min  = start_year,  cumlyear_max  = end_year)
+      cum_damages    = my_getVariable_CUML5y_n(variable_name = "DAMAGES", 
+                                                cumlyear_min  = start_year,
+                                                cumlyear_max  = end_year) %>%  rename("damages" = "value") 
+      
+      
+      cum_gdp        = my_getVariable_CUML5y_n(variable_name = "YGROSS", 
+                                               cumlyear_min  = start_year,
+                                               cumlyear_max  = end_year)%>%  rename("ygross" = "value") 
+      
+      merge(cum_damages,cum_gdp, by = c("n")) %>% mutate(value = damages/ygross) %>% dplyr::select(n,value)
+      
+      
+    }
+    
+    # Maps total damages costs [Trill USD] per each iso3 region
+    #
+    my_CUML_DAMAGES_abs_iso3    <- function(start_year= 0, end_year = 2300){
+      
+      d_n = my_CUML_DAMAGES_perc_n( start_year  = start_year,  
+                                    end_year    = end_year   )
       map_n_iso3 = my_getParameter("map_n_iso3")
       iso3_damages = merge(map_n_iso3,d_n,by=c("n")) %>% sanitizeISO3()
       return(iso3_damages)
     }
     
     
+    
+    # Maps total damages costs [%cmlGDP] per each iso3 region
+    #
+    my_CUML_DAMAGES_perc_iso3    <- function(start_year= 0, end_year = 2300){
+      
+      d_n  = my_CUML_DAMAGES_perc_n ( start_year  = start_year,  
+                                      end_year    = end_year    )
+      map_n_iso3 = my_getParameter("map_n_iso3")
+      iso3_damages = merge(map_n_iso3,d_n,by=c("n")) %>% sanitizeISO3()
+      return(iso3_damages)
+    }
+    
+    
+    
+    # Evaluates total abatement costs [Trill USD] per each region
+    # from start_year to end_year 
+    # multiplying 5 times each timestamp value
+    my_CUML_ABATECOST_abs_n      <- function(start_year= 0, end_year = 2300){
+      
+      my_getVariable_CUML5y_n(variable_name = "ABATECOST", 
+                              cumlyear_min  = start_year,
+                              cumlyear_max  = end_year)
+    }
+    
+    
+    # Evaluates total abatement costs [%cmlGDP] per each region
+    # from start_year to end_year 
+    # (abatecosts and gdp are multiplied 5 times each timestamp value)
+    #
+    my_CUML_ABATECOST_perc_n      <- function(start_year= 0, end_year = 2300){
+      
+      cum_abatecosts = my_getVariable_CUML5y_n(variable_name = "ABATECOST", 
+                                                cumlyear_min  = start_year,
+                                                cumlyear_max  = end_year) %>%  rename("abatecost" = "value") 
+      
+      
+      cum_gdp        = my_getVariable_CUML5y_n(variable_name = "YGROSS", 
+                                               cumlyear_min  = start_year,
+                                               cumlyear_max  = end_year)%>%  rename("ygross" = "value") 
+      
+      merge(cum_abatecosts,cum_gdp, by = c("n")) %>% mutate(value = abatecost/ygross) %>% dplyr::select(n,value)
+      
+      
+    }
+    
+    
+    # Maps total abatement costs [Trill USD] per each iso3 region
+    #
+    my_CUML_ABATECOST_abs_iso3    <- function(start_year= 0, end_year = 2300){
+      
+      d_n = my_CUML_ABATECOST_abs_n ( start_year  = start_year,  
+                                      end_year    = end_year   )
+      map_n_iso3 = my_getParameter("map_n_iso3")
+      iso3_damages = merge(map_n_iso3,d_n,by=c("n")) %>% sanitizeISO3()
+      return(iso3_damages)
+    }
+    
+    
+    # Maps total abatement costs [%cmlGDP] per each iso3 region
+    #
+    my_CUML_ABATECOST_perc_iso3    <- function(start_year= 0, end_year = 2300){
+      
+      d_n  = my_CUML_ABATECOST_perc_n ( start_year  = start_year,  
+                                        end_year    = end_year    )
+      map_n_iso3 = my_getParameter("map_n_iso3")
+      iso3_damages = merge(map_n_iso3,d_n,by=c("n")) %>% sanitizeISO3()
+      return(iso3_damages)
+    }
+    
 
-  # # return specific nty variable up to 2200
-  # getVariable_nty <- function(variable){
-    
-  #   my_gdx[as.character(variable)] %>% 
-  #     mutate(year = t_to_y(as.integer(t))) %>%
-  #     make_t_integer() %>%
-  #     make_year_integer() %>%
-  #     sanitizeISO3() %>%
-  #     filter(year <= 2200)
-  
-  # }
-  
-  # return specific nty variable with no time limits
-  # getVariable_EXTENDED_nty <- function(variable){
-    
-  #   my_gdx[as.character(variable)] %>% 
-  #     mutate(year = t_to_y(as.integer(t))) %>%
-  #     make_t_integer() %>%
-  #     make_year_integer() %>%
-  #     sanitizeISO3()
-    
-  # }
-  
-  # # return specific ty variable up to 2200
-  # getVariable_ty <- function(variable){
-  #   
-  #   my_gdx[as.character(variable)] %>%    
-  #     mutate(year = t_to_y(as.integer(t)) ) %>% 
-  #     make_t_integer() %>%
-  #     make_year_integer()  %>%
-  #     filter(year <= 2200)      
-  #   
-  # }
-  # 
-  # # return specific ty variable with no time limits
-  # getVariable_EXTENDED_ty <- function(variable){
-  #   
-  #   my_gdx[as.character(variable)] %>%    
-  #     mutate(year = t_to_y(as.integer(t)) ) %>% 
-  #     make_t_integer() %>%
-  #     make_year_integer()      
-  #   
-  # }
 
-  # # return specific emissions nty variable up to 2200
-  # myEmissions_nty                 <- getVariable_nty("E")
-  # 
-  # # return specific emissions nty variable with no time limits
-  # myEmissions_EXTENDED_nty        <- getVariable_EXTENDED_nty("E")
-  # 
-  # # return specific world emissions ty variable up to 2200
-  # myWORLDEmissions_ty             <- myEmissions_nty %>%
-  #   group_by(year, t)                %>%
-  #   summarise(value = sum(value))    %>%
-  #   select(t, year, value)
-  # 
-  # # return specific world emissions ty variable with no time limits
-  # myWORLDEmissions_EXTENDED_ty    <- myEmissions_EXTENDED_nty %>%
-  #   group_by(year, t)                %>%
-  #   summarise(value = sum(value))    %>%
-  #   select(t, year, value)
-  # 
-  # # return MIU nty variable up to 2200
-  # myMIU_nty                       <- getVariable_nty("MIU")
-  # 
-  # # return MIU nty variable with no time limits
-  # myMIU_EXTENDED_nty              <- getVariable_EXTENDED_nty("MIU")
-  # 
-  # 
-  # 
   
     
     
     
-    ## EXPOSED METHODS ---------------------------------
+    ## EXPOSED METHODS   ############################################################
     
     
 
@@ -284,6 +347,8 @@ SuperDICE <- function(gdx_file_with_path){
       get_Emissions_nty              = my_Emissions_nty,
       #get_Emissions_GENERAL_nty      = my_Emissions_GENERAL_nty,
       
+      get_TATM_ty                   = my_TATM_ty,
+      
       get_WORLD_EmissionsTOT_ty      = my_WORLD_EmissionsTOT_ty,
       
       get_WORLD_EmissionsFFI_ty      = my_WORLD_EmissionsFFI_ty,
@@ -295,10 +360,29 @@ SuperDICE <- function(gdx_file_with_path){
       get_DAMAGES_nty                = my_DAMAGES_nty,
       
       
-      get_CUML_DAMAGES_n             = my_CUML_DAMAGES_n,
+      get_CUML5y_Variable_n             = my_getVariable_CUML5y_n,
       
-      get_CUML_DAMAGES_iso3           = my_CUML_DAMAGES_iso3
+      get_CUMLn_Variable_y            = my_getVariable_CUMLn_y,
       
+      get_CUML_EMISSIONS_abs_n             = my_CUML_EMISSIONS_abs_n,
+      
+      get_CUML_EMISSIONS_perc_n           = my_CUML_EMISSIONS_perc_n,
+      
+      get_CUML_DAMAGES_abs_n             = my_CUML_DAMAGES_abs_n,
+
+      get_CUML_DAMAGES_perc_n             = my_CUML_DAMAGES_perc_n,
+      
+      get_CUML_DAMAGES_abs_iso3           = my_CUML_DAMAGES_abs_iso3,
+
+      get_CUML_DAMAGES_perc_iso3           = my_CUML_DAMAGES_perc_iso3,
+      
+      get_CUML_ABATECOST_abs_n             = my_CUML_ABATECOST_abs_n,
+      
+      get_CUML_ABATECOST_perc_n        = my_CUML_ABATECOST_perc_n,
+      
+      get_CUML_ABATECOST_abs_iso3       = my_CUML_ABATECOST_abs_iso3,
+      
+      get_CUML_ABATECOST_perc_iso3     = my_CUML_ABATECOST_perc_iso3
       
     )
   

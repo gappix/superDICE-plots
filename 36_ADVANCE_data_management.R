@@ -1,4 +1,18 @@
+source("00_environment_setting.R")
 
+
+dir_data_advance <- here("../../ADVANCE DB/")
+
+
+
+
+
+#ADVANCE 2016 dump !! HEAVY !!
+#ADVANCE_DB           <- read.csv(paste0(dir_data_advance,"/advance_native_20160810-141456.csv"))
+#much more manageable v v
+ADVANCE_DB.CO2ffi    <- read.csv(paste0(dir_data_advance,"/advance_native_20160810-141456.csv")) %>% filter(VARIABLE=="Emissions|CO2|Fossil Fuels and Industry" )
+
+#rm(ADVANCE_DB)
 
 
   
@@ -59,13 +73,13 @@ worldADV <- function(df){
   
 }
 
+ADVANCE_CO2_WORLD = list()
 
-
-ADV_CO2_WORLD.DIAG_Base       <- worldADV(ADV_CO2.DIAG_Base) %>% filter(!(model == "POLES ADVANCE" | model == "POLES_ADVANCE_V2" | model ==  "KEI-Linkages_2.0" | model =="COPPE-MSB_v1.3.2"))      
-ADV_CO2_WORLD.DIAG_C30_const  <- worldADV(ADV_CO2.DIAG_C30_const) %>% filter(!(model == "POLES ADVANCE" | model == "POLES_ADVANCE_V2" | model ==  "KEI-Linkages_2.0" | model =="COPPE-MSB_v1.3.2"))      
-ADV_CO2_WORLD.DIAG_C80_const  <- worldADV(ADV_CO2.DIAG_C80_const) %>% filter(!(model == "POLES ADVANCE" | model == "POLES_ADVANCE_V2" | model ==  "KEI-Linkages_2.0"| model =="COPPE-MSB_v1.3.2"))      
-ADV_CO2_WORLD.DIAG_C30_gr5    <- worldADV(ADV_CO2.DIAG_C30_gr5) %>% filter(!(model == "POLES ADVANCE" | model == "POLES_ADVANCE_V2" | model ==  "KEI-Linkages_2.0"| model =="COPPE-MSB_v1.3.2"))      
-ADV_CO2_WORLD.DIAG_C80_gr5    <- worldADV(ADV_CO2.DIAG_C80_gr5) %>% filter(!(model == "POLES ADVANCE" | model == "POLES_ADVANCE_V2" | model ==  "KEI-Linkages_2.0"| model =="COPPE-MSB_v1.3.2"))      
+ADVANCE_CO2_WORLD$DIAG_Base       <- worldADV(ADV_CO2.DIAG_Base) %>% filter(!(model == "POLES ADVANCE" | model == "POLES_ADVANCE_V2" | model ==  "KEI-Linkages_2.0" | model =="COPPE-MSB_v1.3.2"))      
+ADVANCE_CO2_WORLD$DIAG_C30_const  <- worldADV(ADV_CO2.DIAG_C30_const) %>% filter(!(model == "POLES ADVANCE" | model == "POLES_ADVANCE_V2" | model ==  "KEI-Linkages_2.0" | model =="COPPE-MSB_v1.3.2"))      
+ADVANCE_CO2_WORLD$DIAG_C80_const  <- worldADV(ADV_CO2.DIAG_C80_const) %>% filter(!(model == "POLES ADVANCE" | model == "POLES_ADVANCE_V2" | model ==  "KEI-Linkages_2.0"| model =="COPPE-MSB_v1.3.2"))      
+ADVANCE_CO2_WORLD$DIAG_C30_gr5    <- worldADV(ADV_CO2.DIAG_C30_gr5) %>% filter(!(model == "POLES ADVANCE" | model == "POLES_ADVANCE_V2" | model ==  "KEI-Linkages_2.0"| model =="COPPE-MSB_v1.3.2"))      
+ADVANCE_CO2_WORLD$DIAG_C80_gr5    <- worldADV(ADV_CO2.DIAG_C80_gr5) %>% filter(!(model == "POLES ADVANCE" | model == "POLES_ADVANCE_V2" | model ==  "KEI-Linkages_2.0"| model =="COPPE-MSB_v1.3.2"))      
 
 
 

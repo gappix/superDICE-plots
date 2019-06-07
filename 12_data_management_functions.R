@@ -6,7 +6,7 @@
 
 source("10_data_basic_functions.R")
 
-
+library("dplyr")
 
 
 ## GENERAL FUNCTIONS -------------------------------------------
@@ -23,8 +23,8 @@ getVariable_GENERAL_nty <- function(variable_name,
     make_t_integer() %>%
     make_year_integer() %>%
     sanitizeISO3() %>%
-    filter(year >= year_start) %>%
-    filter(year <= year_limit)
+    dplyr::filter(year >= year_start) %>%
+    dplyr::filter(year <= year_limit)
   
 }
 
@@ -45,12 +45,12 @@ getVariable_GENERAL_ty <- function(variable_name,
                                    year_start = 0,
                                    year_limit=2300){
   
-  my_gdx[as.character(variable_name)] %>%    
+  gdx_file[as.character(variable_name)] %>%    
     mutate(year = t_to_y(as.integer(t)) ) %>% 
     make_t_integer() %>%
     make_year_integer() %>%
-    filter(year >= year_start) %>%
-    filter(year <= year_limit)
+    dplyr::filter(year >= year_start) %>%
+    dplyr::filter(year <= year_limit)
 
 }
 
@@ -74,7 +74,7 @@ getVariable_CUMLn_y <- function(variable_name,
                           year_limit)%>%
     group_by(year, t)                %>%
     summarise(value = sum(value))    %>%
-    select(t, year, value)
+    dplyr::select(t, year, value)
   
 }
 
@@ -93,7 +93,7 @@ getVariable_CUML5y_n <- function(variable_name,
                          cumlyear_max) %>%
     group_by(n)                        %>%
     summarise(value = sum(value*5))    %>%  # multiplied because is the 
-    select(n, value)
+    dplyr::select(n, value)
   
 }
 
@@ -113,7 +113,7 @@ getVariable_CUMLy_n <- function(variable_name,
                           cumlyear_max) %>%
     group_by(n)                         %>%
     summarise(value = sum(value))       %>%
-    select(n, value)
+    dplyr::select(n, value)
   
 }
 

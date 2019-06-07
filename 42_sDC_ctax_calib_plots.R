@@ -1,5 +1,97 @@
 
 
+source("30_sDC_experiments_central_storage.R")
+source("05_colors_settings.R")
+
+require_package("cowplot")
+
+
+my_scenario = IEWexp$kaliBASALT$enerdata56$ssp2$noncoop$clWITCHco2$damOFF$polCTAX_DIAG_C30_const
+
+
+
+###  SINGLE VARIABLE PLOT    #####
+
+plottigat= ggplot() + 
+  
+  
+  
+  geom_line(data= my_scenario$get_Variable_nty("MIU"),
+            aes(x=year, y=value, group=n, color =n),
+            size = 1.7) + 
+  
+  
+  
+  
+  # graphic details
+  scale_color_manual(values= my_colors ) +
+  guides(color=guide_legend(ncol=3), fill=guide_legend(ncol=3)) +
+  
+  labs(color='enerdata56 Regions')+
+  ggtitle("Emissions Stacked in BAU noncoop - ssp2 - r5 regionalization") + 
+  xlab("Year") +
+  ylab("Costs [trill USD]")  ; plottigat
+
+
+# ...if you need to readjust colors.....
+my_colors = sample(my_colors)
+
+
+
+a <- plottigat
+
+b<- plottigat
+
+####
+
+
+# Create the three different plots
+flow_timeseries <- ggplot(yahara_daily_wq, aes(x=Date, y=Flow)) + 
+  geom_point() + theme_bw()
+
+yahara_daily_wq_long <- gather(yahara_daily_wq, Nutrient, Nutrient_va, TSS, InorganicN)
+nutrient_boxplot <- ggplot(yahara_daily_wq_long, aes(x=Nutrient, y=Nutrient_va)) +
+  geom_boxplot() + theme_bw()
+
+tss_flow_plot <- ggplot(yahara_daily_wq, aes(x=Flow, y=TSS)) + 
+  geom_point() + theme_bw()
+
+# Create Flow timeseries plot that spans the grid by making one plot_grid
+#   and then nest it inside of a second. Also, include a title at the top 
+#   for the whole figure. 
+title <- ggdraw() + draw_label("Conditions for site 05430175", fontface='bold')
+bottom_row <- plot_grid(a, b, ncol = 2, labels = "AUTO")
+plot_grid(title, bottom_row, b, nrow = 3, labels = c("", "", "C"),
+          rel_heights = c(0.2, 1, 1))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-
+require_package("wesanderson")
 
 define.legend <- function(chunks = 100,...){
   x <- c(...)
@@ -19,7 +19,7 @@ define.legend <- function(chunks = 100,...){
 
 
 
-diverge.color <- function(data,
+map.diverge.color <- function(data,
                           pal_choice="RdGy",
                           centeredOn=0, 
                           reverse = FALSE, 
@@ -48,6 +48,22 @@ diverge.color <- function(data,
 
 
 
+map.normal.color <- function(data,
+                             pal_choice = "OrRd",
+                             my_ramps = 9,
+                             reverse = FALSE, 
+                             my_style = "jenks"){
+  
+  
+  rc1  <-  brewer.pal(my_ramps, pal_choice)
+  if (reverse){ rc1 =  rev(rc1)}
+  cuts <- classIntervals( data,style = my_style, n=my_ramps)
+
+
+return(list(cuts,rc1))
+ 
+  
+}
 
 
 
