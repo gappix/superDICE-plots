@@ -121,6 +121,17 @@ getVariable_CUMLy_n <- function(variable_name,
 ## SPECIFIC FUNCTIONS -------------------------------------------
 
 
+aggregate_nty_sum_ty <- function(DF_nty){
+  
+  
+  DF_ty =  DF_nty      %>%     
+    group_by(t,year)        %>%
+    summarise(value = sum(value))   %>% 
+    dplyr::select(t,year, value)
+  
+  return(DF_ty)
+  
+}
 
 
 

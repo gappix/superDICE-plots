@@ -87,8 +87,8 @@ ADVANCE_CO2_WORLD$DIAG_C80_gr5    <- worldADV(ADV_CO2.DIAG_C80_gr5) %>% filter(!
 
 
 
-extractBrazil <- function(ADVANCEdf){  ADVANCEdf %>% filter(region == "BRA" | region =="Brazil") }
-extractUSA    <- function(ADVANCEdf){  ADVANCEdf %>% filter(region == "USA") }
-extractChina  <- function(ADVANCEdf){  ADVANCEdf %>% filter(region == "CHN" | region =="china") }
-extractIndia  <- function(ADVANCEdf){  ADVANCEdf %>% filter(region == "IND" | region =="india") }
-extractRussia <- function(ADVANCEdf){  ADVANCEdf %>% filter(region == "RUS" | region =="russia") }
+# extractBrazil <- function(ADVANCEdf){  ADVANCEdf %>% filter(region == "BRA" | region =="Brazil") }
+# extractUSA    <- function(ADVANCEdf){  ADVANCEdf %>% filter(region == "USA") }
+# extractChina  <- function(ADVANCEdf){  ADVANCEdf %>% filter(region == "CHN" | region =="china") }
+# extractIndia  <- function(ADVANCEdf){  ADVANCEdf %>% filter(region == "IND" | region =="india") }
+# extractRussia <- function(ADVANCEdf){  ADVANCEdf %>% filter(region == "RUS" | region =="russia") }

@@ -151,6 +151,38 @@ SuperDICE <- function(gdx_file_with_path){
     }
     
     
+    # NEW GETTERS     -----------------------------------------------------
+    #///////////////////////////////////////////////////////////////////////////////////////
+    
+    my_VAR_nty  <- function(variable_name, ext2300 = FALSE){ 
+      
+      getVariable_GENERAL_nty( variable_name,
+                               gdx_file   = my_gdx,
+                               year_limit = default_time_horizon )#TODO check this
+    }
+    
+    
+    my_PAR_nty  <- function(parameter_name, ext2300 = FALSE){ 
+      
+      getVariable_GENERAL_nty( parameter_name,
+                               gdx_file   = my_gdx,
+                               year_limit = default_time_horizon )#TODO check this
+    }
+    
+    
+    
+    my_WORLDagg_VARnty_ty  <- function(variable_name, ext2300 = FALSE){
+      
+      
+      VAR_nty =  my_VAR_nty(variable_name, ext2300)
+      VAR_ty  =  aggregate_nty_sum_ty(VAR_nty)
+      
+      return(VAR_ty)
+      
+    }
+    
+    
+    
     # SPECIFIC GETTERS :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     
     my_TATM_ty              =  my_getVariable_ty("TATM")
@@ -330,6 +362,12 @@ SuperDICE <- function(gdx_file_with_path){
       #... with the environment
       thisEnv = thisEnv,
       
+      
+      # NEW PROGRESS EXPOSITION
+      get_WORLDagg_VARnty_ty           =  my_WORLDagg_VARnty_ty,
+      #get_base_VAR_nty
+      
+      # OLD 
       get_gdx                       = my_getgdx,
       
       #getters
