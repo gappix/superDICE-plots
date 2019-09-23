@@ -126,7 +126,7 @@ tide_new_experiment_as_table_nty = function(experiment,
   
   
   #TEST#
-  experiment = exp_data_and_info
+  #experiment = exp_data_and_info
   
   
   #create new table

@@ -1,3 +1,7 @@
+
+path_hist = "C:/Users/GaPPi/Documents/PhD Projects/sunRICE/sunRICE-development/sDCdata_enerdata56_t58/"
+
+
 ##### SIGMA DATA               ------------------------------------------------
 sigma_fut_gdx        = gdx(paste0(dir_sR_data,"sigma_fut.gdx"))
 sigma_hist_gdx       = gdx(paste0(dir_sR_data,"sigma_hist.gdx"))

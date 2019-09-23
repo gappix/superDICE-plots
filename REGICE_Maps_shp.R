@@ -52,7 +52,7 @@ ggplot() +
                        ,labels=c(-0.4,-0.2,0,0.2,0.4)
                        ,limits=c(min(c(min_data, -max_data)),max(max_data, abs(min_data))) #symmetric scale (0 in the middle)
   ) +
-  labs (fill = "Damages in 2100 [%GDP]") + 
+  labs (fill = "Damages [%GDP] \nin 2100 ") + 
   ggtitle("Scenario coop Negishi - Burke SR")
 
 

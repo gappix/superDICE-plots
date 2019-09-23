@@ -1,2 +1,2 @@
 "experiment_tag";"ssp";"regional_aggregation";"calibration_id";"cooperation";"climate_module";"damage_module";"saving_rate";"policy";"dk";"elasmu";"prstp";"exp_id"
-"expSIMtest";"ssp2";"enerdata56";"kaliPUMICE";"noncoop";"clWITCHco2";"damBURKESR";"SRfix";"polBAU_xxBurkeEsteem_iso3_omega2";0,1;1,45;0,015;"expSIMtest_enerdata56_ssp2_noncoop_clWITCHco2_damBURKESR_SRfix_polBAU_xxBurkeEsteem_iso3_omega2"
+"expBURKEtest";"ssp2";"enerdata56";"kaliPUMICE";"coopngsw";"clWITCHco2";"damBURKESR";"SRfix";"polCBA_xxBurke_iso3";0,1;1,45;0,015;"expBURKEtest_enerdata56_ssp2_coopngsw_clWITCHco2_damBURKESR_SRfix_polCBA_xxBurke_iso3"

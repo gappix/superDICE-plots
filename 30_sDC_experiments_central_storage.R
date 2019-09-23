@@ -1,7 +1,7 @@
 source("00_environment_setting.R")
 source("23_sDC_new_experiments_import.R")
-source("24_sDC_latest_experiment_import.R")
-
+source("24_sDC_specific_experiment_import.R")
+source("25_sDC_latest_experiment_import.R")
 
 
 
@@ -64,6 +64,44 @@ experiments_load_as_table_ty = function(experiment_id, save_import_time = FALSE)
   return(exp_table)
   
 }
+
+
+
+## SPECIFIC EXPERIMENT  ----------------------------------------------------------------------
+#///////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+central.specific_experiment.load_as_table <- function(gdx_with_path){
+  
+  return(import_specific_result_as_table(gdx_with_path))
+}
+
+
+
+central.specific_experiment.load_as_table_nty<- function(gdx_with_path){
+  
+  return(import_specific_result_as_table_nty(gdx_with_path)) 
+}
+
+
+
+central.specific_experiment.load_as_table_ty<- function(gdx_with_path){
+  
+  return(import_specific_result_as_table_ty(gdx_with_path))
+}
+
+
+
+central.specific_experiment.load_as_table_pars<- function(gdx_with_path){
+  
+  return(import_specific_result_as_table_pars(gdx_with_path))
+}
+
+
+
+
+
 
 
 

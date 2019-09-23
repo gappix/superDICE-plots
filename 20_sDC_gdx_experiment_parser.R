@@ -41,7 +41,7 @@ parse_experiment <- function(gdx_name_with_full_path){
   experiment$cooperation     = exp_infos[grep( regex(regex_for_coop),    exp_infos )]
   experiment$climateMod      = exp_infos[grep( regex("^cl\\w+"),         exp_infos )]
   experiment$damageFunction  = exp_infos[grep( regex("^dam\\w+"),        exp_infos )]
-  experiment$savingRate      = exp_infos[grep( regex("^SR\\w+"),         exp_infos )]
+  experiment$savingRate      = exp_infos[grep( regex("^sav\\w+"),         exp_infos )]
   experiment$policy          = exp_infos[grep( regex("^pol\\w+"),        exp_infos )]
   
   #data extracted in SuperDICE S3 class

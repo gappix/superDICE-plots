@@ -1,4 +1,6 @@
 source("30_sDC_experiments_central_storage.R")
+library(conflicted)
+conflict_prefer("filter", "dplyr")
 
 
 
@@ -132,6 +134,37 @@ n_iso3_regid_table =rbind(n_iso3_regid_table, new_table)
 write.csv(n_iso3_regid_table, paste0(output_dir,"//","n_iso3_regid_bridge.csv"), row.names = FALSE)
 
 
+
+
+
+
+
+
+require_package("ggplot2")
+require_package("ggspatial")
+require_package("ggrepel")
+require_package("raster")
+require_package("sf")
+
+
+
+##  IMPORT REGIONS SHP        -------------------------------------------------------------------------------------------------
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+ed57shp   <- st_read("qgis/shape_outfile/geo_ene57/geo_ene57.shp")        %>% rename(n= REG_NAME) %>% mutate(region_key = paste0("enerdata56_",n))
+ed35shp   <- st_read("qgis/shape_outfile/geo_ene35/geo_ene35.shp")        %>% rename(n= REG_NAME) %>% mutate(region_key = paste0("enerdata35_",n))
+wt17shp   <- st_read("qgis/shape_outfile/geo_witch17/geo_witch17.shp")    %>% rename(n= REG_NAME) %>%  mutate(n = tolower(n)) %>% mutate(region_key = paste0("witch17_",n))
+r5shp     <- st_read("qgis/shape_outfile/geo_r5/geo_r5.shp")              %>% rename(n= REG_NAME) %>%  mutate(n = tolower(n)) %>% mutate(region_key = paste0("r5_",n))
+global1shp <- st_read("qgis/shape_outfile/geo_global1/geo_global1.shp")   %>% rename(n= REG_NAME) %>% mutate(region_key = paste0("global_",n))
+
+
+shp_data = rbind(ed57shp,ed35shp,wt17shp,r5shp,global1shp)
+
+#......................................
+
+write.csv2(shp_data, paste0(output_dir,"//","n_geopoints_bridge.csv"), row.names = FALSE)
 
 
 
