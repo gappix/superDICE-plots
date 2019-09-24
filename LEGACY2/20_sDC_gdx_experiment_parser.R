@@ -29,7 +29,8 @@ parse_experiment <- function(gdx_name_with_full_path){
   exp_infos = str_split(gdx_filename_noext, "__")[[1]]
   
   # regex for complex parsing elements
-  regex_for_regions = "^enerdata..|witch..|^r5$|^storcap\\w+\\d+|^global$"
+  # remember: "^" is starting, "$" is ending, "." means exact one charachter
+  regex_for_regions = "^enerdata..|^ed..|^witch..|^r5$|^storcap\\w+\\d+|^global$"
   regex_for_coop    = "^coop$|^noncoop$|^coop\\w+"
   
   #info parsing 

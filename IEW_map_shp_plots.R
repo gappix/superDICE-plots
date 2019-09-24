@@ -5,21 +5,21 @@ require_package("ggrepel")
 require_package("raster")
 require_package("sf")
 
-ed56 <- st_read("../qgis/geo_ene56/geo_ene56.shp") %>% rename(n= REG_NAME)
+
+# Get the Enerdata56 shape
+ed57_shp <- st_read("qgis/shape_outfile/geo_ene57/geo_ene57.shp") %>% rename(n= REG_NAME)
 
 pal <- rev(RColorBrewer::brewer.pal(9, "RdBu"))
 
 
-
-
-my_Scen = IEWexp$kaliBASALT$enerdata56$ssp2$coop$clWITCHco2$damBURKEbase$polCBA$get_Variable_nty("DAMFRAC") %>% filter(year == 2200)
+my_Scen = PAPexp$kaliJOJO$OPT$ed57$ssp2$coop$clWITCHco2$damBURKEnSR$savFXconv$polCBA$get_Variable_nty("DAMFRAC") %>% filter(year == 2200)
 
 
 
 
 
 
-daaaai = merge(ed56, my_Scen, by = c("n") )
+daaaai = merge(ed57_shp, my_Scen, by = c("n") )
 
 
 
