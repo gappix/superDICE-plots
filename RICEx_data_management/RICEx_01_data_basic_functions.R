@@ -59,6 +59,27 @@ sanitizeISO3 = function(df){
   
 }
 
+
+
+## FUNCTION
+# to aggregate nty dataframes into world ty ones
+
+WORLDaggr_ntyTOty <- function(DF_nty){
+  
+  
+  DF_ty =  DF_nty    %>%
+    group_by(t,year) %>%
+    summarise(value = sum(value))   %>% 
+    dplyr::select(t,year, value)    %>%
+    as.data.frame()
+  
+  return(DF_ty)
+  
+}
+
+
+
+
 # FUNCTION
 # to build artificially constrints point for sigma 
 get_sigma_constraints = function(constraint=""){

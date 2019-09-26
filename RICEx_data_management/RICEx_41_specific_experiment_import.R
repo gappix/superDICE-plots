@@ -3,10 +3,9 @@
 
 # Dependencies 
 source("RICEx_utils/RICEx_01_output_crayon_colouring.R")
-source("RICEx_data/RICEx_30_gdx_experiment_parser.R") 
-source("RICEx_data/RICEx_31_new_results_detector.R") 
-source("RICEx_data/RICEx_32_results_structure_builder.R")
-
+source("RICEx_data_management/RICEx_30_gdx_experiment_parser.R") 
+source("RICEx_data_management/RICEx_31_new_results_detector.R") 
+source("RICEx_data_management/RICEx_32_results_structure_builder.R")
 
 
 
@@ -16,24 +15,24 @@ source("RICEx_data/RICEx_32_results_structure_builder.R")
 ## IMPORT AS LIST  -----------------------------------------------------------------------
 #//////////////////////////////////////////////////////////////////////////////////////////
 
-import_latest_result_as_list <- function(){
+
+import_specific_result_as_list <- function(gdx_with_path){
+
   
   my_experiment = list()
   
-  
-  # Step1: find latest result
-  gdx_with_path  =  find_latest_gdx()
 
+  
   if (length(gdx_with_path) > 0){ 
     
     cat(green("Parsing: ", gdx_with_path ," \n"))
-      
-    # 2a: parse gdx data and experiment info automatically
+    
+    # 1: parse gdx data and experiment info automatically
     exp_data_and_info =  parse_experiment(gdx_path_element)
-      
-    # 2b: tide infos and data in nested list structure
+    
+    # 2: tide infos and data in nested list structure
     my_experiment    =  tide_new_experiment_as_list(exp_data_and_info, my_experiment)
-
+    
   }
   
   
@@ -51,21 +50,16 @@ import_latest_result_as_list <- function(){
 ## IMPORT AS TABLE  -----------------------------------------------------------------------
 #//////////////////////////////////////////////////////////////////////////////////////////
 
-import_latest_result_as_table <- function(){
-  
-  
-  
-  # Step1: find latest result
-  gdx_with_path  =  find_latest_gdx()
-  
+import_specific_result_as_table  <- function(gdx_with_path){
+
   if (length(gdx_with_path) > 0){ 
     
     cat(green("Parsing: ", gdx_with_path ," \n"))
     
-    # 2a: parse gdx data and experiment info automatically
+    # 1: parse gdx data and experiment info automatically
     exp_data_and_info =  parse_experiment(gdx_with_path)
-      
-    # 2b: tide infos and data in a well-built table
+    
+    # 2: tide infos and data in a well-built table
     experiments_newtable    =  tide_new_experiment_as_table(exp_data_and_info)
     
   }
@@ -83,21 +77,17 @@ import_latest_result_as_table <- function(){
 #////////////////////////////////////////////////////////////////////////////////////////
 
 
+import_specific_result_as_table_nty <- function(gdx_with_path){
 
-import_latest_result_as_table_nty <- function(){
-  
-  
-  # Step1: find latest result
-  gdx_with_path  =  find_latest_gdx()
   
   if (length(gdx_with_path) > 0){ 
     
     cat(green("Parsing: ", gdx_with_path ," \n"))
     
-    # 2a: parse gdx data and experiment info automatically
+    # 1: parse gdx data and experiment info automatically
     exp_data_and_info =  parse_experiment(gdx_with_path)
     
-    # 2b: tide infos and data in a well-built table
+    # 2: tide infos and data in a well-built table
     experiments_newtable    =  tide_new_experiment_as_table_nty(exp_data_and_info)
     
   }
@@ -115,22 +105,19 @@ import_latest_result_as_table_nty <- function(){
 # IMPORT AS TABLE < ty >  ----------------------------------------------------------------------
 #///////////////////////////////////////////////////////////////////////////////////////////////
 
+import_specific_result_as_table_ty <- function(gdx_with_path){
 
 
-import_latest_result_as_table_ty <- function(){
   
-  
-  # Step1: find latest result
-  gdx_with_path  =  find_latest_gdx()
   
   if (length(gdx_with_path) > 0){ 
     
     cat(green("Parsing: ", gdx_with_path ," \n"))
     
-    # 2a: parse gdx data and experiment info automatically
+    # 1: parse gdx data and experiment info automatically
     exp_data_and_info =  parse_experiment(gdx_with_path)
     
-    # 2b: tide infos and data in a well-built table
+    # 2: tide infos and data in a well-built table
     experiments_newtable    =  tide_new_experiment_as_table_ty(exp_data_and_info)
     
   }
@@ -141,25 +128,24 @@ import_latest_result_as_table_ty <- function(){
 
 
 
-# IMPORT AS TABLE < ty >  ----------------------------------------------------------------------
+# IMPORT AS TABLE < pars >  ----------------------------------------------------------------------
 #///////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
-import_latest_result_as_table_pars <- function(){
+import_specific_result_as_table_pars <- function(gdx_with_path){
   
   
-  # Step1: find latest result
-  gdx_with_path  =  find_latest_gdx()
+
   
   if (length(gdx_with_path) > 0){ 
     
     cat(green("Parsing: ", gdx_with_path ," \n"))
     
-    # 2a: parse gdx data and experiment info automatically
+    # 1: parse gdx data and experiment info automatically
     exp_data_and_info =  parse_experiment(gdx_with_path)
     
-    # 2b: tide infos and data in a well-built table
+    # 2: tide infos and data in a well-built table
     experiments_newtable    =  tide_new_experiment_as_table_pars(exp_data_and_info)
     
   }

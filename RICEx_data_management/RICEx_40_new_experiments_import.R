@@ -1,9 +1,9 @@
 # IMPORT NEW RESULTS
 
 # Dependencies 
-source("RICEx_data/RICEx_30_gdx_experiment_parser.R") 
-source("RICEx_data/RICEx_31_new_results_detector.R") 
-source("RICEx_data/RICEx_32_results_structure_builder.R")
+source("RICEx_data_management/RICEx_30_gdx_experiment_parser.R") 
+source("RICEx_data_management/RICEx_31_new_results_detector.R") 
+source("RICEx_data_management/RICEx_32_results_structure_builder.R")
 
 
 

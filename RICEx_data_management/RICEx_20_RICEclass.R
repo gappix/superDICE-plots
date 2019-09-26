@@ -3,9 +3,9 @@
 
 # Dependencies 
 source("RICEx_utils/RICEx_00_package_retriever.R")
-source("RICEx_data/RICEx_00_global_settings.R")
-source("RICEx_data/RICEx_01_data_basic_functions.R")
-source("RICEx_data/RICEx_10_data_management_functions.R")
+source("RICEx_data_management/RICEx_00_global_settings.R")
+source("RICEx_data_management/RICEx_01_data_basic_functions.R")
+source("RICEx_data_management/RICEx_10_data_management_functions.R")
 
 require_package("data.table")
 require_package("dplyr")
@@ -49,96 +49,165 @@ RICEx <- function(gdx_file_with_path){
   my_gdx   <- gdx(gdx_file_with_path) 
   
 
-    ## GENERAL PURPOSE GETTERS -----------------------
+  ## -------------:  GENERAL PURPOSE GETTERS  :-----------------------
 
-  
-  
-    my_getVariable_nty  <- function(variable_name){ 
-    
-    	getVariable_GENERAL_nty(	variable_name,
-                								gdx_file   = my_gdx,
-                								year_limit = RICEx_default_time_horizon )
-  }
 
-  
-   my_getVariable_iso3ty <- function(variable_name){ 
-    
-    my_getVariable_GENERAL_iso3ty(	variable_name, year_limit = RICEx_default_time_horizon )
-  }
-  
-  ##
   my_getParameter  <- function(parameter_name){ 
     
-    getParameter(parameter_name,
-                 gdx_file   = my_gdx)
+    getGDX_Parameter( parameter_name, 
+                      gdx_file   = my_gdx)
+  }
+
+
+  my_getVariable  <- function(variable_name){ 
+    
+    getGDX_Variable( variable_name, 
+                     gdx_file   = my_gdx)
+  }
+
+
+  my_getVariable_nty  <- function(  variable_name, 
+                                    year_start = 0,
+                                    year_limit = RICEx_default_time_horizon
+                                  ){ 
+    
+    getGDX_Variable_nty(	variable_name,
+                          year_start,
+                          year_limit, 
+                          gdx_file   = my_gdx
+                        )
+  }
+
+  my_getVariable_ty  <- function(   variable_name, 
+                                    year_start = 0,
+                                    year_limit = RICEx_default_time_horizon
+                                  ){ 
+    
+    getGDX_Variable_ty(	variable_name,
+                        year_start,
+                        year_limit, 
+                        gdx_file   = my_gdx
+                      )
+  }
+
+
+  my_getParameter_nty  <- function( parameter_name, 
+                                    year_start = 0,
+                                    year_limit = RICEx_default_time_horizon
+                                  ){ 
+    
+    getGDX_Parameter_nty(	parameter_name = parameter_name,
+                          year_start,
+                          year_limit, 
+                          gdx_file   = my_gdx
+                        )
+  }
+
+  my_getParameter_ty  <- function(  parameter_name, 
+                                    year_start = 0,
+                                    year_limit = RICEx_default_time_horizon
+                                  ){ 
+    
+    getGDX_Parameter_ty(	parameter_name = parameter_name,
+                          year_start,
+                          year_limit, 
+                          gdx_file   = my_gdx
+                        )
   }
   
-  ##
-  my_getgdx   <- function(){return(my_gdx)}
+  my_getGDX   <-   function(){  return(my_gdx)   }
 
-  ##
-    my_getVariable_GENERAL_nty  <- function(variable_name, 
-                                          	year_start = 0,
-                                          	year_limit = 2300 ){ 
-      
-      	getVariable_GENERAL_nty(  variable_name,
-                  								gdx_file   = my_gdx,
-                  								year_start,
-                  								year_limit )
-    }
+
+
+  ## -------------:  AGGREGATING FUNCTIONS :-----------------------
+
+
+  my_PAR_WORLDagg_ntyTOty  <- function( parameter_name, 
+                                        year_start = 0,
+                                        year_limit = RICEx_default_time_horizon){
     
-    ##
-    my_getVariable_GENERAL_iso3ty    <- function(variable_name, 
-                                                 year_start = 0,
-                                                 year_limit = 2300 ){
+    #to10
+    PAR_nty =  my_getParameter_nty(parameter_name, year_start,year_limit)
+    PAR_ty  =  WORLDaggr_ntyTOty(PAR_nty)
+    
+    return(PAR_ty)
+    
+  }
+
+   my_VAR_WORLDagg_ntyTOty  <- function(  variable_name, 
+                                          year_start = 0,
+                                          year_limit = RICEx_default_time_horizon){
+    
+     #to10
+    VAR_nty =  my_getParameter_nty(variable_name, year_start,year_limit)
+    VAR_ty  =  WORLDaggr_ntyTOty(VAR_nty)
+    
+    return(VAR_ty)
+    
+  }
+
+
+    
+  my_VAR_CUML5y_n <- function(variable_name,
+                              year_start = 0,
+                              year_limit = RICEx_default_time_horizon){
       
-      d_n = my_getVariable_GENERAL_nty(variable_name, year_start,year_limit)
+      getGDX_Variable_CUML5y_n( variable_name,
+                            gdx_file = my_gdx,
+                            year_start,
+                            year_limit)
+    }
+  ## -------------:  DISAGGREGATING FUNCTIONS :-----------------------
+
+
+
+  my_VAR_dsagg_ntyTOiso3ty <- function(   variable_name, 
+                                          year_start = 0,
+                                          year_limit = 2200 ){
+      #to10
+      d_n = my_getVariable_nty(variable_name, year_start,year_limit)
       map_n_iso3 = my_getParameter("map_n_iso3")
       iso3_variable = merge(map_n_iso3,d_n,by=c("n")) %>% sanitizeISO3()
       return(iso3_variable)
-    }
-    
-
-    my_getVariable_ty <- function(variable_name){ 
-    
-    getVariable_GENERAL_ty(	variable_name,
-                             gdx_file   = my_gdx,
-                             year_limit = RICEx_default_time_horizon )
   }
+
+
+
+  my_PAR_dsagg_ntyTOiso3ty <- function(   parameter_name, 
+                                          year_start = 0,
+                                          year_limit = 2200 ){
+      #to10
+      d_n = my_getParameter_nty(parameter_name, year_start,year_limit)
+      map_n_iso3 = my_getParameter("map_n_iso3")
+      iso3_parameter = merge(map_n_iso3,d_n,by=c("n")) %>% sanitizeISO3()
+      return(iso3_parameter)
+  }  
+
+      
+  ## -------------:  SPECIFIC VALUES GETTERS  :-----------------------
+
+  my_TATM_ty             =  my_getVariable_ty("TATM")
+
+  my_EMI_nty             =  my_getVariable_nty("E")
+  my_EIND_nty            =  my_getVariable_nty("EIND")
+  my_MIU_nty             =  my_getVariable_nty("MIU")
+  my_DAMAGES_nty         =  my_getVariable_nty("DAMAGES")
+
+  my_worldEMItot_ty      =  my_VAR_WORLDagg_ntyTOty("E")
+  my_worldEMIffi_ty      =  my_VAR_WORLDagg_ntyTOty("EIND")
+    
   
 
-  
-    my_getVariable_GENERAL_ty  <- function(variable_name, 
-                                         year_start = 0,
-                                         year_limit = 2300 ){ 
-    
-    getVariable_GENERAL_ty(  variable_name,
-                              gdx_file   = my_gdx,
-                              year_start,
-                              year_limit )
-  }
-  
-  
-    my_getVariable_CUMLn_y  <- function(variable_name, 
-                                        year_start = 0,
-                                        year_limit = 2300 ){ 
-      
-      getVariable_CUMLn_y(  variable_name,
-                            gdx_file   = my_gdx,
-                            year_start,
-                            year_limit )
-    }
+
     
     
-    my_getVariable_CUML5y_n <- function(variable_name,
-                                         cumlyear_min = 0,
-                                         cumlyear_max=2300){
-      
-      getVariable_CUML5y_n( variable_name,
-                            gdx_file = my_gdx,
-                            cumlyear_min,
-                            cumlyear_max)
-    }
+    ## ----------------------:  LEGACY  :-------------------------------
+
+  
+
+
+  
+
     
     
     
@@ -153,54 +222,16 @@ RICEx <- function(gdx_file_with_path){
     }
     
     
-    # NEW GETTERS     -----------------------------------------------------
-    #///////////////////////////////////////////////////////////////////////////////////////
-    
-    my_VAR_nty  <- function(variable_name, ext2300 = FALSE){ 
-      
-      getVariable_GENERAL_nty( variable_name,
-                               gdx_file   = my_gdx,
-                               year_limit = RICEx_default_time_horizon )#TODO check this
-    }
-    
-    
-    my_PAR_nty  <- function(parameter_name, ext2300 = FALSE){ 
-      
-      getVariable_GENERAL_nty( parameter_name,
-                               gdx_file   = my_gdx,
-                               year_limit = RICEx_default_time_horizon )#TODO check this
-    }
+
     
     
     
-    my_WORLDagg_VARnty_ty  <- function(variable_name, ext2300 = FALSE){
-      
-      
-      VAR_nty =  my_VAR_nty(variable_name, ext2300)
-      VAR_ty  =  aggregate_nty_sum_ty(VAR_nty)
-      
-      return(VAR_ty)
-      
-    }
-    
-    
+
     
     # SPECIFIC GETTERS :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     
-    my_TATM_ty              =  my_getVariable_ty("TATM")
-    
-    my_Emissions_nty       =  my_getVariable_nty("E")
 
-    my_MIU_nty             =  my_getVariable_nty("MIU")
 
-    my_DAMAGES_nty         =  my_getVariable_nty("DAMAGES")
-    
-    
-    my_WORLD_EmissionsTOT_ty   = my_getVariable_CUMLn_y(variable_name = "E")
-    
-    my_WORLD_EmissionsFFI_ty   = my_getVariable_CUMLn_y(variable_name = "EIND")
-    
-    
     # Evaluates total emissioni [GtCO2] per each region
     # from start_year to end_year 
     # multiplying 5 times each timestamp value
@@ -364,65 +395,57 @@ RICEx <- function(gdx_file_with_path){
       #... with the environment
       thisEnv = thisEnv,
       
+
+      # exposed specific values
       
-      # NEW PROGRESS EXPOSITION
-      get_WORLDagg_VARnty_ty           =  my_WORLDagg_VARnty_ty,
-      #get_base_VAR_nty
-      
-      # OLD 
-      get_gdx                       = my_getgdx,
-      
-      #getters
-      get_Parameter                  = my_getParameter,
-      
-      get_Variable_nty               = my_getVariable_nty,
-      get_Variable_GENERAL_nty       = my_getVariable_GENERAL_nty,
-      
-      get_Variable_iso3ty            = my_getVariable_iso3ty,
-      get_Variable_GENERAL_iso3ty    = my_getVariable_GENERAL_iso3ty,
-      
-      get_Variable_ty                = my_getVariable_ty,
-      get_Variable_GENERAL_ty        = my_getVariable_GENERAL_ty,
-      
-      get_Emissions_nty              = my_Emissions_nty,
-      #get_Emissions_GENERAL_nty      = my_Emissions_GENERAL_nty,
-      
-      get_TATM_ty                   = my_TATM_ty,
-      
-      get_WORLD_EmissionsTOT_ty      = my_WORLD_EmissionsTOT_ty,
-      
-      get_WORLD_EmissionsFFI_ty      = my_WORLD_EmissionsFFI_ty,
-      #get_WORLDEmissions_GENERAL_ty  = my_WORLDEmissions_EXTENDED_ty,
-      
-      get_MIU_nty                    = my_MIU_nty,
-      #get_MIU_GENERAL_nty            = myMIU_EXTENDED_nty,
-      
-      get_DAMAGES_nty                = my_DAMAGES_nty,
-      
-      
-      get_CUML5y_Variable_n             = my_getVariable_CUML5y_n,
-      
-      get_CUMLn_Variable_y            = my_getVariable_CUMLn_y,
-      
-      get_CUML_EMISSIONS_abs_n             = my_CUML_EMISSIONS_abs_n,
-      
-      get_CUML_EMISSIONS_perc_n           = my_CUML_EMISSIONS_perc_n,
-      
+      get_TATM_ty                        = my_TATM_ty,
+
+      get_EMI_nty                        = my_EMI_nty,
+      get_EIND_nty                       = my_EIND_nty,
+      get_MIU_nty                        = my_MIU_nty,
+      get_DAMAGES_nty                    = my_DAMAGES_nty,  
+
+      get_worldEMItot_ty                 = my_worldEMItot_ty,
+      get_worldEMIffi_ty                 = my_worldEMIffi_ty,   
+
+
+      # aggregating function #underrevisions
+
+      get_PARAMETER_WORLDagg_ntyTOty    =  my_PAR_WORLDagg_ntyTOty,
+      get_VARIABLE_WORLDagg_ntyTOty     =  my_VAR_WORLDagg_ntyTOty,
+      get_VARIABLE_CUML5y_n              = my_getVariable_CUML5y_n,    
+         
+      get_CUML_EMISSIONS_abs_n           = my_CUML_EMISSIONS_abs_n,     
+      get_CUML_EMISSIONS_perc_n          = my_CUML_EMISSIONS_perc_n,      
       get_CUML_DAMAGES_abs_n             = my_CUML_DAMAGES_abs_n,
+      get_CUML_DAMAGES_perc_n            = my_CUML_DAMAGES_perc_n,     
+      get_CUML_DAMAGES_abs_iso3          = my_CUML_DAMAGES_abs_iso3,
+      get_CUML_DAMAGES_perc_iso3         = my_CUML_DAMAGES_perc_iso3,
+      get_CUML_ABATECOST_abs_n           = my_CUML_ABATECOST_abs_n,
+      get_CUML_ABATECOST_perc_n          = my_CUML_ABATECOST_perc_n,  
+      get_CUML_ABATECOST_abs_iso3        = my_CUML_ABATECOST_abs_iso3,  
+      get_CUML_ABATECOST_perc_iso3       = my_CUML_ABATECOST_perc_iso3,
 
-      get_CUML_DAMAGES_perc_n             = my_CUML_DAMAGES_perc_n,
-      
-      get_CUML_DAMAGES_abs_iso3           = my_CUML_DAMAGES_abs_iso3,
+      # disaggregating functions
 
-      get_CUML_DAMAGES_perc_iso3           = my_CUML_DAMAGES_perc_iso3,
+      get_VARIABLE_dsagg_ntyTOiso3ty   = my_VAR_dsagg_ntyTOiso3ty,
+      get_PARAMETER_dsagg_ntyTOiso3ty  = my_PAR_dsagg_ntyTOiso3ty,
+
+
+      # exposed general-purpouse functions
+
+      get_PARAMETER_nty                = my_getParameter_nty,
+      get_PARAMETER_ty                 = my_getParameter_ty,
+      get_VARIABLE_nty                 = my_getVariable_nty,
+      get_VARIABLE_ty                  = my_getVariable_ty,
+      get_PARAMETER                    = my_getParameter,
+      get_VARIABLE                     = my_getVariable,
+    
+      get_GDX                          = my_getGDX
       
-      get_CUML_ABATECOST_abs_n             = my_CUML_ABATECOST_abs_n,
+
       
-      get_CUML_ABATECOST_perc_n        = my_CUML_ABATECOST_perc_n,
-      
-      get_CUML_ABATECOST_abs_iso3       = my_CUML_ABATECOST_abs_iso3,
-      
-      get_CUML_ABATECOST_perc_iso3     = my_CUML_ABATECOST_perc_iso3
+
       
     )
   

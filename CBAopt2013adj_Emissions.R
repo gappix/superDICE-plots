@@ -5,11 +5,8 @@ source("RICEx_plots/RICEx_01_export_plots.R")
 
 # Retrieve experiments
 
-PAPexp = list()
-PAPexp = experiments_load_as_list(PAPexp,"PAP")
-
-
-PAPexp$kaliJOJO$OPT$ed57$ssp2$coop$clWITCHco2$damBURKEnSR$savFXfix$polCBA$get_Variable_nty("E")
+MYexp = list()
+MYexp = experiments_load_as_list(MYexp,"CBAopt2013adj")
 
 
 
@@ -23,12 +20,12 @@ PAPexp$kaliJOJO$OPT$ed57$ssp2$coop$clWITCHco2$damBURKEnSR$savFXfix$polCBA$get_Va
 
 tatm_plot <- RICEx.plot.lineplot(
    EXPdata   = list(
-     "BAU"          = PAPexp$kaliJOJO$OPT$ed57$ssp2$coop$clWITCHco2$damOFF$savFXconv$polBAU$get_Variable_ty("TATM"),
-     "Coop Pop"     = PAPexp$kaliJOJO$OPT$ed57$ssp2$coop$clWITCHco2$damBURKEnSR$savFXconv$polCBA$get_Variable_ty("TATM"),
-     "Coop Negishi" = PAPexp$kaliJOJO$OPT$ed57$ssp2$coopngsw$clWITCHco2$damBURKEnSR$savFXconv$polCBA$get_Variable_ty("TATM"),
-     "Non Coop"     = PAPexp$kaliJOJO$OPT$ed57$ssp2$noncoop$clWITCHco2$damBURKEnSR$savFXconv$polCBA$get_Variable_ty("TATM")
+     "BAU"           = MYexp$v0x90$OPT$ed57$ssp2$coop$maccED$clWITCHco2$damOFF$savFXconv$runBAU$get_VARIABLE_ty("TATM")
+     ,"Coop Pop"     = MYexp$v0x90$OPT$ed57$ssp2$coop$maccED$clWITCHco2$damBURKEnSR$savFXconv$runCBA$get_VARIABLE_ty("TATM")
+     ,"Coop Negishi" = MYexp$v0x90$OPT$ed57$ssp2$coopngsw$maccED$clWITCHco2$damBURKEnSR$savFXconv$runCBA$get_VARIABLE_ty("TATM")
+     ,"Non Coop"     = MYexp$v0x90$OPT$ed57$ssp2$noncoop$maccED$clWITCHco2$damBURKEnSR$savFXconv$runCBA$get_VARIABLE_ty("TATM")
    )
-  ,EXPtitle  = "Temperature increase with Burke SR by varying cooperation"
+  ,EXPtitle  = "Temperature increase with Burke SR by varying cooperation (Pback adjusted)"
   ,EXPylabel = "Temperature atmosphere increase [ºC]"
   ,EXPlegend = "Experiments"
 )
@@ -37,12 +34,14 @@ tatm_plot <- RICEx.plot.lineplot(
 
 emi_plot <- RICEx.plot.lineplot(
   EXPdata   = list(
-    "BAU"          = PAPexp$kaliJOJO$OPT$ed57$ssp2$coop$clWITCHco2$damOFF$savFXconv$polBAU$get_Variable_ty("W_EMI")%>% filter(ghg == "co2")
-    ,"Coop Pop"     = PAPexp$kaliJOJO$OPT$ed57$ssp2$coop$clWITCHco2$damBURKEnSR$savFXconv$polCBA$get_Variable_ty("W_EMI")%>% filter(ghg == "co2")
-    ,"Coop Negishi" = PAPexp$kaliJOJO$OPT$ed57$ssp2$coopngsw$clWITCHco2$damBURKEnSR$savFXconv$polCBA$get_Variable_ty("W_EMI")%>% filter(ghg == "co2")
-    ,"Non Coop"     = PAPexp$kaliJOJO$OPT$ed57$ssp2$noncoop$clWITCHco2$damBURKEnSR$savFXconv$polCBA$get_Variable_ty("W_EMI")%>% filter(ghg == "co2")
+ 
+    "BAU"           = MYexp$v0x90$OPT$ed57$ssp2$coop$maccED$clWITCHco2$damOFF$savFXconv$runBAU$get_worldEMItot_ty
+    ,"Coop Popx"     = MYexp$v0x90$OPT$ed57$ssp2$coop$maccED$clWITCHco2$damBURKEnSR$savFXconv$runCBA$get_worldEMItot_ty
+        ,"Coop Pop"     = MYexp$v0x90$OPT$ed57$ssp2$coop$maccED$clWITCHco2$damBURKEnSR$savFXconv$runCBA$get_PARAMETER_ty("world_E")
+    ,"Coop Negishi" = MYexp$v0x90$OPT$ed57$ssp2$coopngsw$maccED$clWITCHco2$damBURKEnSR$savFXconv$runCBA$get_PARAMETER_ty("world_E")
+    ,"Non Coop"     = MYexp$v0x90$OPT$ed57$ssp2$noncoop$maccED$clWITCHco2$damBURKEnSR$savFXconv$runCBA$get_PARAMETER_ty("world_E")
   )
-  ,EXPtitle  = "World emissions with Burke SR by varying cooperation"
+  ,EXPtitle  = "World emissions with Burke SR by varying cooperation (Pback adjusted)"
   ,EXPylabel = "World emissions [GtCO2/year]"
   ,EXPlegend = "Experiments"
 )

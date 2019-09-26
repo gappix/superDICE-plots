@@ -1,7 +1,7 @@
 ## RESULT LIST RETRIEVER
 
 # Dependencies
-source("RICEx_data/RICEx_20_RICEclass.R")
+source("RICEx_data_management/RICEx_20_RICEclass.R")
 
 
 

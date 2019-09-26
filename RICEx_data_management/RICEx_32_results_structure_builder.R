@@ -1,5 +1,5 @@
 
-source("RICEx_data/RICEx_20_RICEclass.R")
+source("RICEx_data_management/RICEx_20_RICEclass.R")
 
 
 
@@ -27,12 +27,13 @@ tide_new_experiment_as_list = function(experiment,original_list){
                                         ssp           = experiment$ssp, 
                                         runtype       = experiment$runtype,
                                         regions       = experiment$regions,        
-                                        kali          = experiment$kali,           
+                                        version       = experiment$version,  
+                                        macc          = experiment$macc,
                                         cooperation   = experiment$cooperation,    
                                         climateModule = experiment$climateMod,     
                                         damageModule  = experiment$damageFunction, 
                                         savingRate    = experiment$savingRate,
-                                        policy        = experiment$policy,         
+                                        runmode        = experiment$runmode,         
                                         RICEx_S3data  = experiment$data    )
   
 }
@@ -64,12 +65,13 @@ tide_new_experiment_as_table = function(experiment,
              ssp                   = experiment$ssp,  
              runtype               = experiment$runtype,
              regional_aggregation  = experiment$regions,        
-             calibration_id        = experiment$kali,           
-             cooperation           = experiment$cooperation,    
+             model_version         = experiment$version,           
+             cooperation           = experiment$cooperation,
+             macc                  = experiment$macc,
              climate_module        = experiment$climateMod,     
              damage_module         = experiment$damageFunction, 
              saving_rate           = experiment$savingRate,
-             policy                = experiment$policy        
+             runmode                = experiment$runmode        
              )
   # initialize n-t-y-dimensions with a null-by merge (MIU is one good choice)
   new_table = merge.data.frame(new_table,
@@ -138,12 +140,13 @@ tide_new_experiment_as_table_nty = function(experiment,
     runtype               = experiment$runtype,
     ssp                   = experiment$ssp,  
     regional_aggregation  = experiment$regions,        
-    calibration_id        = experiment$kali,           
-    cooperation           = experiment$cooperation,    
+    model_version         = experiment$version,           
+    cooperation           = experiment$cooperation, 
+    macc                  = experiment$macc,
     climate_module        = experiment$climateMod,     
     damage_module         = experiment$damageFunction, 
     saving_rate           = experiment$savingRate,
-    policy                = experiment$policy        
+    runmode                = experiment$runmode        
   )
   
   # initialize n-t-y-dimensions with a null-by merge (MIU is one good choice)
@@ -192,12 +195,13 @@ tide_new_experiment_as_table_ty <-  function(experiment,
     runtype               = experiment$runtype,
     ssp                   = experiment$ssp,            
     regional_aggregation  = experiment$regions,        
-    calibration_id        = experiment$kali,           
-    cooperation           = experiment$cooperation,    
+    model_version         = experiment$version,           
+    cooperation           = experiment$cooperation, 
+    macc                  = experiment$macc,
     climate_module        = experiment$climateMod,     
     damage_module         = experiment$damageFunction, 
     saving_rate           = experiment$savingRate,
-    policy                = experiment$policy        
+    runmode               = experiment$runmode        
   )
   # initialize t-y-dimensions with a null-by merge (WORLD_E is one good choice)
   new_table = cbind(new_table, as.data.frame(experiment$data$get_WORLD_EmissionsTOT_ty))  %>% rename(WORLD_E = value)
@@ -251,12 +255,13 @@ tide_new_experiment_as_table_pars <-  function(experiment,
     runtype               = experiment$runtype,
     ssp                   = experiment$ssp, 
     regional_aggregation  = experiment$regions,        
-    calibration_id        = experiment$kali,           
-    cooperation           = experiment$cooperation,    
+    model_version         = experiment$version,           
+    cooperation           = experiment$cooperation, 
+    macc                  = experiment$macc,
     climate_module        = experiment$climateMod,     
     damage_module         = experiment$damageFunction, 
     saving_rate           = experiment$savingRate,
-    policy                = experiment$policy        
+    runmode               = experiment$runmode        
   )
   
   
@@ -302,29 +307,31 @@ tide_new_experiment_as_table_pars <-  function(experiment,
 #///////////////////////////////////////////////////////////////////////////////////////////
 
 add_experiment_to_general_structure = function(original_list,
-                                               kali,
+                                               version,
                                                runtype,
+                                               macc,
                                                regions,
                                                ssp,
                                                cooperation,
                                                climateModule,
                                                damageModule,
                                                savingRate,
-                                               policy,
+                                               runmode,
                                                RICEx_S3data){
   
   
   
   eval(parse(text = paste0('original_list',
-                           '$',kali,
+                           '$',version,
                            '$',runtype,
                            '$',regions,
                            '$',ssp,
                            '$',cooperation,
+                           '$',macc,
                            '$',climateModule,
                            '$',damageModule,
                            '$',savingRate,
-                           '$',policy,
+                           '$',runmode,
                            ' <- RICEx_S3data')))
   
   original_list
