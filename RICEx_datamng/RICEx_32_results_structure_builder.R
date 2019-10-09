@@ -1,5 +1,5 @@
 
-source("RICEx_data_management/RICEx_20_RICEclass.R")
+source("RICEx_datamng/RICEx_20_RICEclass.R")
 
 
 
@@ -319,7 +319,16 @@ add_experiment_to_general_structure = function(original_list,
                                                runmode,
                                                RICEx_S3data){
   
-  
+ if(length( version       ) < 1) { version       = "UNKvers"         }
+ if(length( runtype       ) < 1) { runtype       = "UNKruntype"      }
+ if(length( macc          ) < 1) { macc          = "UNKmacc"         }
+ if(length( regions       ) < 1) { regions       = "UNKregions"      }
+ if(length( ssp           ) < 1) { ssp           = "UNKssp"          }
+ if(length( cooperation   ) < 1) { cooperation   = "UNKcooperation"  }
+ if(length( climateModule ) < 1) { climateModule = "UNKclimateModule"}
+ if(length( damageModule  ) < 1) { damageModule  = "UNKdamageModule" }
+ if(length( savingRate    ) < 1) { savingRate    = "UNKsavingRate"   }
+ if(length( runmode       ) < 1) { runmode       = "UNKrunmode"      }
   
   eval(parse(text = paste0('original_list',
                            '$',version,

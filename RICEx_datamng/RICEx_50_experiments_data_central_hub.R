@@ -3,9 +3,9 @@
 # for further analyisis
 
 # Dependencies 
-source("RICEx_data_management/RICEx_40_new_experiments_import.R")
-source("RICEx_data_management/RICEx_41_specific_experiment_import.R")
-source("RICEx_data_management/RICEx_42_last_experiment_import.R")
+source("RICEx_datamng/RICEx_40_new_experiments_import.R")
+source("RICEx_datamng/RICEx_41_specific_experiment_import.R")
+source("RICEx_datamng/RICEx_42_last_experiment_import.R")
 
 
 

@@ -1,5 +1,5 @@
-source("RICEx_data_management/RICEx_50_experiments_data_central_hub.R")
-source("Other_data_management/ADVANCE_data_management.R")
+source("OTHER_datamng/ADVANCE_data_management.R")
+source("RICEx_datamng/RICEx_50_experiments_data_central_hub.R")
 source("RICEx_plots/RICEx_20_line_comparisons_plot.R")
 source("RICEx_plots/RICEx_01_export_plots.R")
 source("RICEx_plots/RICEx_00_colors_settings.R")
@@ -7,29 +7,26 @@ source("RICEx_plots/RICEx_00_colors_settings.R")
 # Retrieve experiments
 
 CTAXexp = list()
+CTAXexp = experiments_load_as_list(CTAXexp,"MYEXPERIMENT")
+
+
+baseexp = CTAXexp$v0x092$OPT$ed57$ssp2$cooppop$maccED$clWITCHco2$damBURKEnSR$savFXconv
+BAU     = CTAXexp$v0x092$OPT$ed57$ssp2$cooppop$maccED$clWITCHco2$damBURKEnSR$savFXconv$runBAU
 
 
 
-
-CTAXexp = experiments_load_as_list(CTAXexp,"CTAXtest")
-
-
-
-
- 
-## -------------------:  BURKE SR VARYING COOPERATION : --------------------------------
+## ------------------:   CTAX DIAG 30 gr5   :---------------------
 
 
 EXPdata   = list(
-  "Base"        = CTAXexp$v0x90$OPT$ed57$ssp2$noncoop$maccED$clWITCHco2$damOFF$savFXconv$runCTAX_DIAG_C30_gr5_xxbase$get__PARAMETER_ty("world_E")
-  ,"tmaxMIU18"  = CTAXexp$v0x90$OPT$ed57$ssp2$coop$maccED$clWITCHco2$damOFF$savFXconv$runCTAX_DIAG_C30_gr5_xxtmaxmiu18$get__PARAMETER_ty("world_E")
-  ,"tmaxMIU18 PBfull18"  = CTAXexp$v0x90$OPT$ed57$ssp2$coop$maccED$clWITCHco2$damOFF$savFXconv$runCTAX_DIAG_C30_gr5_xxtmaxmiu18_tendPback18$get__PARAMETER_ty("world_E")
-  ,"PBfull18 p344 g05"   = CTAXexp$v0x90$OPT$ed57$ssp2$noncoop$maccED$clWITCHco2$damOFF$savFXconv$runCTAX_DIAG_C30_gr5_xxtendPback18_p344_g05$get__PARAMETER_ty("world_E")
-  ,"PBfull10 p344 g025"  = CTAXexp$v0x90$OPT$ed57$ssp2$noncoop$maccED$clWITCHco2$damOFF$savFXconv$runCTAX_DIAG_C30_gr5_xxtendPback10_p344_g025$get__PARAMETER_ty("world_E")
-  ,"PBfull10 p550 g025"  = CTAXexp$v0x90$OPT$ed57$ssp2$noncoop$maccED$clWITCHco2$damOFF$savFXconv$runCTAX_DIAG_C30_gr5_xxtendPback10_p550_g025$get__PARAMETER_ty("world_E")
-  ,"PBfull10 p550 g025 \n tminMIU14"  = CTAXexp$v0x90$OPT$ed57$ssp2$noncoop$maccED$clWITCHco2$damOFF$savFXconv$runCTAX_DIAG_C30_gr5_xxtendPback10_p550_g025_tminMIU14$get__PARAMETER_ty("world_E")
-  ,"PBfull10 p550 g025 \n tminMIU17"  = CTAXexp$v0x90$OPT$ed57$ssp2$noncoop$maccED$clWITCHco2$damOFF$savFXconv$runCTAX_DIAG_C30_gr5_xxtendPback10_p550_g025_tminMIU17$get__PARAMETER_ty("world_E")
-  
+  # "Base"        = BAU$get_worldEMIffi_ty
+    "minMU7 maxMUt28 \npback550 gback025 \n      fullpb28 "  = baseexp$runCTAX_DIAG_C30_gr5_xxA$get_worldEMIffi_ty
+  , "minMU7 maxMUt28 \npback550 gback025 \n      fullpb10 "  = baseexp$runCTAX_DIAG_C30_gr5_xxB$get_worldEMIffi_ty
+  , "minMU14 maxMUt28 \npback550 gback025\n      fullpb10 "  = baseexp$runCTAX_DIAG_C30_gr5_xxC$get_worldEMIffi_ty
+  , "minMU7 maxMUt28 \npback344 gback05  \n      fullpb28 "  = baseexp$runCTAX_DIAG_C30_gr5_xxD$get_worldEMIffi_ty
+  , "minMU7 maxMUt28 \npback344 gback025 \n      fullpb28 "  = baseexp$runCTAX_DIAG_C30_gr5_xxE$get_worldEMIffi_ty
+  , "minMU14 maxMUt28 \npback344 gback05 \n      fullpb10 "  = baseexp$runCTAX_DIAG_C30_gr5_xxF$get_worldEMIffi_ty
+  , "minMU14 maxMUt28 \npback344 gback05 \n      fullpb14 "  = baseexp$runCTAX_DIAG_C30_gr5_xxG$get_worldEMIffi_ty
 )
 EXPtitle  = "World Emissions under CTAX DIAG 30 gr5"
 EXPylabel = "World Emissions [GtCO2]"
@@ -43,27 +40,25 @@ plotCTAX()
 
 
 
-
-
-MIUdata_nty = CTAXexp$v0x90$OPT$ed57$ssp2$coop$clWITCHco2$damOFF$savFXconv$runCTAX_DIAG_C30_gr5_xxtmaxmiu18_tendPback18$get__VARIABLE_nty("MIU")
-expName     =  "tmaxMIU18 PBfull18" 
+MIUdata_nty = intermediate$runCTAX_DIAG_C30_gr5_xxpb550_gb0.025_ptend28_tminM7_tmaxM28$get__VARIABLE_nty("MIU")
+expName     =  "pb550 gb025 tminM7  tmaxM28 ptend28 "
 
 
 plotMIU()
 
 
+
 ## ------------------:   CTAX DIAG 30 const   :---------------------
-intermediate = CTAXexp$v0x90$OPT$ed57$ssp2$noncoop$maccED$clWITCHco2$damOFF$savFXconv
 
 EXPdata   = list(
-
-  "pb344 gb025  \ntminM7  tmaxM28 \nptend28 "  = intermediate$runCTAX_DIAG_C30_const_xxpb344_gb0.025_ptend28_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb344 gb05  \ntminM14 tmaxM28 \nptend10 "  = intermediate$runCTAX_DIAG_C30_const_xxpb344_gb0.05_ptend10_tminM14_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb344 gb05  \ntminM14 tmaxM28 \nptend14 "  = intermediate$runCTAX_DIAG_C30_const_xxpb344_gb0.05_ptend14_tminM14_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb344 gb05  \ntminM7  tmaxM28 \nptend14 "  = intermediate$runCTAX_DIAG_C30_const_xxpb344_gb0.05_ptend28_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb550 gb025 \ntminM14 tmaxM28 \nptend14 "  = intermediate$runCTAX_DIAG_C30_const_xxpb550_gb0.025_ptend10_tminM14_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb550 gb025 \ntminM7  tmaxM28 \nptend14 "  = intermediate$runCTAX_DIAG_C30_const_xxpb550_gb0.025_ptend10_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb550 gb025 \ntminM7  tmaxM28 \nptend28 "  = intermediate$runCTAX_DIAG_C30_const_xxpb550_gb0.025_ptend28_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
+  # "Base"        = BAU$get_worldEMIffi_ty
+    "minMU7 maxMUt28 \npback550 gback025 \n      fullpb28 "  = baseexp$runCTAX_DIAG_C30_const_xxA$get_worldEMIffi_ty
+  , "minMU7 maxMUt28 \npback550 gback025 \n      fullpb10 "  = baseexp$runCTAX_DIAG_C30_const_xxB$get_worldEMIffi_ty
+  , "minMU14 maxMUt28 \npback550 gback025\n      fullpb10 "  = baseexp$runCTAX_DIAG_C30_const_xxC$get_worldEMIffi_ty
+  , "minMU7 maxMUt28 \npback344 gback05  \n      fullpb28 "  = baseexp$runCTAX_DIAG_C30_const_xxD$get_worldEMIffi_ty
+  , "minMU7 maxMUt28 \npback344 gback025 \n      fullpb28 "  = baseexp$runCTAX_DIAG_C30_const_xxE$get_worldEMIffi_ty
+  , "minMU14 maxMUt28 \npback344 gback05 \n      fullpb10 "  = baseexp$runCTAX_DIAG_C30_const_xxF$get_worldEMIffi_ty
+  , "minMU14 maxMUt28 \npback344 gback05 \n      fullpb14 "  = baseexp$runCTAX_DIAG_C30_const_xxG$get_worldEMIffi_ty
 )
 EXPtitle  = "World Emissions under CTAX DIAG 30 const "
 EXPylabel = "World Emissions [GtCO2]"
@@ -76,52 +71,20 @@ ADVANCE_MODELS = ADVANCE_CO2_WORLD$DIAG_C30_const
 plotCTAX()
 
 
-## ------------------:   CTAX DIAG 30 gr5   :---------------------
-intermediate = CTAXexp$v0x90$OPT$ed57$ssp2$noncoop$maccED$clWITCHco2$damOFF$savFXconv
-
-EXPdata   = list(
-  
-  "pb344 gb025  \ntminM7  tmaxM28 \nptend28 "  = intermediate$runCTAX_DIAG_C30_gr5_xxpb344_gb0.025_ptend28_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb344 gb05  \ntminM14 tmaxM28 \nptend10 "  = intermediate$runCTAX_DIAG_C30_gr5_xxpb344_gb0.05_ptend10_tminM14_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb344 gb05  \ntminM14 tmaxM28 \nptend14 "  = intermediate$runCTAX_DIAG_C30_gr5_xxpb344_gb0.05_ptend14_tminM14_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb344 gb05  \ntminM7  tmaxM28 \nptend14 "  = intermediate$runCTAX_DIAG_C30_gr5_xxpb344_gb0.05_ptend28_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb550 gb025 \ntminM14 tmaxM28 \nptend14 "  = intermediate$runCTAX_DIAG_C30_gr5_xxpb550_gb0.025_ptend10_tminM14_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb550 gb025 \ntminM7  tmaxM28 \nptend14 "  = intermediate$runCTAX_DIAG_C30_gr5_xxpb550_gb0.025_ptend10_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb550 gb025 \ntminM7  tmaxM28 \nptend28 "  = intermediate$runCTAX_DIAG_C30_gr5_xxpb550_gb0.025_ptend28_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-)
-EXPtitle  = "World Emissions under CTAX DIAG 30 gr5 "
-EXPylabel = "World Emissions [GtCO2]"
-EXPlegend = "Experiments"
-
-
-ADVANCE_MODELS = ADVANCE_CO2_WORLD$DIAG_C30_gr5
-
-plotCTAX()
-
-
-
-
-MIUdata_nty = intermediate$runCTAX_DIAG_C30_gr5_xxpb550_gb0.025_ptend28_tminM7_tmaxM28$get__VARIABLE_nty("MIU")
-expName     =  "pb550 gb025 tminM7  tmaxM28 ptend28 "
-
-
-plotMIU()
-
 
 
 ## ------------------:   CTAX DIAG 80 const   :---------------------
-intermediate = CTAXexp$v0x90$OPT$ed57$ssp2$noncoop$maccED$clWITCHco2$damOFF$savFXconv
 
 EXPdata   = list(
-  
-  "pb344 gb025  \ntminM7  tmaxM28 \nptend28 "  = intermediate$runCTAX_DIAG_C80_const_xxpb344_gb0.025_ptend28_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb344 gb05  \ntminM14 tmaxM28 \nptend10 "  = intermediate$runCTAX_DIAG_C80_const_xxpb344_gb0.05_ptend10_tminM14_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb344 gb05  \ntminM14 tmaxM28 \nptend14 "  = intermediate$runCTAX_DIAG_C80_const_xxpb344_gb0.05_ptend14_tminM14_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb344 gb05  \ntminM7  tmaxM28 \nptend14 "  = intermediate$runCTAX_DIAG_C80_const_xxpb344_gb0.05_ptend28_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb550 gb025 \ntminM14 tmaxM28 \nptend14 "  = as.data.frame(cbind("value"=c(0),"year"=c(2000),"t"=c(0))) #intermediate$runCTAX_DIAG_C80_const_xxpb550_gb0.025_ptend10_tminM14_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb550 gb025 \ntminM7  tmaxM28 \nptend14 "  = intermediate$runCTAX_DIAG_C80_const_xxpb550_gb0.025_ptend10_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb550 gb025 \ntminM7  tmaxM28 \nptend28 "  = intermediate$runCTAX_DIAG_C80_const_xxpb550_gb0.025_ptend28_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-)
+  # "Base"        = BAU$get_worldEMIffi_ty
+    "minMU7 maxMUt28 \npback550 gback025 \n      fullpb28 "  = baseexp$runCTAX_DIAG_C80_const_xxA$get_worldEMIffi_ty
+  , "minMU7 maxMUt28 \npback550 gback025 \n      fullpb10 "  = baseexp$runCTAX_DIAG_C80_const_xxB$get_worldEMIffi_ty
+  , "minMU14 maxMUt28 \npback550 gback025\n      fullpb10 "  = baseexp$runCTAX_DIAG_C80_const_xxC$get_worldEMIffi_ty
+  , "minMU7 maxMUt28 \npback344 gback05  \n      fullpb28 "  = baseexp$runCTAX_DIAG_C80_const_xxD$get_worldEMIffi_ty
+  , "minMU7 maxMUt28 \npback344 gback025 \n      fullpb28 "  = baseexp$runCTAX_DIAG_C80_const_xxE$get_worldEMIffi_ty
+  , "minMU14 maxMUt28 \npback344 gback05 \n      fullpb10 "  = baseexp$runCTAX_DIAG_C80_const_xxF$get_worldEMIffi_ty
+  , "minMU14 maxMUt28 \npback344 gback05 \n      fullpb14 "  = baseexp$runCTAX_DIAG_C80_const_xxG$get_worldEMIffi_ty
+) 
 EXPtitle  = "World Emissions under CTAX DIAG 80 const "
 EXPylabel = "World Emissions [GtCO2]"
 EXPlegend = "Experiments"
@@ -134,18 +97,15 @@ plotCTAX()
 
 ## ---------------:   CTAX 80 gr5   :------------------------------------------- 
 
-
-intermediate = CTAXexp$v0x90$OPT$ed57$ssp2$noncoop$maccED$clWITCHco2$damOFF$savFXconv
-
 EXPdata   = list(
-  
-  "pb344 gb025  \ntminM7  tmaxM28 \nptend28 "  = intermediate$runCTAX_DIAG_C80_gr5_xxpb344_gb0.025_ptend28_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb344 gb05  \ntminM14 tmaxM28 \nptend10 "  = as.data.frame(cbind("value"=c(0),"year"=c(2000),"t"=c(1))) #intermediate$runCTAX_DIAG_C80_gr5_xxpb344_gb0.05_ptend10_tminM14_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb344 gb05  \ntminM14 tmaxM28 \nptend14 "  = intermediate$runCTAX_DIAG_C80_gr5_xxpb344_gb0.05_ptend14_tminM14_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb344 gb05  \ntminM7  tmaxM28 \nptend14 "  = as.data.frame(cbind("value"=c(0),"year"=c(2000),"t"=c(1))) #intermediate$runCTAX_DIAG_C80_gr5_xxpb344_gb0.05_ptend28_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb550 gb025 \ntminM14 tmaxM28 \nptend14 "  = intermediate$runCTAX_DIAG_C80_gr5_xxpb550_gb0.025_ptend10_tminM14_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb550 gb025 \ntminM7  tmaxM28 \nptend14 "  = as.data.frame(cbind("value"=c(0),"year"=c(2000),"t"=c(1))) #intermediate$runCTAX_DIAG_C80_gr5_xxpb550_gb0.025_ptend10_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
-  ,"pb550 gb025 \ntminM7  tmaxM28 \nptend28 "  = as.data.frame(cbind("value"=c(0),"year"=c(2000),"t"=c(1)))#intermediate$runCTAX_DIAG_C80_gr5_xxpb550_gb0.025_ptend28_tminM7_tmaxM28$get__PARAMETER_ty("world_E")
+  # "Base"        = BAU$get_worldEMIffi_ty
+    "minMU7 maxMUt28 \npback550 gback025 \n      fullpb28 "  = baseexp$runCTAX_DIAG_C80_gr5_xxA$get_worldEMIffi_ty
+  , "minMU7 maxMUt28 \npback550 gback025 \n      fullpb10 "  = baseexp$runCTAX_DIAG_C80_gr5_xxB$get_worldEMIffi_ty
+  , "minMU14 maxMUt28 \npback550 gback025\n      fullpb10 "  = baseexp$runCTAX_DIAG_C80_gr5_xxC$get_worldEMIffi_ty
+  , "minMU7 maxMUt28 \npback344 gback05  \n      fullpb28 "  = baseexp$runCTAX_DIAG_C80_gr5_xxD$get_worldEMIffi_ty
+  , "minMU7 maxMUt28 \npback344 gback025 \n      fullpb28 "  = baseexp$runCTAX_DIAG_C80_gr5_xxE$get_worldEMIffi_ty
+  , "minMU14 maxMUt28 \npback344 gback05 \n      fullpb10 "  = baseexp$runCTAX_DIAG_C80_gr5_xxF$get_worldEMIffi_ty
+  , "minMU14 maxMUt28 \npback344 gback05 \n      fullpb14 "  = baseexp$runCTAX_DIAG_C80_gr5_xxG$get_worldEMIffi_ty
 )
 EXPtitle  = "World Emissions under CTAX DIAG 80 gr5 "
 EXPylabel = "World Emissions [GtCO2]"
@@ -156,6 +116,10 @@ ADVANCE_MODELS = ADVANCE_CO2_WORLD$DIAG_C80_gr5
 
 
 plotCTAX()
+
+
+
+
 
 
 ## ---------------:   CTAX 30 gr5  Only DICE2016 MACC  :------------------------------------------- 

@@ -2,7 +2,7 @@
 
 
 ## Dependencies
-source("RICEx_data_management/RICEx_20_RICEclass.R")
+source("RICEx_datamng/RICEx_20_RICEclass.R")
 
 require_package("purrr")
 require_package("stringr")
@@ -36,7 +36,7 @@ parse_experiment <- function(gdx_name_with_full_path){
   # regex for complex parsing elements
   # remember: "^" is starting, "$" is ending, "." means exact one charachter
   regex_for_regions = "^enerdata..|^ed..|^witch..|^r5$|^storcap\\w+\\d+|^global$"
-  regex_for_coop    = "^coop$|^noncoop$|^coop\\w+"
+  regex_for_coop    = "^coop$|^noncoop$|^coopngsw$|^cooppop$|^noncooppop$"
   
   #info parsing 
   experiment= list() 

@@ -1,7 +1,12 @@
 source("RICEx_utils/RICEx_00_package_retriever.R")
 require_package("dplyr")
+require_package("here")
+require_package("data.table")
+require_package("purrr")
+require_package("tidyr")
+require_package("stringr")
 
-dir_data_advance <- here("../RICEx_Data/advance/")
+dir_data_advance <- here("../RICEx-Data/advance/")
 
 
 
