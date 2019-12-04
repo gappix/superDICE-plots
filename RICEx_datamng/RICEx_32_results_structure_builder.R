@@ -33,7 +33,8 @@ tide_new_experiment_as_list = function(experiment,original_list){
                                         climateModule = experiment$climateMod,     
                                         damageModule  = experiment$damageFunction, 
                                         savingRate    = experiment$savingRate,
-                                        runmode        = experiment$runmode,         
+                                        runmode       = experiment$runmode,  
+                                        welfare       = experiment$welfare, 
                                         RICEx_S3data  = experiment$data    )
   
 }
@@ -71,7 +72,8 @@ tide_new_experiment_as_table = function(experiment,
              climate_module        = experiment$climateMod,     
              damage_module         = experiment$damageFunction, 
              saving_rate           = experiment$savingRate,
-             runmode                = experiment$runmode        
+             welfare               = experiment$welfare, 
+             runmode               = experiment$runmode        
              )
   # initialize n-t-y-dimensions with a null-by merge (MIU is one good choice)
   new_table = merge.data.frame(new_table,
@@ -146,7 +148,8 @@ tide_new_experiment_as_table_nty = function(experiment,
     climate_module        = experiment$climateMod,     
     damage_module         = experiment$damageFunction, 
     saving_rate           = experiment$savingRate,
-    runmode                = experiment$runmode        
+    welfare               = experiment$welfare, 
+    runmode               = experiment$runmode        
   )
   
   # initialize n-t-y-dimensions with a null-by merge (MIU is one good choice)
@@ -201,6 +204,7 @@ tide_new_experiment_as_table_ty <-  function(experiment,
     climate_module        = experiment$climateMod,     
     damage_module         = experiment$damageFunction, 
     saving_rate           = experiment$savingRate,
+    welfare               = experiment$welfare, 
     runmode               = experiment$runmode        
   )
   # initialize t-y-dimensions with a null-by merge (WORLD_E is one good choice)
@@ -261,6 +265,7 @@ tide_new_experiment_as_table_pars <-  function(experiment,
     climate_module        = experiment$climateMod,     
     damage_module         = experiment$damageFunction, 
     saving_rate           = experiment$savingRate,
+    welfare               = experiment$welfare, 
     runmode               = experiment$runmode        
   )
   
@@ -316,6 +321,7 @@ add_experiment_to_general_structure = function(original_list,
                                                climateModule,
                                                damageModule,
                                                savingRate,
+                                               welfare,
                                                runmode,
                                                RICEx_S3data){
   
@@ -328,6 +334,7 @@ add_experiment_to_general_structure = function(original_list,
  if(length( climateModule ) < 1) { climateModule = "UNKclimateModule"}
  if(length( damageModule  ) < 1) { damageModule  = "UNKdamageModule" }
  if(length( savingRate    ) < 1) { savingRate    = "UNKsavingRate"   }
+ if(length( welfare       ) < 1) { welfare       = "UNKwelfare"      }
  if(length( runmode       ) < 1) { runmode       = "UNKrunmode"      }
   
   eval(parse(text = paste0('original_list',
@@ -339,6 +346,7 @@ add_experiment_to_general_structure = function(original_list,
                            '$',macc,
                            '$',climateModule,
                            '$',damageModule,
+                           '$',welfare,
                            '$',savingRate,
                            '$',runmode,
                            ' <- RICEx_S3data')))

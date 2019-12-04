@@ -15,7 +15,12 @@ MMexp_POWERFIT     = MMexp$UNKvers$UNKruntype$global$UNKssp$noncooppop$maccEDpow
 MMexp_FXPOWERFIT   = MMexp$UNKvers$UNKruntype$global$UNKssp$noncooppop$maccEDfxpowerfit$UNKclimateModule$UNKdamageModule$UNKsavingRate
 
 
+copyplot <- function(x){
+  # copy
+  windows(1150, 600, pointsize = 10) #opens a separate window with the size you want 
 
+  savePlot("clipboard", type="wmf") #saves plot to WMF
+}
 
 ## ------------------:   CTAX DIAG 30 gr5   :---------------------
 
@@ -37,6 +42,7 @@ EXPlegend = "Experiments"
 ADVANCE_MODELS = ADVANCE_CO2_WORLD$DIAG_C30_gr5
 
 
+#show
 plotCTAX()
 
 
@@ -203,8 +209,8 @@ plotCTAX()
 
 EXPdata   = list(
   # "Base"        = BAU$get_worldEMIffi_ty
-  "_quadfit vanilla "                =    MMexp_QUADFIT$runCTAX_DIAG_C30_gr5_xxvanilla_ssp2marker$get_worldEMIffi_ty
-  ,    "powerfit dice adv "      = MMexp_POWERFIT$runCTAX_DIAG_C30_gr5_xxdice_adv$get_worldEMIffi_ty
+  #"_quadfit vanilla "                =    MMexp_QUADFIT$runCTAX_DIAG_C30_gr5_xxvanilla_ssp2marker$get_worldEMIffi_ty
+      "powerfit dice adv "      = MMexp_POWERFIT$runCTAX_DIAG_C30_gr5_xxdice_adv$get_worldEMIffi_ty
   ,    "powerfit freefit adv "      =   MMexp_POWERFIT$runCTAX_DIAG_C30_gr5_xxfreefit_adv$get_worldEMIffi_ty
   ,    "powerfit freefit sspmk "    =   MMexp_POWERFIT$runCTAX_DIAG_C30_gr5_xxfreefit_ssp2marker$get_worldEMIffi_ty
   ,    "quadfit freefit sspmk "        =    MMexp_QUADFIT$runCTAX_DIAG_C30_gr5_xxfreefit_ssp2marker$get_worldEMIffi_ty
@@ -213,8 +219,8 @@ EXPdata   = list(
   ,    "quadfit backfx adv "          =    MMexp_QUADFIT$runCTAX_DIAG_C30_gr5_xxbackfxfit_adv$get_worldEMIffi_ty
   
   
-  ,    "_powerfit vanilla "          =   MMexp_POWERFIT$runCTAX_DIAG_C30_gr5_xxvanilla_ssp2marker$get_worldEMIffi_ty
-  ,    "_fxpowerfit vanilla "        = MMexp_FXPOWERFIT$runCTAX_DIAG_C30_gr5_xxvanilla_ssp2marker$get_worldEMIffi_ty
+  #,    "_powerfit vanilla "          =   MMexp_POWERFIT$runCTAX_DIAG_C30_gr5_xxvanilla_ssp2marker$get_worldEMIffi_ty
+  #,    "_fxpowerfit vanilla "        = MMexp_FXPOWERFIT$runCTAX_DIAG_C30_gr5_xxvanilla_ssp2marker$get_worldEMIffi_ty
 
   
 )
@@ -423,8 +429,8 @@ plotCTAX()
 
 EXPdata   = list(
   # "Base"        = BAU$get_worldEMIffi_ty
-  "_quadfit vanilla "                =    MMexp_QUADFIT$runCTAX_DIAG_C80_gr5_xxvanilla_ssp2marker$get_worldEMIffi_ty
-  ,    "powerfit dice adv "          =   MMexp_POWERFIT$runCTAX_DIAG_C80_gr5_xxdice_adv$get_worldEMIffi_ty
+  #"_quadfit vanilla "                =    MMexp_QUADFIT$runCTAX_DIAG_C80_gr5_xxvanilla_ssp2marker$get_worldEMIffi_ty
+      "powerfit dice adv "          =   MMexp_POWERFIT$runCTAX_DIAG_C80_gr5_xxdice_adv$get_worldEMIffi_ty
   ,    "powerfit freefit adv "       =   MMexp_POWERFIT$runCTAX_DIAG_C80_gr5_xxfreefit_adv$get_worldEMIffi_ty
   ,    "powerfit freefit sspmk "     =   MMexp_POWERFIT$runCTAX_DIAG_C80_gr5_xxfreefit_ssp2marker$get_worldEMIffi_ty
   ,    "quadfit freefit sspmk "      =    MMexp_QUADFIT$runCTAX_DIAG_C80_gr5_xxfreefit_ssp2marker$get_worldEMIffi_ty
@@ -433,8 +439,8 @@ EXPdata   = list(
   ,    "quadfit backfx adv "         =    MMexp_QUADFIT$runCTAX_DIAG_C80_gr5_xxbackfxfit_adv$get_worldEMIffi_ty
   
   
-  ,    "_powerfit vanilla "          =   MMexp_POWERFIT$runCTAX_DIAG_C80_gr5_xxvanilla_ssp2marker$get_worldEMIffi_ty
-  ,    "_fxpowerfit vanilla "        = MMexp_FXPOWERFIT$runCTAX_DIAG_C80_gr5_xxvanilla_ssp2marker$get_worldEMIffi_ty
+  #,    "_powerfit vanilla "          =   MMexp_POWERFIT$runCTAX_DIAG_C80_gr5_xxvanilla_ssp2marker$get_worldEMIffi_ty
+  #,    "_fxpowerfit vanilla "        = MMexp_FXPOWERFIT$runCTAX_DIAG_C80_gr5_xxvanilla_ssp2marker$get_worldEMIffi_ty
   
   
 )
@@ -640,8 +646,8 @@ plotCTAX()
 
 EXPdata   = list(
   # "Base"        = BAU$get_worldEMIffi_ty
-  "_quadfit vanilla "                =    MMexp_QUADFIT$runCTAX_DIAG_C80_const_xxvanilla_ssp2marker$get_worldEMIffi_ty
-  ,    "powerfit dice adv "          =   MMexp_POWERFIT$runCTAX_DIAG_C80_const_xxdice_adv$get_worldEMIffi_ty
+  #"_quadfit vanilla "                =    MMexp_QUADFIT$runCTAX_DIAG_C80_const_xxvanilla_ssp2marker$get_worldEMIffi_ty
+      "powerfit dice adv "          =   MMexp_POWERFIT$runCTAX_DIAG_C80_const_xxdice_adv$get_worldEMIffi_ty
   ,    "powerfit freefit adv "       =   MMexp_POWERFIT$runCTAX_DIAG_C80_const_xxfreefit_adv$get_worldEMIffi_ty
   ,    "powerfit freefit sspmk "     =   MMexp_POWERFIT$runCTAX_DIAG_C80_const_xxfreefit_ssp2marker$get_worldEMIffi_ty
   ,    "quadfit freefit sspmk "      =    MMexp_QUADFIT$runCTAX_DIAG_C80_const_xxfreefit_ssp2marker$get_worldEMIffi_ty
@@ -650,8 +656,8 @@ EXPdata   = list(
   ,    "quadfit backfx adv "         =    MMexp_QUADFIT$runCTAX_DIAG_C80_const_xxbackfxfit_adv$get_worldEMIffi_ty
   
   
-  ,    "_powerfit vanilla "          =   MMexp_POWERFIT$runCTAX_DIAG_C80_const_xxvanilla_ssp2marker$get_worldEMIffi_ty
-  ,    "_fxpowerfit vanilla "        = MMexp_FXPOWERFIT$runCTAX_DIAG_C80_const_xxvanilla_ssp2marker$get_worldEMIffi_ty
+  #,    "_powerfit vanilla "          =   MMexp_POWERFIT$runCTAX_DIAG_C80_const_xxvanilla_ssp2marker$get_worldEMIffi_ty
+  #,    "_fxpowerfit vanilla "        = MMexp_FXPOWERFIT$runCTAX_DIAG_C80_const_xxvanilla_ssp2marker$get_worldEMIffi_ty
   
   
 )
@@ -858,8 +864,8 @@ plotCTAX()
 
 EXPdata   = list(
   # "Base"        = BAU$get_worldEMIffi_ty
-  "_quadfit vanilla "                =    MMexp_QUADFIT$runCTAX_DIAG_C30_const_xxvanilla_ssp2marker$get_worldEMIffi_ty
-  ,    "powerfit dice adv "          =   MMexp_POWERFIT$runCTAX_DIAG_C30_const_xxdice_adv$get_worldEMIffi_ty
+  #"_quadfit vanilla "                =    MMexp_QUADFIT$runCTAX_DIAG_C30_const_xxvanilla_ssp2marker$get_worldEMIffi_ty
+      "powerfit dice adv "          =   MMexp_POWERFIT$runCTAX_DIAG_C30_const_xxdice_adv$get_worldEMIffi_ty
   ,    "powerfit freefit adv "       =   MMexp_POWERFIT$runCTAX_DIAG_C30_const_xxfreefit_adv$get_worldEMIffi_ty
   ,    "powerfit freefit sspmk "     =   MMexp_POWERFIT$runCTAX_DIAG_C30_const_xxfreefit_ssp2marker$get_worldEMIffi_ty
   ,    "quadfit freefit sspmk "      =    MMexp_QUADFIT$runCTAX_DIAG_C30_const_xxfreefit_ssp2marker$get_worldEMIffi_ty
@@ -868,8 +874,8 @@ EXPdata   = list(
   ,    "quadfit backfx adv "         =    MMexp_QUADFIT$runCTAX_DIAG_C30_const_xxbackfxfit_adv$get_worldEMIffi_ty
   
   
-  ,    "_powerfit vanilla "          =   MMexp_POWERFIT$runCTAX_DIAG_C30_const_xxvanilla_ssp2marker$get_worldEMIffi_ty
-  ,    "_fxpowerfit vanilla "        = MMexp_FXPOWERFIT$runCTAX_DIAG_C30_const_xxvanilla_ssp2marker$get_worldEMIffi_ty
+  #,    "_powerfit vanilla "          =   MMexp_POWERFIT$runCTAX_DIAG_C30_const_xxvanilla_ssp2marker$get_worldEMIffi_ty
+  #,    "_fxpowerfit vanilla "        = MMexp_FXPOWERFIT$runCTAX_DIAG_C30_const_xxvanilla_ssp2marker$get_worldEMIffi_ty
   
   
 )
@@ -954,35 +960,38 @@ plottigat = ggplot() +
   # MY DATA
   
   geom_line(data = mydf, aes(year,value, color=cat), size = 1.2)  +  
-
+  
+  # HISTORICAL DATA
+  
+  geom_line(data = E_hist_PRIMAP_world_y%>%filter(year >=1990), aes(year,value, color="__historical"), size = 1.2)  +  
   
   # graphic details
   
   guides(colour=guide_legend(ncol=1)) +
-  scale_color_manual(breaks= c("_ADVANCE","_MEDIAN",names(EXPdata)),
-                     values = c("grey","black", wes_palette(name = "Darjeeling1"), wes_palette(name = "GrandBudapest2"),
+  scale_color_manual(breaks= c("__ADVANCE","__MEDIAN","__historical",names(EXPdata)[order(names(EXPdata))]),
+                     values = c("grey","black","black", wes_palette(name = "Darjeeling1"), #wes_palette(name = "GrandBudapest2"),
                                 
                                 
+                                "blue",   #blue
+                                #???"#0f86db",
+                                #"#0ccfab",
+                                
+                                "green",  #greens
+                               "#d64cf5", # pink
+                                
+                                "#8232c7", #violet
+                                "#450094",
+                                "#32c738",  
+                                "#046918",
                                 
                                 
                                 "#f77f2f", #orange
                                 "#db0f20", 
                                 "red",      # red
                                 
-                                "#d64cf5", # pink
+
                                 
-                                "#8232c7", #violet
-                                "#450094",
-                                
-                                "blue",   #blue
-                                "#0f86db",
-                                "#0ccfab",
-                                
-                                "green",  #greens
-                                
-                                "#32c738",  
-                                "#046918",
-                                
+
                                 
                                 
                                 "#c4570e",  # brown

@@ -2,6 +2,22 @@
 source("RICEx_utils/RICEx_00_package_retriever.R")
 require_package("wesanderson")
 
+
+
+
+
+
+
+wes_14colors = c(  wes_palette(name = "Darjeeling1"), 
+                  wes_palette(name = "GrandBudapest2"),
+                  wes_palette(name = "FantasticFox1"))
+
+
+
+
+
+
+
 #Cool Palette
 somecol= c(
   
@@ -142,6 +158,37 @@ randomize_my_colors = function(){
   
   my_colors = sample(my_colors) 
 }
+
+
+##--------------- POLLO_20 :: Color Paolette -----------------------
+
+
+
+
+pollo_20 <- c(  
+  "#FF0000" 
+  ,"#00A08A" 
+  ,"#F2AD00" 
+  ,"#F98400" 
+  ,"#5BBCD6"
+  ,"#5bbf13" # green dettofatto  
+  ,"#ff03f2" # pink 
+  ,"#6b43e0"  # everybody violet
+  ,"#00a61c" # ireland
+  ,"#000000" # black
+  ,"#4d1919" #coral bella storia
+  ,"#0374ff" # intense blue
+  ,"#690038" # shitty bordeaux
+  ,"#03ff79" # shy green
+  ,"#695006"  #real brown
+  ,"#696506" #what is this?
+  ,"#cf6b00" # candy brown
+  ,"#007c82" # petroleum
+  
+  
+  ####3 
+  )
+
 
 
 

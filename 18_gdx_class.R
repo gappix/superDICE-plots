@@ -2,11 +2,11 @@
 # contains an handful set of pre-configured data manipulation functions
 
 
-#Dependencies
-source("10_data_basic_functions.R")
-source("12_data_management_functions.R")
-
-
+# Dependencies 
+source("RICEx_utils/RICEx_00_package_retriever.R")
+source("RICEx_datamng/RICEx_00_global_settings.R")
+source("RICEx_datamng/RICEx_01_data_basic_functions.R")
+source("RICEx_datamng/RICEx_10_data_management_functions.R")
 
 
 # 
