@@ -49,15 +49,10 @@ ssplist = list()
 
 
 # ultra-detailed 
-ssplist$ssp_xxF_yyA  = GDXclass(paste0(resuts_path,"sigma_baseline_kali_allSSPs_xxF_yyA.gdx"))
-ssplist$ssp_xxF_yyB  = GDXclass(paste0(resuts_path,"sigma_baseline_kali_allSSPs_xxF_yyB.gdx"))
-ssplist$ssp_xxF_yyC  = GDXclass(paste0(resuts_path,"sigma_baseline_kali_allSSPs_xxF_yyC.gdx"))
-ssplist$ssp_xxF_yyD  = GDXclass(paste0(resuts_path,"sigma_baseline_kali_allSSPs_xxF_yyD.gdx"))
-
-
-ssplist$ssp_xxF_yyE  = GDXclass(paste0(resuts_path,"sigma_baseline_kali_allSSPs_xxF_yyE.gdx"))
-ssplist$ssp_xxF_yyF  = GDXclass(paste0(resuts_path,"sigma_baseline_kali_allSSPs_xxF_yyF.gdx"))
-
+ssplist$ssp_xxA_yyA  = GDXclass(paste0(resuts_path,"sigma_baseline_kali_allSSPs_xxA_yyA.gdx"))
+ssplist$ssp_xxA_yyB  = GDXclass(paste0(resuts_path,"sigma_baseline_kali_allSSPs_xxA_yyB.gdx"))
+ssplist$ssp_xxA_yyC  = GDXclass(paste0(resuts_path,"sigma_baseline_kali_allSSPs_xxA_yyC.gdx"))
+ssplist$ssp_xxA_yyD  = GDXclass(paste0(resuts_path,"sigma_baseline_kali_allSSPs_xxA_yyD.gdx"))
 
 
 
@@ -93,6 +88,9 @@ dice2016gdx  = gdx(paste0(here("../DICE Vanillas//"), "DICE2016R_091916ap_BAU_va
 dicesigma =  dice2016gdx["sigma"] %>% mutate(year= 2010 + (as.numeric(t) * 5))
 
 
+## Add today values to historical for continuity
+E_hist_PRIMAP_world_y = rbind(E_hist_PRIMAP_world_y, data.frame(year=2015, value= 35.04)) 
+
 
 
 ## GDP under different SSP-scenarios
@@ -100,13 +98,31 @@ dicesigma =  dice2016gdx["sigma"] %>% mutate(year= 2010 + (as.numeric(t) * 5))
 ykali_gdx = gdx(paste0(data_path,"RICExdata_baseline_ssp_pop_ykali.gdx")) 
 
 ssp_ykali_nty = ykali_gdx["ssp_ykali"] %>% 
-  mutate(year= 2010 + (as.numeric(t) * 5)) %>% 
-  rename(extension = V1, type = V2, ssp = V3) 
+  mutate(year= 2010 + (as.numeric(t) * 5)) 
+
+ssp_pop_nty = ykali_gdx["ssp_pop"] %>% 
+  mutate(year= 2010 + (as.numeric(t) * 5)) 
+
+
 
 world_ssp_ykali_ty = ssp_ykali_nty %>% 
-  group_by(ssp,extension,type,year,t) %>% 
+  group_by(ssp,extension,gdpadj,year,t) %>% 
   summarise(value = sum(value)) %>% 
   as.data.frame()
+
+world_ssp_pop_ty = ssp_pop_nty %>% 
+  group_by(ssp,extension,year,t) %>% 
+  summarise(value = sum(value)) %>% 
+  as.data.frame()
+
+
+# Regions mappings
+
+map_img_ed57  <- ssplist[[1]]$get_PARAMETER("map_imagex24_ed57") %>% rename(img = imagex24)
+map_mglo_ed57 <- ssplist[[1]]$get_PARAMETER("map_message_globiom11_ed57") %>% rename(mglo = message_globiom11)
+map_acg_ed57  <- ssplist[[1]]$get_PARAMETER("map_aim_cge17_ed57") %>% rename(acg = aim_cge17)
+map_gcam_ed57 <- ssplist[[1]]$get_PARAMETER("map_gcamx27_ed57") %>% rename(gcam = gcamx27)
+map_rmag_ed57 <- ssplist[[1]]$get_PARAMETER("map_remind_magpie11_ed57") %>% rename(rmag = remind_magpie11)
 
 
 
@@ -118,11 +134,11 @@ world_ssp_ykali_ty = ssp_ykali_nty %>%
 #
 evaluate_sigmaWorld_from_nty <- function(experiment){
   
-  experiment$get_PARAMETER_ty("exp_world_emi", year_limit = 2300) %>% 
+  experiment$get_PARAMETER_ty("world_emi_exp", year_limit = 2300) %>% 
     mutate(ssp = "ssp2") %>% 
     select(-"t") %>%
     merge( world_ssp_ykali_ty %>% 
-             filter(type =="PPP"), 
+             filter(gdpadj =="PPP"), 
            by = c("year","ssp","extension"))   %>% 
     rename(  "emi" = value.x , "gdp_PPP" =  value.y  ) %>%
     mutate(sigma_PPP = emi/gdp_PPP )
@@ -182,12 +198,6 @@ extract_region_value <- function(nty_value,
 
 ## -------------- CODE WAREHOUSE (dunno if useful)   -------------------
 
-
-map_img_ed57  <- ssplist$ssp_xxF_yyA$get_PARAMETER("map_imagex24_ed57") %>% rename(img = imagex24)
-map_mglo_ed57 <- ssplist$ssp_xxF_yyA$get_PARAMETER("map_message_globiom11_ed57") %>% rename(mglo = message_globiom11)
-map_acg_ed57  <- ssplist$ssp_xxF_yyA$get_PARAMETER("map_aim_cge17_ed57") %>% rename(acg = aim_cge17)
-map_gcam_ed57 <- ssplist$ssp_xxF_yyA$get_PARAMETER("map_gcamx27_ed57") %>% rename(gcam = gcamx27)
-map_rmag_ed57 <- ssplist$ssp_xxF_yyA$get_PARAMETER("map_remind_magpie11_ed57") %>% rename(rmag = remind_magpie11)
 
 
 
@@ -367,7 +377,7 @@ plottigat= ggplot() +
   
   
   # Experiment World Sigma
-  geom_line(data= my_experiment$get_PARAMETER_nty("exp_ppp_sigma", year_limit = 2300) %>% 
+  geom_line(data= my_experiment$get_PARAMETER_nty("sigma_ppp_exp", year_limit = 2300) %>% 
               filter(extension == my_extension,
                      trns_type == my_transition_type,
                      trns_end  == my_transition_end
@@ -410,10 +420,10 @@ plottigat= ggplot() +
 
 # ||||  Short-run settings  |||
 
-my_experiment = ssplist$ssp_xxF_yyC 
-my_exp_descrp = "Test_xxF_yyC"
+my_experiment = ssplist$ssp_xxA_yyB 
+my_exp_descrp = "Test_xxA_yyB"
 
-my_ssp        = "ssp4" 
+my_ssp        = "ssp1" 
 
 
 #...........................................
@@ -501,7 +511,7 @@ no_legend = FALSE  # | TRUE | FALSE |
     
     scale_fill_manual(values= colorize_regions("ed57") ) + 
     
-    guides(colour=guide_legend(ncol=2), fill=guide_legend(ncol=2)) +
+    guides(colour=guide_legend(ncol=1), fill=guide_legend(ncol=2)) +
     
     theme( legend.position=if(no_legend){"none"} else {"right"} ,
            plot.title = element_text(size=18),
@@ -509,7 +519,7 @@ no_legend = FALSE  # | TRUE | FALSE |
            axis.text.x = element_text(size = 14),
            axis.title.y = element_text(size = 16)) +  
     
-    ggtitle(paste0("Emissions Stacked  ",my_exp_descrp, "  ", my_ssp,"  <","DC",my_dice_curve,",",my_extension,", ",my_transition_type,", ",my_transition_end,"> at country level")) + 
+    ggtitle(paste0("Emissions Stacked  ",my_exp_descrp, "  ", my_ssp,"  <",my_dice_curve,",",my_extension,", ",my_transition_type,", ",my_transition_end,"> at country level")) + 
     xlab("Year") +
     ylab("Emissions FFI [GtCO2]")  ; plottigat
   
@@ -527,12 +537,13 @@ no_legend = FALSE  # | TRUE | FALSE |
 # ?!?!?!?!  ?!?!?!?!?  !?!?!??!  ?!?!?!?!  ?!?!?!?!?
 
 
+my_ssp        = "ssp5" 
+
+
 # ||||  Short-run settings  |||
 
-my_experiment = ssplist$ssp_xxF_yyB 
-my_exp_descrp = "Test_xxF_yyB"
-
-my_ssp        = "ssp5" 
+my_experiment = ssplist$ssp_xxA_yyB 
+my_exp_descrp = "Test_xxA_yyB"
 
 
 #...........................................
@@ -554,10 +565,10 @@ my_dice_curve      = "discounted"
 
 
 # | sigmoid_HHs | sigmoid_Hs | sigmoid_Ms | sigmoid_Ls | sigmoid_LLs | linear_pure | linear_soft |
-my_transition_type = "sigmoid_Ls"
+my_transition_type = "sigmoid_LLs"
 
 # | 28 | 38 | 48 | 58 |
-my_transition_end  = 28 
+my_transition_end  = 38 
 
 
 
@@ -583,7 +594,7 @@ my_transition_end  = 28
 ## -------------- PLOT ::  World Emissions  :: Kali Comparison   -------------------
 
 
-my_ssp        = "ssp2" 
+my_ssp        = "ssp1" 
 
 #...........................................
 # here you have to select the 
@@ -603,16 +614,17 @@ my_extension       = "extmed"
 my_dice_curve      = "discounted"
 
 # | sigmoid_HHs | sigmoid_Hs | sigmoid_Ms | sigmoid_Ls | sigmoid_LLs | linear_pure | linear_soft |
-my_transition_type = "sigmoid_Ms"
+my_transition_type = "sigmoid_Ls"
 
 # | 28 | 38 | 48 | 58 |
-my_transition_end   = 28 
+my_transition_end   = 38 
 
 
 
 
 #..........  //   AUTORUN  // ...................
 {
+  
   
   my_sspIIASA =  sspDB_all_baseline_CO2_ffi   %>% filter(scenario == paste0(toupper(my_ssp),"-Baseline"))
   my_marker   =  ssp_world_markers_CO2_ffi    %>% filter(ssp == my_ssp)  %>% mutate(year = 2010 + (t*5))
@@ -633,49 +645,49 @@ my_transition_end   = 28
     
     # Baseline world-calibrated (world emissions from sigma kali)
     
-    geom_line(data= ssplist$ssp_xxF_yyA$get_PARAMETER_ty("world_emi_exp", year_limit = 2300) %>% 
+    geom_line(data= ssplist$ssp_xxA_yyA$get_PARAMETER_ty("world_emi_exp", year_limit = 2300) %>% 
                 filter(ssp        == my_ssp,
                        dice_curve == my_dice_curve,
                        extension  == my_extension,
                        trns_type  == my_transition_type,
                        trns_end   == my_transition_end
                 ),
-              aes(x=year, y=value, group=1, color = "test_xxF_yyA"),
+              aes(x=year, y=value, group=1, color = "test_xxA_yyA"),
               size = 1.1) +
     
     
-    geom_line(data= ssplist$ssp_xxF_yyB$get_PARAMETER_ty("world_emi_exp", year_limit = 2300) %>% 
+    geom_line(data= ssplist$ssp_xxA_yyB$get_PARAMETER_ty("world_emi_exp", year_limit = 2300) %>% 
                 filter(ssp        == my_ssp,
                        dice_curve == my_dice_curve,
                        extension  == my_extension,
                        trns_type  == my_transition_type,
                        trns_end   == my_transition_end
                 ),
-              aes(x=year, y=value, group=1, color = "test_xxF_yyB"),
+              aes(x=year, y=value, group=1, color = "test_xxA_yyB"),
               size = 1.1) +
     
-    geom_line(data= ssplist$ssp_xxF_yyC$get_PARAMETER_ty("world_emi_exp", year_limit = 2300) %>% 
+    geom_line(data= ssplist$ssp_xxA_yyC$get_PARAMETER_ty("world_emi_exp", year_limit = 2300) %>% 
                 filter(ssp        == my_ssp,
                        dice_curve == my_dice_curve,
                        extension  == my_extension,
                        trns_type  == my_transition_type,
                        trns_end   == my_transition_end
                 ),
-              aes(x=year, y=value, group=1, color = "test_xxF_yyC"),
+              aes(x=year, y=value, group=1, color = "test_xxA_yyC"),
               size = 1.1) +
     
-    geom_line(data= ssplist$ssp_xxF_yyD$get_PARAMETER_ty("world_emi_exp", year_limit = 2300) %>% 
+    
+    geom_line(data= ssplist$ssp_xxA_yyD$get_PARAMETER_ty("world_emi_exp", year_limit = 2300) %>% 
                 filter(ssp        == my_ssp,
                        dice_curve == my_dice_curve,
                        extension  == my_extension,
                        trns_type  == my_transition_type,
                        trns_end   == my_transition_end
                 ),
-              aes(x=year, y=value, group=1, color = "test_xxF_yyD"),
+              aes(x=year, y=value, group=1, color = "test_xxA_yyD"),
               size = 1.1) +
     
 
-    
     
     # Enerdata emissions
     geom_point(data= EnerData_World_CO2_BAU,
@@ -749,8 +761,9 @@ my_transition_end   = 28
          axis.text.x   = element_text(size = 14),
          axis.title.y  = element_text(size = 16)  ) +
     labs (color = "Tests") + 
-    ggtitle(paste0("Baselines ", my_ssp, " <","DC",my_dice_curve, ", ", my_extension,", ",my_transition_type,", ",my_transition_end, "> across different calibrations")) + 
+    ggtitle(paste0("Baselines ", my_ssp, " <",my_dice_curve, ", ", my_extension,", ",my_transition_type,", ",my_transition_end, "> across different calibrations")) + 
     xlab("Year") +
+    xlim(2000,2150) + 
     ylab("World Emissions [GtCO2]")  ; plottigat
   
 }
@@ -767,6 +780,9 @@ my_transition_end   = 28
 
 
 my_ssp        = "ssp5" 
+
+
+
 
 #...........................................
 # here you have to select the 
@@ -803,9 +819,10 @@ my_transition_end   = 28
 ## -------------- PLOT ::  World Emissions  :: LR-Scenario Comparison   -------------------
 
 
+my_ssp = "ssp1"
 
-my_experiment = ssplist$ssp2_A_xxx 
-my_exp_descrp = "Test_A"
+my_experiment = ssplist$ssp_xxA_yyB 
+my_exp_descrp = "Test_xxA_yyB"
 
 #...........................................
 # here you can MODIFY FILTER LOGIC to compare
@@ -819,13 +836,27 @@ my_exp_descrp = "Test_A"
 
 
 # | extshort | extmed | extlong |
-my_extension       = "extshort"
+my_acc_extensions  = c("extshort",
+                       "extmed",
+                       "#extlong")
 
 # | sigmoid_HHs | sigmoid_Hs | sigmoid_Ms | sigmoid_Ls | sigmoid_LLs | linear_pure | linear_soft |
-my_transition_type = "sigmoid_LLs"
+my_acc_transition_type  = c("sigmoid_Ms",
+                            "sigmoid_Ls",
+                            "#sigmoid_Hs", 
+                            "#sigmoid_HHs", 
+                            "#sigmoid_LLs", 
+                            "#linear_pure", 
+                            "#linear_soft" )
 
 # | 28 | 38 | 48 | 58 |
-my_transition_end   = 28 
+my_acc_transition_end  = c("#28",
+                           "38",
+                           "48",
+                           "#58")
+# | original | discounted |
+my_acc_dice_curve      = c("discounted",
+                           "#original" )
 
 
 #...........................................
@@ -833,7 +864,7 @@ my_transition_end   = 28
 
 # change filter :: V :: ^ ::
 
-
+{
 my_sspIIASA =  sspDB_all_baseline_CO2_ffi   %>% filter(scenario == paste0(toupper(my_ssp),"-Baseline"))
 my_marker   =  ssp_world_markers_CO2_ffi    %>% filter(ssp == my_ssp)  %>% mutate(year = 2010 + (t*5))
 
@@ -853,17 +884,20 @@ plottigat= ggplot() +
   
   
   # Experiment World Sigma
-  geom_line(data= my_experiment$get_PARAMETER_ty("exp_world_emi", year_limit = 2300) %>% 
-              mutate(key = paste0(extension,"//",trns_type,"//",trns_end)) %>%
+  geom_line(data= my_experiment$get_PARAMETER_ty("world_emi_exp", year_limit = 2300) %>% 
+              mutate(key = paste0(extension," | ",trns_end," | ",trns_type , " | ",  dice_curve)) %>%
               filter(
+                
+                ssp == my_ssp,
                 
                 # obvious, always active
                 key == key
                 
-                # optional, activate if desired
-                #        ,extension == my_extension
-                ,trns_type == my_transition_type
-                #        ,trns_end  == my_transition_end
+                # optional, DEACTIVATE what you wanna plot
+                ,extension %in% my_acc_extensions
+                ,trns_type %in% my_acc_transition_type
+                ,trns_end  %in% my_acc_transition_end
+                ,dice_curve %in% my_acc_dice_curve
               )
             
             ,aes(x=year, y=value, group=key, color = key)
@@ -895,13 +929,15 @@ plottigat= ggplot() +
          axis.title.y  = element_text(size = 16)  ) +
   
   labs (color = "Scenarios") + 
-  ggtitle(paste0("World Emissions alternative scenarios for <",my_exp_descrp,"> compared" )) + 
+  ggtitle(paste0("World Emissions LR-alternatives for ", my_ssp )) + 
   xlab("Year") +
-  ylab("Carbon Intensity [GtCO2/Trill USD]")  ; plottigat
+  ylab("Emissions [GtCO2/Trill USD]")  ; plottigat
+
+}
 
 
 
-
+my_ssp = "ssp4"
 
 
 
@@ -919,12 +955,12 @@ plottigat= ggplot() +
 my_ssp        = "ssp1" 
 
 # view regions for selected ssp
-marker_ssp_regional = ssplist$ssp_xxF_yyA$get_PARAMETER_nty(paste0("SSPemi_",my_ssp,"_marker_native_regions"), year_limit = 2300) 
+marker_ssp_regional = ssplist$ssp_xxA_yyA$get_PARAMETER_nty(paste0("SSPemi_",my_ssp,"_marker_native_regions"), year_limit = 2300) 
 marker_ssp_regional %>% select( get_model_code(my_ssp)) %>% distinct()
 
 
 # select region
-my_region = "chn"
+my_region = "bra"
 my_reg_description = (get(my_ssp, regions_markers) %>% 
   filter(!!as.symbol(get_model_code(my_ssp)) == my_region)  %>% 
   select(paste0(get_model_code(my_ssp),"_description")))[1,1]
@@ -961,67 +997,67 @@ my_dice_curve      = "discounted"
     
     # Baseline region-calibrated 
     
-    geom_line(data= ssplist$ssp_xxF_yyA$get_PARAMETER_nty(paste0("emi_reg_",my_ssp), year_limit = 2300) %>% 
-                filter(!!as.symbol(get_model_code(my_ssp)) == my_region,
+    geom_line(data= ssplist$ssp_xxA_yyA$get_PARAMETER_nty(paste0("emi_reg_",my_ssp), year_limit = 2300) %>% 
+                filter(tolower(!!as.symbol(get_model_code(my_ssp))) == my_region,
                        dice_curve                   == my_dice_curve,
                        extension                    == my_extension,
                        trns_type                    == my_transition_type,
                        trns_end                     == my_transition_end
                 ),
-              aes(x=year, y=value, group=1, color = "test_xxF_yyA"),
+              aes(x=year, y=value, group=1, color = "test_xxA_yyA"),
               size = 1.1) +
     
-    geom_line(data= ssplist$ssp_xxF_yyB$get_PARAMETER_nty(paste0("emi_reg_",my_ssp), year_limit = 2300) %>% 
-                filter(!!as.symbol(get_model_code(my_ssp)) == my_region,
+    geom_line(data= ssplist$ssp_xxA_yyB$get_PARAMETER_nty(paste0("emi_reg_",my_ssp), year_limit = 2300) %>% 
+                filter(tolower(!!as.symbol(get_model_code(my_ssp))) == my_region,
                        dice_curve                   == my_dice_curve,
                        extension                    == my_extension,
                        trns_type                    == my_transition_type,
                        trns_end                     == my_transition_end
                 ),
-              aes(x=year, y=value, group=1, color = "test_xxF_yyB"),
+              aes(x=year, y=value, group=1, color = "test_xxA_yyB"),
               size = 1.1) +
     
-    geom_line(data= ssplist$ssp_xxF_yyC$get_PARAMETER_nty(paste0("emi_reg_",my_ssp), year_limit = 2300) %>% 
-                filter(!!as.symbol(get_model_code(my_ssp)) == my_region,
+    geom_line(data= ssplist$ssp_xxA_yyC$get_PARAMETER_nty(paste0("emi_reg_",my_ssp), year_limit = 2300) %>% 
+                filter(tolower(!!as.symbol(get_model_code(my_ssp))) == my_region,
                        dice_curve                   == my_dice_curve,
                        extension                    == my_extension,
                        trns_type                    == my_transition_type,
                        trns_end                     == my_transition_end
                 ),
-              aes(x=year, y=value, group=1, color = "test_xxF_yyC"),
+              aes(x=year, y=value, group=1, color = "test_xxA_yyC"),
               size = 1.1) +
     
-    geom_line(data= ssplist$ssp_xxF_yyD$get_PARAMETER_nty(paste0("emi_reg_",my_ssp), year_limit = 2300) %>% 
-                filter(!!as.symbol(get_model_code(my_ssp)) == my_region,
+    geom_line(data= ssplist$ssp_xxA_yyD$get_PARAMETER_nty(paste0("emi_reg_",my_ssp), year_limit = 2300) %>% 
+                filter(tolower(!!as.symbol(get_model_code(my_ssp))) == my_region,
                        dice_curve                   == my_dice_curve,
                        extension                    == my_extension,
                        trns_type                    == my_transition_type,
                        trns_end                     == my_transition_end
                 ),
-              aes(x=year, y=value, group=1, color = "test_xxF_yyD"),
+              aes(x=year, y=value, group=1, color = "test_xxA_yyD"),
               size = 1.1) +
     
     
     # Enerdata emissions
     geom_point(data= extract_region_value( EnerData_n_CO2_BAU, get(paste0("map_",get_model_code(my_ssp),"_ed57")), get_model_code(my_ssp)) %>% 
-                 filter(!!as.symbol(get_model_code(my_ssp)) == my_region),
+                 filter(tolower(!!as.symbol(get_model_code(my_ssp))) == my_region),
                aes(x=year, y=value, group=1, color = "EnerData Blue BAU"),
                
                shape = 19,
                size = 2.4) +
     
     # Historical emissions
-    geom_line(data= ssplist$ssp_xxF_yyC$get_PARAMETER(paste0("hist_emi_reg_",my_ssp)) %>% 
+    geom_line(data= ssplist$ssp_xxA_yyC$get_PARAMETER(paste0("hist_emi_reg_",my_ssp)) %>% 
                 mutate(year = (as.numeric(t)*5) +2010) %>% 
-                filter(!!as.symbol(get_model_code(my_ssp)) == my_region),
+                filter(tolower(!!as.symbol(get_model_code(my_ssp))) == my_region),
               aes(x=year, y=value, group=1, color = "Hist emissions"),
               size = 1.2)  +   
     
   
     
     # SSP marker
-    geom_line(data= ssplist$ssp_xxF_yyA$get_PARAMETER_nty(paste0("SSPemi_",my_ssp,"_marker_native_regions"), year_limit = 2300) %>% 
-                filter(!!as.symbol(get_model_code(my_ssp)) == my_region),
+    geom_line(data= ssplist$ssp_xxA_yyA$get_PARAMETER_nty(paste0("SSPemi_",my_ssp,"_marker_native_regions"), year_limit = 2300) %>% 
+                filter(tolower(!!as.symbol(get_model_code(my_ssp))) == my_region),
               aes(x=year, y=value, group=1, color = "IIASA SSP Marker"),
               size = 1.2,
               linetype = 4)  + 
@@ -1085,8 +1121,9 @@ my_dice_curve      = "discounted"
          axis.text.x   = element_text(size = 14),
          axis.title.y  = element_text(size = 16)  ) +
     labs (color = "Tests") + 
-    ggtitle(paste0("Baselines ", my_ssp, "  ", my_reg_description,"  <","DC",my_dice_curve, ", ", my_extension,", ",my_transition_type,", ",my_transition_end, "> across different calibrations")) + 
+    ggtitle(paste0("Baselines ", my_ssp, " - ", my_reg_description)) +  # <","DC",my_dice_curve, ", ", my_extension,", ",my_transition_type,", ",my_transition_end, "> across different calibrations")) + 
     xlab("Year") +
+    xlim(2000,2125) +
     ylab("Region Emissions [GtCO2]")  ; plottigat
   
 }
@@ -1104,16 +1141,17 @@ my_dice_curve      = "discounted"
 # ?!?!?!?!  ?!?!?!?!?  !?!?!??!  ?!?!?!?!  ?!?!?!?!?
 
 
-my_ssp        = "ssp1" 
+my_ssp        = "ssp5" 
 
 # view regions for selected ssp
-marker_ssp_regional = ssplist$ssp_xxF_yyA$get_PARAMETER_nty(paste0("SSPemi_",my_ssp,"_marker_native_regions"), year_limit = 2300) 
+marker_ssp_regional = ssplist$ssp_xxA_yyA$get_PARAMETER_nty(paste0("SSPemi_",my_ssp,"_marker_native_regions"), year_limit = 2300) 
 
-marker_ssp_regional %>% select( get_model_code(my_ssp)) %>% distinct()
+
+regions_markers[[my_ssp]]
 
 
 # select region
-my_region = "bra"
+my_region = "mea"
 my_reg_description = (get(my_ssp, regions_markers) %>% 
                         filter(!!as.symbol(get_model_code(my_ssp)) == my_region)  %>% 
                         select(paste0(get_model_code(my_ssp),"_description")))[1,1]
@@ -1137,6 +1175,220 @@ my_transition_end   = 38
 
 # | original | discounted |
 my_dice_curve      = "discounted"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## -------------- PLOT ::  REGION Emissions  ::  FUNCTION to pass through all regs quickly  -------------------
+
+
+
+
+
+#..........  //   AUTORUN  // ...................
+plotthis<- function(my_region){
+  
+  plottigat <- ggplot() +
+    
+    
+    # Baseline region-calibrated 
+    
+    geom_line(data= ssplist$ssp_xxA_yyA$get_PARAMETER_nty(paste0("emi_reg_",my_ssp), year_limit = 2300) %>% 
+                filter(!!as.symbol(get_model_code(my_ssp)) == my_region,
+                       dice_curve                   == my_dice_curve,
+                       extension                    == my_extension,
+                       trns_type                    == my_transition_type,
+                       trns_end                     == my_transition_end
+                ),
+              aes(x=year, y=value, group=1, color = "test_xxA_yyA"),
+              size = 1.1) +
+    
+    geom_line(data= ssplist$ssp_xxA_yyB$get_PARAMETER_nty(paste0("emi_reg_",my_ssp), year_limit = 2300) %>% 
+                filter(!!as.symbol(get_model_code(my_ssp)) == my_region,
+                       dice_curve                   == my_dice_curve,
+                       extension                    == my_extension,
+                       trns_type                    == my_transition_type,
+                       trns_end                     == my_transition_end
+                ),
+              aes(x=year, y=value, group=1, color = "test_xxA_yyB"),
+              size = 1.1) +
+    
+    geom_line(data= ssplist$ssp_xxA_yyC$get_PARAMETER_nty(paste0("emi_reg_",my_ssp), year_limit = 2300) %>% 
+                filter(!!as.symbol(get_model_code(my_ssp)) == my_region,
+                       dice_curve                   == my_dice_curve,
+                       extension                    == my_extension,
+                       trns_type                    == my_transition_type,
+                       trns_end                     == my_transition_end
+                ),
+              aes(x=year, y=value, group=1, color = "test_xxA_yyC"),
+              size = 1.1) +
+    
+    geom_line(data= ssplist$ssp_xxA_yyD$get_PARAMETER_nty(paste0("emi_reg_",my_ssp), year_limit = 2300) %>% 
+                filter(!!as.symbol(get_model_code(my_ssp)) == my_region,
+                       dice_curve                   == my_dice_curve,
+                       extension                    == my_extension,
+                       trns_type                    == my_transition_type,
+                       trns_end                     == my_transition_end
+                ),
+              aes(x=year, y=value, group=1, color = "test_xxA_yyD"),
+              size = 1.1) +
+    
+    
+    # Enerdata emissions
+    geom_point(data= extract_region_value( EnerData_n_CO2_BAU, get(paste0("map_",get_model_code(my_ssp),"_ed57")), get_model_code(my_ssp)) %>% 
+                 filter(!!as.symbol(get_model_code(my_ssp)) == my_region),
+               aes(x=year, y=value, group=1, color = "EnerData Blue BAU"),
+               
+               shape = 19,
+               size = 2.4) +
+    
+    # Historical emissions
+    geom_line(data= ssplist$ssp_xxA_yyC$get_PARAMETER(paste0("hist_emi_reg_",my_ssp)) %>% 
+                mutate(year = (as.numeric(t)*5) +2010) %>% 
+                filter(!!as.symbol(get_model_code(my_ssp)) == my_region),
+              aes(x=year, y=value, group=1, color = "Hist emissions"),
+              size = 1.2)  +   
+    
+    
+    
+    # SSP marker
+    geom_line(data= ssplist$ssp_xxA_yyA$get_PARAMETER_nty(paste0("SSPemi_",my_ssp,"_marker_native_regions"), year_limit = 2300) %>% 
+                filter(!!as.symbol(get_model_code(my_ssp)) == my_region),
+              aes(x=year, y=value, group=1, color = "IIASA SSP Marker"),
+              size = 1.2,
+              linetype = 4)  + 
+    
+    
+    
+    # graphic details
+    scale_color_manual(  values = c(  "black", "blue", "black",  pollo_20 )) + 
+    ## Use this only on final chart! 
+    #  scale_color_manual(  values =  c("sUC <.1"             = "black",
+    #                                   "sUC <.01"            = "black",
+    #                                   "IIASA SSP Baselines" = "#8585ad", #dark grey
+    #                                   "IIASA SSP Marker"    = "black",
+    #                                   "EnerData Blue BAU"   = "black",
+    #                                   "Hist emissions"      = "blue",
+    #                                   
+    #                                   "test_A"  =  "#32c738",
+    #                                   "test_B"  =  "#f77f2f", #orange
+    #                                   "test_C"  =  "#db0f20", 
+  #                                   "test_D"  =  "#c4570e",  # brown
+  #                                   "test_E"  =  "#d64cf5", # pink
+  #                                   "test_F"  =  "#8232c7", #violet
+  #                                   "test_G"  =  "#450094",
+  #                                   "test_H"  =  "blue",   #blue
+  #                                   "test_I"  =  "#0f86db",
+  #                                   "test_J"  =  "#0ccfab",
+  #                                   "test_K"  =  "green",  #greens
+  #                                   "test_L"  =  "#fff100", #yellow
+  #                                   "test_M"  =  "#046918",
+  #                                   "test_N"  =  "red",      # red
+  #                                   "test_O"  =  "#9c4317"
+  #  )) +
+  ## Use this only on final chart!   
+  #    guides(colour=guide_legend(  ncol=1,
+  #                                 override.aes = list(linetype = c(
+  #                                                                  "sUC <.01"           = "blank",
+  #                                                                  "sUC <.1"            = "blank",
+  #                                                                  "IIASA SSP Baselines"= "solid",
+  #                                                                  "IIASA SSP Marker"   = "solid",
+  #                                                                  "EnerData Blue BAU"  = "blank",
+  #                                                                  "Hist emissions"     = "solid",
+  #                                                                   "test_A"  =  "solid" #yellow
+  #                                                                  ,"test_B"  =  "solid" #orange
+  #                                                                  ,"test_C"  =  "solid"
+  #                                                                  ,"test_D"  =  "solid"      # red
+  #                                                                  ,"test_E"  =  "solid" # pink
+  #                                                                  ,"test_F"  =  "solid" #violet
+  #                                                                  ,"test_G"  =  "solid"
+  #                                                                  ,"test_H"  =  "solid"   #blue
+  #                                                                  ,"test_I"  =  "solid"
+  #                                                                  ,"test_J"  =  "solid"
+  #                                                                  ,"test_K"  =  "solid"
+  #                                                                  ,"test_L"  =  "solid"  
+  #                                                                  ,"test_M"  =  "solid"
+  #                                                                  ,"test_N"  =  "solid"
+  #                                                                  ,"test_O"  =  "solid"
+  #                                                                                           )))) + 
+  theme( legend.text   = element_text(size = 13),
+         plot.title    = element_text(size = 18),
+         axis.title.x  = element_text(size = 16),
+         axis.text.x   = element_text(size = 14),
+         axis.title.y  = element_text(size = 16)  ) +
+    labs (color = "Tests") + 
+    ggtitle(paste0("Baselines ", my_ssp, " - ", my_reg_description)) +  # <","DC",my_dice_curve, ", ", my_extension,", ",my_transition_type,", ",my_transition_end, "> across different calibrations")) + 
+    xlab("Year") +
+    xlim(2000,2125) +
+    ylab("Region Emissions [GtCO2]"); plottigat  
+  
+}
+
+
+
+
+my_ssp = "ssp5"
+# view regions for selected ssp
+marker_ssp_regional = ssplist$ssp_xxA_yyA$get_PARAMETER_nty(paste0("SSPemi_",my_ssp,"_marker_native_regions"), year_limit = 2300) 
+marker_ssp_regional %>% select( get_model_code(my_ssp)) %>% distinct()
+
+
+
+plottigatlist = list()
+
+for(r in (marker_ssp_regional %>% select( get_model_code(my_ssp)) %>% distinct())[[get_model_code(my_ssp)]]){
+  
+  
+  my_reg_description = (get(my_ssp, regions_markers) %>% 
+                          filter(!!as.symbol(get_model_code(my_ssp)) == r)  %>% 
+                          select(paste0(get_model_code(my_ssp),"_description")))[1,1]
+  
+  plottigatlist[[r]] = plotthis(r)
+}
+
+
+
+i = 1
+
+# pass through plots, one by one...
+#................................
+
+  plottigatlist[[i]]
+  i = i+1
+#................................
+#................................
+  
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

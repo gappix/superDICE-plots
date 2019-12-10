@@ -86,8 +86,9 @@ parse_experiment <- function(gdx_name_with_full_path){
   sanitize_runmode <- function(mystring){
     
     if(length(mystring) < 1) return(mystring) # empty value
-    if(toupper(mystring) =='RRBAU')  return('BAU')
-    if(toupper(mystring) =='RRCBA' ) return('CBA')
+    if(toupper(mystring) =='RRBAU')     return('BAU')
+    if(toupper(mystring) =='RRBAUDAM')  return('BAUdam')
+    if(toupper(mystring) =='RRCBA' )    return('CBA')
     if(length(grep("rrCTX", mystring)) > 0 ) return(paste0("CTAX",str_split(mystring, "rrCTX")[[1]][2]))
     if(length(grep("rrCEA", mystring)) > 0 ) return(paste0("CEA", str_split(mystring, "rrCEA")[[1]][2]))
     #default/no match case

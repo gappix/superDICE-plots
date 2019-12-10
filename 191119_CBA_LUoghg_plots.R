@@ -121,7 +121,7 @@ tatm_plot <- RICEx.plot.lineplot(
     
   )
   ,EXPtitle  = "Temperature increase with Burke SR by varying cooperation"
-  ,EXPylabel = "Temperature atmosphere increase [ÂºC]"
+  ,EXPylabel = "Temperature atmosphere increase [ºC]"
   ,EXPlegend = "Experiments"
 )
 

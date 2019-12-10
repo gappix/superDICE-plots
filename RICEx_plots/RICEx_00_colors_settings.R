@@ -173,18 +173,17 @@ pollo_20 <- c(
   ,"#5BBCD6"
   ,"#5bbf13" # green dettofatto  
   ,"#ff03f2" # pink 
-  ,"#6b43e0"  # everybody violet
-  ,"#00a61c" # ireland
-  ,"#000000" # black
-  ,"#4d1919" #coral bella storia
+  ,"#6b43e0"  # everybody violet  
   ,"#0374ff" # intense blue
+  ,"#4d1919" #coral bella storia
   ,"#690038" # shitty bordeaux
   ,"#03ff79" # shy green
   ,"#695006"  #real brown
   ,"#696506" #what is this?
   ,"#cf6b00" # candy brown
   ,"#007c82" # petroleum
-  
+  ,"#00a61c" # ireland
+  ,"#000000" # black
   
   ####3 
   )

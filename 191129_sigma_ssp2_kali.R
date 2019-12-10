@@ -88,7 +88,8 @@ source("OTHER_datamng/HIST_emissions_data.R")
 ## DICE SIGMA
 dice2016gdx  = gdx(paste0(here("../DICE Vanillas//"), "DICE2016R_091916ap_BAU_vanilla_results.gdx"))
 dicesigma =  dice2016gdx["sigma"] %>% mutate(year= 2010 + (as.numeric(t) * 5))
-
+dicepop   =  dice2016gdx["l"] %>% mutate(year= 2010 + (as.numeric(t) * 5))
+diceykali =  dice2016gdx["YGROSS"] %>% mutate(year= 2010 + (as.numeric(t) * 5))
 
 
 
@@ -97,14 +98,22 @@ dicesigma =  dice2016gdx["sigma"] %>% mutate(year= 2010 + (as.numeric(t) * 5))
 ykali_gdx = gdx(paste0(data_path,"RICExdata_baseline_ssp_pop_ykali.gdx")) 
 
 ssp_ykali_nty = ykali_gdx["ssp_ykali"] %>% 
-  mutate(year= 2010 + (as.numeric(t) * 5)) %>% 
-  rename(extension = V1, type = V2, ssp = V3) 
+  mutate(year= 2010 + (as.numeric(t) * 5)) 
+
+ssp_pop_nty = ykali_gdx["ssp_pop"] %>% 
+  mutate(year= 2010 + (as.numeric(t) * 5)) 
+
+
 
 world_ssp_ykali_ty = ssp_ykali_nty %>% 
-  group_by(ssp,extension,type,year,t) %>% 
+  group_by(ssp,extension,gdpadj,year,t) %>% 
   summarise(value = sum(value)) %>% 
   as.data.frame()
 
+world_ssp_pop_ty = ssp_pop_nty %>% 
+  group_by(ssp,extension,year,t) %>% 
+  summarise(value = sum(value)) %>% 
+  as.data.frame()
 
 
 ##--------------- FUNCTIONS to transform easycode  --------------------------------
@@ -115,11 +124,11 @@ world_ssp_ykali_ty = ssp_ykali_nty %>%
 #
 evaluate_sigmaWorld_from_nty <- function(experiment){
   
-  experiment$get_PARAMETER_ty("exp_world_emi", year_limit = 2300) %>% 
+  experiment$get_PARAMETER_ty("world_emi_exp", year_limit = 2300) %>% 
       mutate(ssp = "ssp2") %>% 
       select(-"t") %>%
       merge( world_ssp_ykali_ty %>% 
-               filter(type =="PPP"), 
+               filter(gdpadj =="PPP"), 
              by = c("year","ssp","extension"))   %>% 
       rename(  "emi" = value.x , "gdp_PPP" =  value.y  ) %>%
       mutate(sigma_PPP = emi/gdp_PPP )
@@ -180,7 +189,9 @@ extract_region_value <- function(nty_value,
 ## -------------- CODE WAREHOUSE (dunno if useful)   -------------------
 
 
-map_mglo_ed57 <- my_experiment$get_PARAMETER("map_message_globiom11_ed57")
+map_mglo_ed57 <- ssplist$ssp2_A_xxx$get_PARAMETER("map_message_globiom11_ed57")
+
+
 
 
 ## -------------- PLOT ::  Sigma World  :: Specific Comparison   -------------------
@@ -270,7 +281,7 @@ my_exp_descrp = "Test_A"
 my_extension       = "extshort"
 
 # | sigmoid_HHs | sigmoid_Hs | sigmoid_Ms | sigmoid_Ls | sigmoid_LLs | linear_pure | linear_soft |
-my_transition_type = "sigmoid_LLs"
+my_transition_type = "sigmoid_Ls"
 
 # | 28 | 38 | 48 | 58 |
 my_transition_end   = 28 
@@ -359,7 +370,7 @@ plottigat= ggplot() +
   
   
   # Experiment World Sigma
-  geom_line(data= my_experiment$get_PARAMETER_nty("exp_ppp_sigma", year_limit = 2300) %>% 
+  geom_line(data= my_experiment$get_PARAMETER_nty("sigma_ppp_exp", year_limit = 2300) %>% 
               filter(extension == my_extension,
                      trns_type == my_transition_type,
                      trns_end  == my_transition_end
@@ -400,10 +411,10 @@ plottigat= ggplot() +
 ## -------------- PLOT ::  Emissions Stacked Countries  :: Specific Comparison   -------------------
 
 
+s
 
-
-my_experiment = ssplist$ssp2_F_xxx 
-my_exp_descrp = "Test_F"
+my_experiment = ssplist$ssp2_A_xxx 
+my_exp_descrp = "Test_A"
 my_ssp        = "ssp2" 
 
 #...........................................
@@ -416,10 +427,10 @@ my_ssp        = "ssp2"
 my_extension       = "extshort"
 
 # | sigmoid_HHs | sigmoid_Hs | sigmoid_Ms | sigmoid_Ls | sigmoid_LLs | linear_pure | linear_soft |
-my_transition_type = "sigmoid_Ms"
+my_transition_type = "sigmoid_LLs"
 
 # | 28 | 38 | 48 | 58 |
-my_transition_end   = 28 
+my_transition_end   = 48 
 
 
 
@@ -438,7 +449,7 @@ my_marker   =  ssp_world_markers_CO2_ffi    %>% filter(ssp == my_ssp)  %>% mutat
 plottigat= ggplot() + 
     
     # Scenario
-    geom_area(data= my_experiment$get_PARAMETER_nty("exp_emi_bau", year_limit = 2300) %>% 
+    geom_area(data= my_experiment$get_PARAMETER_nty("emi_bau_exp", year_limit = 2300) %>% 
                 filter(extension == my_extension,
                        trns_type == my_transition_type,
                        trns_end  == my_transition_end
@@ -485,11 +496,12 @@ plottigat= ggplot() +
            axis.text.x = element_text(size = 14),
            axis.title.y = element_text(size = 16)) +  
     
-    ggtitle(paste0("Emissions Stacked  ",my_ssp," <",my_exp_descrp,", ",my_extension,", ",my_transition_type,", ",my_transition_end,"> at country level")) + 
+    ggtitle(paste0("Emissions Stacked  ",my_exp_descrp,", my_ssp", " <",my_extension,", ",my_transition_type,", ",my_transition_end,"> at country level")) + 
     xlab("Year") +
     ylab("Emissions FFI [GtCO2]")  ; plottigat
   
 } 
+# ................. AUTORUN .................
 
 
 
@@ -498,6 +510,20 @@ plottigat= ggplot() +
 
 
 
+
+# | extshort | extmed | extlong |
+my_extension       = "extmed"
+
+# | sigmoid_HHs | sigmoid_Hs | sigmoid_Ms | sigmoid_Ls | sigmoid_LLs | linear_pure | linear_soft |
+my_transition_type = "linear_pure"
+
+# | 28 | 38 | 48 | 58 |
+my_transition_end   = 38 
+
+
+
+# extra setting 
+no_legend = FALSE  # | TRUE | FALSE |  
 
 
 
@@ -536,7 +562,7 @@ my_extension       = "extmed"
 my_transition_type = "sigmoid_Ms"
 
 # | 28 | 38 | 48 | 58 |
-my_transition_end   = 28 
+my_transition_end   = 38 
 
 
 
@@ -558,7 +584,7 @@ plottigat= ggplot() +
   # SSP model
   geom_line(data= my_sspIIASA ,
             aes(x=year, y=value, group=model, color = "IIASA SSP Baselines"),
-            size = 1.2)  + 
+            size = 1)  + 
   
   # Historical emissions
   geom_line(data= E_hist_PRIMAP_world_y %>% filter(year >= 2000) ,
@@ -567,7 +593,7 @@ plottigat= ggplot() +
   
   # Baseline world-calibrated (world emissions from sigma kali)
   
-  geom_line(data= ssplist$ssp2_A_xxx$get_PARAMETER_nty("exp_world_emi", year_limit = 2300) %>% 
+  geom_line(data= ssplist$ssp2_A_xxx$get_PARAMETER_nty("world_emi_exp", year_limit = 2300) %>% 
               filter(extension == my_extension,
                      trns_type == my_transition_type,
                      trns_end  == my_transition_end
@@ -576,7 +602,7 @@ plottigat= ggplot() +
             size = 1.1) +
   
 
-  geom_line(data= ssplist$ssp2_B_xxx$get_PARAMETER_nty("exp_world_emi", year_limit = 2300) %>% 
+  geom_line(data= ssplist$ssp2_B_xxx$get_PARAMETER_nty("world_emi_exp", year_limit = 2300) %>% 
               filter(extension == my_extension,
                      trns_type == my_transition_type,
                      trns_end  == my_transition_end
@@ -585,7 +611,7 @@ plottigat= ggplot() +
             size = 1.1) +
   
   
-  geom_line(data= ssplist$ssp2_C_xxx$get_PARAMETER_nty("exp_world_emi", year_limit = 2300) %>% 
+  geom_line(data= ssplist$ssp2_C_xxx$get_PARAMETER_nty("world_emi_exp", year_limit = 2300) %>% 
               filter(extension == my_extension,
                      trns_type == my_transition_type,
                      trns_end  == my_transition_end
@@ -594,7 +620,7 @@ plottigat= ggplot() +
             size = 1.1) +
   
   
-  geom_line(data= ssplist$ssp2_D_xxx$get_PARAMETER_nty("exp_world_emi", year_limit = 2300) %>% 
+  geom_line(data= ssplist$ssp2_D_xxx$get_PARAMETER_nty("world_emi_exp", year_limit = 2300) %>% 
               filter(extension == my_extension,
                      trns_type == my_transition_type,
                      trns_end  == my_transition_end
@@ -603,7 +629,7 @@ plottigat= ggplot() +
             size = 1.1) +
   
   
-  geom_line(data= ssplist$ssp2_E_xxx$get_PARAMETER_nty("exp_world_emi", year_limit = 2300) %>% 
+  geom_line(data= ssplist$ssp2_E_xxx$get_PARAMETER_nty("world_emi_exp", year_limit = 2300) %>% 
               filter(extension == my_extension,
                      trns_type == my_transition_type,
                      trns_end  == my_transition_end
@@ -612,7 +638,7 @@ plottigat= ggplot() +
             size = 1.1) +
   
   
-  geom_line(data= ssplist$ssp2_F_xxx$get_PARAMETER_nty("exp_world_emi", year_limit = 2300) %>% 
+  geom_line(data= ssplist$ssp2_F_xxx$get_PARAMETER_nty("world_emi_exp", year_limit = 2300) %>% 
               filter(extension == my_extension,
                      trns_type == my_transition_type,
                      trns_end  == my_transition_end
@@ -697,6 +723,7 @@ theme( legend.text   = element_text(size = 13),
   labs (color = "Tests") + 
   ggtitle(paste0("Baselines ", my_ssp, " <",my_extension,", ",my_transition_type,", ",my_transition_end, "> across different calibrations")) + 
   xlab("Year") +
+  xlim(2000,2150)+
   ylab("World Emissions [GtCO2]")  ; plottigat
 
 }
@@ -718,9 +745,9 @@ theme( legend.text   = element_text(size = 13),
 
 
 
-my_experiment = ssplist$ssp2_F_xxx 
-my_exp_descrp = "Test_F"
-
+my_experiment = ssplist$ssp2_A_xxx 
+my_exp_descrp = "Test_A"
+my_ssp = "ssp2"
 #...........................................
 # here you can MODIFY FILTER LOGIC to compare
 # many scenarios alltogether
@@ -733,14 +760,24 @@ my_exp_descrp = "Test_F"
 
 
 # | extshort | extmed | extlong |
-my_extension       = "extshort"
+my_acc_extensions  = c("extshort",
+                       "extmed",
+                       "extlong")
 
 # | sigmoid_HHs | sigmoid_Hs | sigmoid_Ms | sigmoid_Ls | sigmoid_LLs | linear_pure | linear_soft |
-my_transition_type = "sigmoid_LLs"
+my_acc_transition_type  = c("#sigmoid_Ms",
+                            "sigmoid_Ls",
+                            "#sigmoid_Hs", 
+                            "#sigmoid_HHs", 
+                            "#sigmoid_LLs", 
+                            "#linear_pure", 
+                            "#linear_soft" )
 
 # | 28 | 38 | 48 | 58 |
-my_transition_end   = 28 
-
+my_acc_transition_end  = c("#28",
+                           "38",
+                           "48",
+                           "#58")
 
 #...........................................
 
@@ -767,17 +804,17 @@ plottigat= ggplot() +
   
   
   # Experiment World Sigma
-  geom_line(data= my_experiment$get_PARAMETER_ty("exp_world_emi", year_limit = 2300) %>% 
-              mutate(key = paste0(extension,"//",trns_type,"//",trns_end)) %>%
+  geom_line(data= my_experiment$get_PARAMETER_ty("world_emi_exp", year_limit = 2300) %>% 
+              mutate(key = paste0(extension," / ",trns_end," / ",trns_type)) %>%
               filter(
                 
                 # obvious, always active
                 key == key
                 
-                # optional, activate if desired
-                #        ,extension == my_extension
-                ,trns_type == my_transition_type
-                #        ,trns_end  == my_transition_end
+                # optional, DEACTIVATE what you wanna plot
+                ,extension %in% my_acc_extensions
+                ,trns_type %in% my_acc_transition_type
+                ,trns_end  %in% my_acc_transition_end
               )
             
             ,aes(x=year, y=value, group=key, color = key)
@@ -809,9 +846,9 @@ plottigat= ggplot() +
          axis.title.y  = element_text(size = 16)  ) +
   
   labs (color = "Scenarios") + 
-  ggtitle(paste0("World Emissions alternative scenarios for <",my_exp_descrp,"> compared" )) + 
+  ggtitle(paste0("World Emissions LR-scenarios for <",my_exp_descrp,">" )) + 
   xlab("Year") +
-  ylab("Carbon Intensity [GtCO2/Trill USD]")  ; plottigat
+  ylab("Emissions [GtCO2/Year]")  ; plottigat
 
 
 
@@ -855,10 +892,12 @@ marker_ssp_regional = get(paste0("sspDB_",my_ssp,"_native_regions_CO2_ffi")) %>%
 marker_ssp_regional %>% select(paste0("n",my_ssp)) %>% distinct()
 
 
-# select region
-my_region = "cpa"
-my_reg_description = "subsaharian africa"
 
+# select region
+my_region = "afr"
+my_reg_description = (get(my_ssp, regions_markers) %>% 
+                        filter(!!as.symbol(get_model_code(my_ssp)) == my_region)  %>% 
+                        select(paste0(get_model_code(my_ssp),"_description")))[1,1]
 
 # ................. AUTORUN .................
 {
@@ -1010,26 +1049,39 @@ my_reg_description = "subsaharian africa"
          axis.text.x   = element_text(size = 14),
          axis.title.y  = element_text(size = 16)  ) +
     labs (color = "Tests") + 
-    ggtitle(paste0("Baselines ", my_ssp, " <",my_reg_description,", ",my_extension,", ",my_transition_type,", ",my_transition_end, "> across different calibrations")) + 
+    ggtitle(paste0("Baselines ", 
+                   my_ssp, " - ", my_reg_description)) +  
+    #<",my_reg_description,", ",my_extension,", ",my_transition_type,", ",my_transition_end, "> across different calibrations")) + 
     xlab("Year") +
+    xlim(2000,2150)+
     ylab("Region Emissions [GtCO2]")  ; plottigat
   
 }
-
-
-
-#...
+#................ // AUTORUN // ................
 
 # select region
 marker_ssp_regional %>% select(paste0("n",my_ssp)) %>% distinct()
-my_region = "afr"
-my_reg_description = "subsaharian africa"
+# select region
+my_region = "mea"
+my_reg_description = (get(my_ssp, regions_markers) %>% 
+                        filter(!!as.symbol(get_model_code(my_ssp)) == my_region)  %>% 
+                        select(paste0(get_model_code(my_ssp),"_description")))[1,1]
+
+
+
+
+
+
+
+
+
 
 
 
 
 
 ## -------------- PLOT ::  REGION Emissions  :: LR-Scenario Comparison   -------------------
+
 
 
 my_ssp        = "ssp2" 
@@ -1043,21 +1095,28 @@ my_exp_descrp = "Test_A"
 #...........................................
 
 
-
-# Those filters are not all necessarily used 
+# Those filters are not all necessarily used (# deactivates option)
 
 
 # | extshort | extmed | extlong |
-my_extension       = "extmed"
+my_acc_extensions  = c("extshort",
+                       "extmed",
+                       "extlong")
 
 # | sigmoid_HHs | sigmoid_Hs | sigmoid_Ms | sigmoid_Ls | sigmoid_LLs | linear_pure | linear_soft |
-my_transition_type = "sigmoid_Ls"
+my_acc_transition_type  = c("sigmoid_Ms",
+                            "sigmoid_Ls",
+                            "#sigmoid_Hs", 
+                            "#sigmoid_HHs", 
+                            "sigmoid_LLs", 
+                            "#linear_pure", 
+                            "#linear_soft" )
 
 # | 28 | 38 | 48 | 58 |
-my_transition_end   = 38 
-
-
-
+my_acc_transition_end  = c("#28",
+                           "38",
+                           "48",
+                           "#58")
 
 
 
@@ -1069,32 +1128,31 @@ marker_ssp_regional %>% select(paste0("n",my_ssp)) %>% distinct()
 
 # select region
 my_region = "afr"
-my_reg_description = "subsaharian africa"
+my_reg_description = (get(my_ssp, regions_markers) %>% 
+                        filter(!!as.symbol(get_model_code(my_ssp)) == my_region)  %>% 
+                        select(paste0(get_model_code(my_ssp),"_description")))[1,1]
 
 
 
-#...........................................
 
-# change filter :: V :: ^ ::
-
-
+#................ // AUTORUN // ................
+{
   plottigat= ggplot() +
-    
   
     
   # Baseline region-calibrated 
     geom_line(data= my_experiment$get_PARAMETER_nty(paste0("emi_reg_",my_ssp), year_limit = 2300) %>% 
-                mutate(key = paste0(extension,"//",trns_type,"//",trns_end)) %>%
+                mutate(key = paste0(extension," / ",trns_end," / ",trns_type)) %>%
                 filter(
                   
                   # >> obvious, always active
                   key == key
                   ,get(get_model_code(my_ssp))  == my_region
                   
-                  # >> optional, activate if desired
-                  #        ,extension == my_extension
-                  ,trns_type == my_transition_type
-                  #        ,trns_end  == my_transition_end
+                  # >> optional, DEACTIVATE what you wanna plot
+                  ,extension %in% my_acc_extensions
+                  ,trns_type %in% my_acc_transition_type
+                  ,trns_end  %in% my_acc_transition_end
                 )
               
               ,aes(x=year, y=value, group=key, color = key)
@@ -1104,7 +1162,7 @@ my_reg_description = "subsaharian africa"
     
     # Enerdata emissions
     geom_point(data= extract_region_value( EnerData_n_CO2_BAU, map_mglo_ed57, "message_globiom11") %>% 
-                 filter( message_globiom11  == my_region),
+                 filter( mglo  == my_region),
                aes(x=year, y=value, group=1, color = "_EnerData Blue BAU"),
 
                shape = 19,
@@ -1134,17 +1192,195 @@ my_reg_description = "subsaharian africa"
            axis.title.y  = element_text(size = 16)  ) +
     
     labs (color = "Scenarios") + 
-    ggtitle(paste0("Region Emissions alternative scenarios for < ",my_region,",",my_exp_descrp,"> compared" )) + 
+    ggtitle(paste0("Baselines <", my_exp_descrp,"> ", 
+                   my_ssp, " - ", my_reg_description)) +  
     xlab("Year") +
     ylab("Region Emissions [GtCO2]")  ; plottigat
 
   
+  }
+  #................ // AUTORUN // ................
+  
+  
+  # access data and view regions
+  marker_ssp_regional %>% select(paste0("n",my_ssp)) %>% distinct()
+
+
+  
+  # select region
+  my_region = "afr"
+  my_reg_description = (get(my_ssp, regions_markers) %>% 
+                          filter(!!as.symbol(get_model_code(my_ssp)) == my_region)  %>% 
+                          select(paste0(get_model_code(my_ssp),"_description")))[1,1]
+  
+  
+
+
   
   
   
+  
+  
+  
+  
+  
 
+  
+  
+  
+  
+  
+  
+  
+  ## -------------- PLOT ::  BASELINE scenarios   -------------------
+  
 
+ 
+  plottigat= ggplot() +
+    
+    
+    
+    # Baseline region-calibrated 
+    geom_line(data= world_ssp_ykali_ty %>% filter(ssp == "ssp2", gdpadj =="PPP") 
+              ,aes(x=year, y=value, group=extension, color = extension)
+              ,size = 1.2)  + 
 
+    
+    # Plot appearance 
+    scale_color_manual( values= pollo_20  ) + 
+    guides(colour=guide_legend(ncol=1), fill=guide_legend(ncol=2)) +
+    theme( legend.text   = element_text(size = 13),
+           plot.title    = element_text(size = 18),
+           axis.title.x  = element_text(size = 16),
+           axis.text.x   = element_text(size = 14),
+           axis.title.y  = element_text(size = 16)  ) +
+    
+    labs (color = "Scenarios") + 
+    ggtitle(paste0("GDP LR scenarios compared" )) + 
+    xlab("Year") +
+    ylab("Trill 2005 USD")  ; plottigat
+  
+  
+  
+  
+  plottigat= ggplot() +
+    
+    
+    
+    # Baseline region-calibrated 
 
+    
+    geom_line(data= world_ssp_pop_ty %>% filter(ssp == "ssp2") 
+              ,aes(x=year, y=value, group=extension, color = extension)
+              ,size = 1.2
+    )  + 
+    
+    
+    
+    # Plot appearance 
+    scale_color_manual( values= pollo_20  ) + 
+    guides(colour=guide_legend(ncol=1), fill=guide_legend(ncol=2)) +
+    theme( legend.text   = element_text(size = 13),
+           plot.title    = element_text(size = 18),
+           axis.title.x  = element_text(size = 16),
+           axis.text.x   = element_text(size = 14),
+           axis.title.y  = element_text(size = 16)  ) +
+    
+    labs (color = "Scenarios") + 
+    ggtitle(paste0("Pop LR scenarios compared" )) + 
+    xlab("Year") +
+    ylab("Millions people")  ; plottigat
+  
+  
+  
+  ## -------------- PLOT ::  BASELINE scenarios STACKED   -------------------
+  
 
-
+  # | extshort | extmed | extlong |
+  my_extension       = "extshort"
+  
+  # | TRUE | FALSE |
+  no_legend = TRUE
+  
+  
+  my_ssp = "ssp2"
+  
+  
+  
+  # ................. AUTORUN GDP .................
+  
+  plottigat= ggplot() + 
+    
+    
+    # Scenario
+    geom_area(data= ssp_ykali_nty %>% filter( ssp == my_ssp, gdpadj =="PPP", extension == my_extension),
+              aes(x=year, y=value, group=n, fill =n)) + 
+    
+    # DICE
+    geom_line(data= diceykali %>% filter(year <= 2300) 
+              ,aes(x=year, y=value, group=1, color = "dice2016")
+              ,size = 1.2
+              ,linetype = "dashed"
+    )  + 
+    
+    
+    # graphic details
+    scale_color_manual( values= c("black")  ) + 
+    scale_fill_manual(values= colorize_regions("ed57") ) + 
+    
+    guides(colour=guide_legend(ncol=2), fill=guide_legend(ncol=2)) +
+    
+    theme( legend.position=if(no_legend){"none"} else {"right"} ,
+           plot.title = element_text(size=18),
+           axis.title.x = element_text(size = 16),
+           axis.text.x = element_text(size = 14),
+           axis.title.y = element_text(size = 16)) +  
+    
+    ggtitle(paste0("GDP stacked under -",my_extension, "- assumption")) + 
+    
+    
+    
+     ylim(0,max(max((world_ssp_ykali_ty%>%filter(ssp == my_ssp))$value),
+                max((diceykali%>% filter(year <= 2300))$value))) + 
+    
+    xlab("Year") +
+    ylab("Trill 2005 USD")  ; plottigat
+  
+  
+  
+  # ................. AUTORUN POP .................
+  
+  plottigat= ggplot() + 
+    
+    
+    # Scenario
+    geom_area(data= ssp_pop_nty %>% filter( ssp == my_ssp,  extension == my_extension),
+              aes(x=year, y=value, group=n, fill =n)) + 
+    
+    
+    # DICE
+    geom_line(data= dicepop %>% filter(year <= 2300) 
+              ,aes(x=year, y=value, group=1, color = "dice2016")
+              ,size = 1.2
+              ,linetype = "dashed"
+    )  + 
+    
+    
+    # graphic details
+    scale_color_manual( values= c("black")  ) + 
+    scale_fill_manual(values= colorize_regions("ed57") ) + 
+    
+    guides(colour=guide_legend(ncol=2), fill=guide_legend(ncol=2)) +
+    
+    theme( legend.position=if(no_legend){"none"} else {"right"} ,
+           plot.title = element_text(size=18),
+           axis.title.x = element_text(size = 16),
+           axis.text.x = element_text(size = 14),
+           axis.title.y = element_text(size = 16)) +  
+    
+    ggtitle(paste0("POP stacked under -",my_extension, "- assumption")) +
+    ylim(0,max(max((world_ssp_pop_ty%>%filter(ssp == my_ssp))$value),
+               max((dicepop%>% filter(year <= 2300))$value))) + 
+    xlab("Year") +
+    ylab("Million people")  ; plottigat
+  
