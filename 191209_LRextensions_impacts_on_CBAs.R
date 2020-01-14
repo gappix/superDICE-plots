@@ -35,17 +35,17 @@ RICEx.plot.lineplot(
   EXPdata   = list(
     "_Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000)
  
-    ,"BAU | 38 | sig_Ls | extmed "    = GEN_noncoop_base$BAU__ppp_exmed_38_Ls_disc$get_worldEMIffi_ty
-    ,"BAU | 38 | sig_Ls | extshort "  = GEN_noncoop_base$BAU__ppp_exshort_38_Ls_disc$get_worldEMIffi_ty
-    ,"BAU | 38 | sig_Ls | extlong "   = GEN_noncoop_base$BAU__ppp_exlong_38_Ls_disc$get_worldEMIffi_ty
+    ,"BAU nodmg | 38 | sig_Ls | extmed "    = GEN_noncoop_base$BAU__ppp_exmed_38_Ls_disc_discrt1x5$get_worldEMIffi_ty
+    ,"BAU nodmg | 38 | sig_Ls | extshort "  = GEN_noncoop_base$BAU__ppp_exshort_38_Ls_disc_discrt1x5$get_worldEMIffi_ty
+    ,"BAU nodmg | 38 | sig_Ls | extlong "   = GEN_noncoop_base$BAU__ppp_exlong_38_Ls_disc_discrt1x5$get_worldEMIffi_ty
     
-    ,"CBAnoncoop | 38 | sig_Ls | extmed "    = GEN_noncoop_base$CBA__ppp_exmed_38_Ls_disc$get_worldEMIffi_ty
-    ,"CBAnoncoop | 38 | sig_Ls | extshort "  = GEN_noncoop_base$CBA__ppp_exshort_38_Ls_disc$get_worldEMIffi_ty
-    ,"CBAnoncoop | 38 | sig_Ls | extlong "   = GEN_noncoop_base$CBA__ppp_exlong_38_Ls_disc$get_worldEMIffi_ty
+    ,"CBAnoncoop | 38 | sig_Ls | extmed "    = GEN_noncoop_base$CBA__ppp_exmed_38_Ls_disc_discrt1x5$get_worldEMIffi_ty
+    ,"CBAnoncoop | 38 | sig_Ls | extshort "  = GEN_noncoop_base$CBA__ppp_exshort_38_Ls_disc_discrt1x5$get_worldEMIffi_ty
+    ,"CBAnoncoop | 38 | sig_Ls | extlong "   = GEN_noncoop_base$CBA__ppp_exlong_38_Ls_disc_discrt1x5$get_worldEMIffi_ty
     
-    ,"CBAcoop_pop | 38 | sig_Ls | extmed "    = GEN_cooppop_base$CBA__ppp_exmed_38_Ls_disc$get_worldEMIffi_ty
-    ,"CBAcoop_pop | 38 | sig_Ls | extshort "  = GEN_cooppop_base$CBA__ppp_exshort_38_Ls_disc$get_worldEMIffi_ty
-    ,"CBAcoop_pop | 38 | sig_Ls | extlong "   = GEN_cooppop_base$CBA__ppp_exlong_38_Ls_disc$get_worldEMIffi_ty
+    ,"CBAcoop_pop | 38 | sig_Ls | extmed "    = GEN_cooppop_base$CBA__ppp_exmed_38_Ls_disc_discrt1x5$get_worldEMIffi_ty
+    ,"CBAcoop_pop | 38 | sig_Ls | extshort "  = GEN_cooppop_base$CBA__ppp_exshort_38_Ls_disc_discrt1x5$get_worldEMIffi_ty
+    ,"CBAcoop_pop | 38 | sig_Ls | extlong "   = GEN_cooppop_base$CBA__ppp_exlong_38_Ls_disc_discrt1x5$get_worldEMIffi_ty
     
     
     # ,"BAUdam | 38 | sig_Ls | extmed "    = BAUdam_base$BAUdam__ppp_exmed_38_Ls_disc$get_worldEMItot_ty
@@ -54,10 +54,199 @@ RICEx.plot.lineplot(
     # 
     # 
      )
-  ,EXPtitle  = "World FFI Emissions SSP2 under different LR-scenarios"
+  ,EXPtitle  = "World FFI Emissions SSP2 - Discount Rate 1.5% (default)"
   ,EXPylabel = "Emissions [GtCO2/year]"
   ,EXPlegend = "LR-scenarios"
 )
+
+
+
+# -------------- PLOT CBA::  World Emissions  :: changing LR extension  -------------------
+
+
+
+RICEx.plot.lineplot(
+  EXPdata   = list(
+    "_Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000)
+    
+    ,"BAU nodmg | 38 | sig_Ls | extmed "    = GEN_noncoop_base$BAU__ppp_exmed_38_Ls_disc_discrt001$get_worldEMIffi_ty
+    ,"BAU nodmg | 38 | sig_Ls | extshort "  = GEN_noncoop_base$BAU__ppp_exshort_38_Ls_disc_discrt001$get_worldEMIffi_ty
+    ,"BAU nodmg | 38 | sig_Ls | extlong "   = GEN_noncoop_base$BAU__ppp_exlong_38_Ls_disc_discrt001$get_worldEMIffi_ty
+    
+    ,"CBAnoncoop | 38 | sig_Ls | extmed "    = GEN_noncoop_base$CBA__ppp_exmed_38_Ls_disc_discrt001$get_worldEMIffi_ty
+    ,"CBAnoncoop | 38 | sig_Ls | extshort "  = GEN_noncoop_base$CBA__ppp_exshort_38_Ls_disc_discrt001$get_worldEMIffi_ty
+    ,"CBAnoncoop | 38 | sig_Ls | extlong "   = GEN_noncoop_base$CBA__ppp_exlong_38_Ls_disc_discrt001$get_worldEMIffi_ty
+    
+    ,"CBAcoop_pop | 38 | sig_Ls | extmed "    = GEN_cooppop_base$CBA__ppp_exmed_38_Ls_disc_discrt0015$get_worldEMIffi_ty
+    ,"CBAcoop_pop | 38 | sig_Ls | extshort "  = GEN_cooppop_base$CBA__ppp_exshort_38_Ls_disc_discrt0015$get_worldEMIffi_ty
+    ,"CBAcoop_pop | 38 | sig_Ls | extlong "   = GEN_cooppop_base$CBA__ppp_exmed_38_Ls_disc_discrt0015$get_worldEMIffi_ty %>% filter(year==2015)
+    
+    
+    # ,"BAUdam | 38 | sig_Ls | extmed "    = BAUdam_base$BAUdam__ppp_exmed_38_Ls_disc$get_worldEMItot_ty
+    # ,"BAUdam | 38 | sig_Ls | extshort "  = BAUdam_base$BAUdam__ppp_exshort_38_Ls_disc$get_worldEMItot_ty
+    # ,"BAUdam | 38 | sig_Ls | extlong "   = BAUdam_base$BAUdam__ppp_exlong_38_Ls_disc$get_worldEMItot_ty
+    # 
+    # 
+  )
+  ,EXPtitle  = "World FFI Emissions SSP2 - Discount Rate ~0.1%"
+  ,EXPylabel = "Emissions [GtCO2/year]"
+  ,EXPlegend = "LR-scenarios"
+)
+
+
+
+
+
+
+
+# -------------- PLOT CBA::  World Emissions  :: changing LR extension  -------------------
+
+
+
+RICEx.plot.lineplot(
+  EXPdata   = list(
+    "_Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000)
+    
+    ,"BAU nodmg | 38 | sig_Ls | extmed "    = GEN_noncoop_base$BAU__ppp_exmed_38_Ls_disc_discrt03$get_worldEMIffi_ty
+    ,"BAU nodmg | 38 | sig_Ls | extshort "  = GEN_noncoop_base$BAU__ppp_exshort_38_Ls_disc_discrt03$get_worldEMIffi_ty
+    ,"BAU nodmg | 38 | sig_Ls | extlong "   = GEN_noncoop_base$BAU__ppp_exlong_38_Ls_disc_discrt03$get_worldEMIffi_ty
+    
+    ,"CBAnoncoop | 38 | sig_Ls | extmed "    = GEN_noncoop_base$CBA__ppp_exmed_38_Ls_disc_discrt03$get_worldEMIffi_ty
+    ,"CBAnoncoop | 38 | sig_Ls | extshort "  = GEN_noncoop_base$CBA__ppp_exshort_38_Ls_disc_discrt03$get_worldEMIffi_ty
+    ,"CBAnoncoop | 38 | sig_Ls | extlong "   = GEN_noncoop_base$CBA__ppp_exlong_38_Ls_disc_discrt03$get_worldEMIffi_ty
+    
+    ,"CBAcoop_pop | 38 | sig_Ls | extmed "    = GEN_cooppop_base$CBA__ppp_exmed_38_Ls_disc_discrt03$get_worldEMIffi_ty
+    ,"CBAcoop_pop | 38 | sig_Ls | extshort "  = GEN_cooppop_base$CBA__ppp_exshort_38_Ls_disc_discrt03$get_worldEMIffi_ty
+    ,"CBAcoop_pop | 38 | sig_Ls | extlong "   = GEN_cooppop_base$CBA__ppp_exlong_38_Ls_disc_discrt03$get_worldEMIffi_ty
+    
+
+  )
+  ,EXPtitle  = "World FFI Emissions SSP2 - Discount Rate 3%"
+  ,EXPylabel = "Emissions [GtCO2/year]"
+  ,EXPlegend = "LR-scenarios"
+)
+
+
+
+
+
+
+
+
+# -------------- PLOT CBA::  World Emissions  :: changing LR extension  -------------------
+
+
+RICEx.plot.lineplot(
+  EXPdata   = list(
+    "_Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000)
+    
+    ,"BAU nodmg | 48 | sig_Ls | extmed "    = GEN_noncoop_base$BAU__ppp_exmed_48_Ls_disc$get_worldEMIffi_ty
+    
+    ,"CBAnoncoop | 48 | sig_Ls | extmed "    = GEN_noncoop_base$CBA__ppp_exmed_38_Ls_disc$get_worldEMIffi_ty
+
+    ,"CBAcoop_NGSW | 48 | sig_Ls | extmed "    = GEN_coopngsw_base$CBA__ppp_exmed_38_Ls_disc$get_worldEMIffi_ty
+    
+    ,"CBAcoop_pop | 48 | sig_Ls | extmed "    = GEN_cooppop_base$CBA__ppp_exmed_38_Ls_disc$get_worldEMIffi_ty
+
+    
+    
+  )
+  ,EXPtitle  = "World FFI Emissions SSP2 - GDP PPP"
+  ,EXPylabel = "Emissions [GtCO2/year]"
+  ,EXPlegend = "LR-scenarios"
+)
+
+
+
+
+
+
+RICEx.plot.lineplot(
+  EXPdata   = list(
+    "_Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000)
+    
+    ,"BAU nodmg | 48 | sig_Ls | extmed "    = GEN_noncoop_base$BAU__ppp_exlong_48_Ls_disc$get_worldEMIffi_ty
+    
+    ,"CBAnoncoop | 48 | sig_Ls | extmed "    = GEN_noncoop_base$CBA__mer_exmed_48_Ls_disc$get_worldEMIffi_ty
+    
+    ,"CBAcoop_NGSW | 48 | sig_Ls | extmed "    = GEN_coopngsw_base$CBA__mer_exmed_48_Ls_disc$get_worldEMIffi_ty
+    
+    ,"CBAcoop_pop | 48 | sig_Ls | extmed "    = GEN_cooppop_base$CBA__mer_exmed_48_Ls_disc$get_worldEMIffi_ty
+    
+    
+    
+  )
+  ,EXPtitle  = "World FFI Emissions SSP2 - GDP MER"
+  ,EXPylabel = "Emissions [GtCO2/year]"
+  ,EXPlegend = "LR-scenarios"
+)
+
+
+
+
+
+
+
+
+# -------------- PLOT CBA::  World Emissions  :: changing LR extension  -------------------
+
+
+# With Extshot setting (which should be very similar)
+
+RICEx.plot.lineplot(
+  EXPdata   = list(
+    "_Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000)
+    
+    ,"BAU "    = GEN_noncoop_base$BAU__mer_exmed_48_Ls_disc$get_worldEMIffi_ty
+  
+    
+    ,"CBAcoop NGSW "    = GEN_coopngsw_base$CBA__mer_exshort_linear_48_disc$get_worldEMIffi_ty
+    
+    ,"CBAcoop pop "    = GEN_cooppop_base$CBA__mer_exshort_linear_48_disc$get_worldEMIffi_ty
+    
+    
+    
+  )
+  ,EXPtitle  = "World FFI Emissions SSP2 - GDP MER"
+  ,EXPylabel = "Emissions [GtCO2/year]"
+  ,EXPlegend = "Extshort scenarios"
+)
+
+
+
+
+
+
+RICEx.plot.lineplot(
+  EXPdata   = list(
+    "_Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000)
+    
+    ,"BAU "    = GEN_noncoop_base$BAU__mer_exmed_48_Ls_disc$get_worldEMIffi_ty
+    
+    
+    ,"CBAcoop NGSW "    = GEN_coopngsw_base$CBA__ppp_exshort_linear_48_disc$get_worldEMIffi_ty
+    
+    ,"CBAcoop pop "    = GEN_cooppop_base$CBA__ppp_exshort_linear_48_disc$get_worldEMIffi_ty
+    
+    
+    
+  )
+  ,EXPtitle  = "World FFI Emissions SSP2 - GDP PPP"
+  ,EXPylabel = "Emissions [GtCO2/year]"
+  ,EXPlegend = "Extshort scenarios"
+)
+
+
+
+#dfskfjsdkjfhsjhfkjshdfk
+
+
+
+
+
+
+
+
 
 
 
@@ -67,7 +256,7 @@ RICEx.plot.lineplot(
     
     ,"BAU | 48 | sig_Ls | extmed "    = GEN_noncoop_base$BAU__ppp_exmed_48_Ls_disc$get_worldEMIffi_ty
     ,"BAU | 48 | sig_Ls | extshort "  = GEN_noncoop_base$BAU__ppp_exshort_48_Ls_disc$get_worldEMIffi_ty
-    ,"BAU | 48 | sig_Ls | extlong "   = GEN_noncoop_base$BAU__ppp_exlong_48_Ls_disc$get_worldEMIffi_ty
+    #,"BAU | 48 | sig_Ls | extlong "   = GEN_noncoop_base$BAU__ppp_exlong_48_Ls_disc$get_worldEMIffi_ty
     
     ,"BAU | 28 | sig_Ls | extmed "    = GEN_noncoop_base$BAU__ppp_exmed_28_Ls_disc$get_worldEMIffi_ty
     ,"BAU | 28 | sig_Ls | extshort "  = GEN_noncoop_base$BAU__ppp_exshort_28_Ls_disc$get_worldEMIffi_ty

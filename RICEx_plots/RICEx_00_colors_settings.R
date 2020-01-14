@@ -191,6 +191,96 @@ pollo_20 <- c(
 
 
 
+require_package("tibble")
+require_package("dplyr")
+
+# The secret:
+# YOUR color-filled table
+
+pollos_colors <- tribble(
+  
+  ~color_code, ~description     ,~q1_priority  ,~q5_cluster  ,~q5_priority ,~q4_cluster  ,~q4_priority  ,~q2_cluster  ,~q2_priority  ,~q3_cluster  ,~q3_priority                      
+  
+  ,"#FF0000"   ,"Red vero"            ,1            ,"Q1"        ,1             ,"Q1"        ,1             ,"Warm"         ,1           ,"Q1Warm"        ,1                               
+  ,"#00A08A"   ,"Green buff"          ,2            ,"Q3"        ,1             ,"Q3"        ,1             ,"Cold"         ,1           ,"Q2Cold"        ,1                           
+  ,"#F2AD00"   ,"Yellow DettoFatto"   ,3            ,"Q4"        ,1             ,"Q4"        ,1             ,"Warm"         ,3           ,"Q1Warm"        ,3                           
+  ,"#F98400"   ,"Orange Rugby Varese" ,4            ,"Q4"        ,2             ,"Q4"        ,2             ,"Warm"         ,2           ,"Q1Warm"        ,2                           
+  ,"#5BBCD6"   ,"Light Blue Cielo"    ,5            ,"Q2"        ,1             ,"Q2"        ,1             ,"Cold"         ,2           ,"Q2Cold"        ,2                           
+  ,"#5bbf13"   ,"Green DettoFatto"    ,6            ,"Q3"        ,2             ,"Q3"        ,2             ,"Cold"         ,3           ,"Q2Cold"        ,3                                          
+  ,"#ff03f2"   ,"Pink"                ,7            ,"Q1"        ,2             ,"Q1"        ,2             ,"Warm"         ,4           ,"Q1Warm"        ,4                             
+  ,"#6b43e0"   ,"Violet EveryBody "   ,8            ,"Q2"        ,2             ,"Q2"        ,2             ,"Cold"         ,5           ,"Q2Cold"        ,5                                          
+  ,"#0374ff"   ,"Intense blue"        ,9            ,"Q2"        ,3             ,"Q2"        ,3             ,"Cold"         ,4           ,"Q2Cold"        ,4                                    
+  ,"#4d1919"   ,"Coral bella storia"  ,10           ,"Q1"        ,3             ,"Q1"        ,3             ,"Warm"         ,6           ,"Q1Warm"        ,4                                         
+  ,"#690038"   ,"shitty bordeaux"     ,11           ,"Q1"        ,4             ,"Q1"        ,4             ,"Warm"         ,5           ,"Q3Neutral"     ,1                                       
+  ,"#03ff79"   ,"shy green"           ,12           ,"Q4"        ,3             ,"Q4"        ,3             ,"Cold"         ,6           ,"Q2Cold"        ,7                                 
+  ,"#695006"   ,"real brown"          ,13           ,"Q5"        ,1             ,"Q4"        ,4             ,"Warm"         ,7           ,"Q3Neutral"     ,2                                    
+  ,"#696506"   ,"what is this?"       ,14           ,"Q5"        ,2             ,"Q3"        ,3             ,"Warm"         ,8           ,"Q3Neutral"     ,3                                       
+  ,"#cf6b00"   ,"candy brown"         ,15           ,"Q5"        ,3             ,"Q4"        ,5             ,"Warm"         ,9           ,"Q3Neutral"     ,4                                     
+  ,"#007c82"   ,"petroleum"           ,16           ,"Q3"        ,3             ,"Q3"        ,4             ,"Cold"         ,7           ,"Q2Cold"        ,8                                   
+  ,"#00a61c"   ,"ireland"             ,17           ,"Q3"        ,4             ,"Q3"        ,5             ,"Cold"         ,8           ,"Q2Cold"        ,9                                 
+  ,"#000000"   ,"black"               ,18           ,"Q5"        ,4             ,"Q1"        ,5             ,"Warm"         ,9           ,"Q3Neutral"     ,5                               
+  
+)
+
+
+# The function
+
+
+
+i_want_pollos_colors <- function(   howmany_colors      = NULL
+                                    , howmany_categories  = NULL
+                                    , colors_per_category = NULL 
+){
+  
+  if(is.null(howmany_colors)){ncolors = length(pollos_colors[[1]])} 
+  else{ ncolors = howmany_colors }
+  
+  
+  
+  # Check input consistency
+  
+  if(!is.null(howmany_categories)){
+
+
+    if(is_null(colors_per_category)){
+      stop("colors_per_category must contain a valid number!")
+    }
+
+  }
+  
+  #TODO
+  
+  # Check colors availability
+  
+  if(ncolors > length(pollos_colors[[1]] )){
+    stop(paste0("Too many colors! Only ",length(pollos_colors[[1]] )," available!"))
+  }
+  
+  #TODO
+  
+  
+  # Colors builder 
+  
+  # One category
+  if(is.null(howmany_categories)){
+    return(pollos_colors[order(pollos_colors$q1_priority),]$color_code[1:ncolors])
+  }
+  if(howmany_categories == 1){
+    return(pollos_colors[order(pollos_colors$q1_priority),]$color_code[1:ncolors])
+  }
+  
+  # More categories
+  
+  # subset of colors needed
+  pollos_subset = pollos_colors %>%  filter( !!as.symbol(paste0("q",howmany_categories,"_priority")) %in% c(1:colors_per_category)) %>% as.data.frame()
+  return(pollos_subset[order(pollos_subset[[paste0("q",howmany_categories,"_cluster")]]),]$color_code)
+  
+  
+}
+
+
+
+
 
 ##---------------: REGIONAL COLOR PALETTE :-----------------------
 

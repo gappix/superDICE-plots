@@ -1,0 +1,113 @@
+#:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# 
+#  
+#  
+# 
+#:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+
+## -----------------   Source files   ---------------------------------
+
+source("RICEx_plots/RICEx_40_map_plot_utilities.R")
+# library(gridExtra)
+library(ggpubr)
+
+
+
+
+## ____ FUNCTION ____
+# to evaluate multiple MAPS sharing the same dimensions and legend
+# on the same chart
+RICEx.plot.multimap <- function( EXPdata 
+                                ,legend 
+                                ,title
+                                ,palette  = NULL 
+                                ,shape    = NULL 
+                                ,min_data = NULL 
+                                ,max_data = NULL 
+                            ){
+
+
+
+  
+  # Retrieve general informations
+  myTitle   =  title
+  myLegend  =  legend
+  
+  myShape   =  shape
+  # stupid guessing for most used shape mappings
+  if(is.null(myShape)){ 
+    regions = nrow(EXPdata[[1]]%>%select(n)%>%distinct())
+    if (regions > 50) myShape = ed57shp 
+    else if(regions >30) myShape = ed35shp 
+    else if(regions == 17) myShape = wt17shp 
+    else if(regions == 5) myShape = r5shp 
+    else if(regions == 1) myShape = global1shp 
+    else stop("please specify shape mapping for regions!")
+  }
+  
+  
+  myPalette =  palette 
+  # Default palette adopted
+  if(is.null(myPalette)) myPalette = rev(RColorBrewer::brewer.pal(9, "RdBu")) 
+  
+  # General informations
+  mydf  <- cbind(cat=rep(names(EXPdata),sapply(EXPdata,nrow)),do.call(rbind,EXPdata))
+  min_measure = min(mydf$value)
+  max_measure = max(mydf$value)
+  if(is.null(min_data)){ min_data = min(c(min_measure, -max_measure)) }
+  if(is.null(max_data)){ max_data = max(c(max_measure, -min_measure)) }
+  # Check df correctness
+  if("year" %in% colnames(mydf)) if(nrow(mydf %>% dplyr::select("year") %>% distinct() ) > 1) stop("More than one year found! No temporal dimension in maps!")
+   
+  
+  # Get number of plots 
+  nplots     = length(EXPdata)
+  map_layout = get_map_plots_layout(nplots)
+
+  
+  plotlist    = list()
+  plotlegend  = NULL
+  
+  
+  # Alternative approach (much slower! )
+  # plotlist <- lapply(names(EXPdata), RICEx.plot.map 
+  #                    ,data     = mydf
+  #                    ,shape    = myShape
+  #                    ,legend   = myLegend 
+  #                    ,palette  = myPalette                     
+  #                    ,min_data = min_data
+  #                    ,max_data = max_data)
+  # 
+  # plottigat = do.call("grid.arrange", c(plotlist, ncol=floor(sqrt(nplots))))
+
+  
+  for(p in c(1:length(EXPdata))){
+    
+    message( paste0("preparing plot < ",names(EXPdata)[p]," > ...") )
+  
+    # Plottigat ...........................
+    plottigat = RICEx.plot.map( data     = EXPdata[[p]]
+                               ,title    = names(EXPdata)[p]
+                               ,shape    = myShape
+                               ,legend   = myLegend 
+                               ,palette  = myPalette                     
+                               ,min_data = min_data
+                               ,max_data = max_data )
+      
+    # if(p == 1){plotlegend <- get_plotlegend(plottigat)} 
+    plotlist[[p]] <- local(print(plottigat  + theme(legend.position="none")))
+  }
+  
+  message( paste0("putting all together (maps are an hard job, it may take some MINUTES!)") )
+  nCol = floor(sqrt(nplots))
+  nRow = ceiling(nplots/nCol)
+  
+  annotate_figure(do.call("ggarrange", c(plotlist, ncol=nCol, nrow=nRow,  common.legend = TRUE, legend="right")) 
+                  ,top =  text_grob(myTitle, face = "bold", size = 16)
+  )
+  
+
+
+}

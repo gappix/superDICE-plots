@@ -1,5 +1,31 @@
-require_package("wesanderson")
 
+require_package("ggplot2")
+require_package("ggspatial")
+require_package("ggrepel")
+require_package("raster")
+require_package("sf")
+require_package("conflicted")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("select", "dplyr")
+
+##---------:  IMPORT REGIONS SHP   :-------------------------------------------------------------------------------------------------
+
+capture.output({
+
+ed57shp   <- st_read("qgis/shape_outfile/geo_ene57/geo_ene57.shp")        %>% rename(n= REG_NAME) %>% mutate(region_key = paste0("ed57_",n))
+ed35shp   <- st_read("qgis/shape_outfile/geo_ene35/geo_ene35.shp")        %>% rename(n= REG_NAME) %>% mutate(region_key = paste0("ed3_",n))
+wt17shp   <- st_read("qgis/shape_outfile/geo_witch17/geo_witch17.shp")    %>% rename(n= REG_NAME) %>% mutate(n = tolower(n)) %>% mutate(region_key = paste0("witch17_",n))
+r5shp     <- st_read("qgis/shape_outfile/geo_r5/geo_r5.shp")              %>% rename(n= REG_NAME) %>% mutate(n = tolower(n)) %>% mutate(region_key = paste0("r5_",n))
+global1shp <- st_read("qgis/shape_outfile/geo_global1/geo_global1.shp")   %>% rename(n= REG_NAME) %>% mutate(region_key = paste0("global_",n))
+
+}, file='NUL')
+
+# View(ed57shp)
+
+
+## ____ FUNCTION ____
+# to evaluate world sigma
+#
 define.legend <- function(chunks = 100,...){
   x <- c(...)
   sum(...)       
@@ -19,6 +45,10 @@ define.legend <- function(chunks = 100,...){
 
 
 
+
+## ____ FUNCTION ____
+# to evaluate world sigma
+#
 map.diverge.color <- function(data,
                           pal_choice="RdGy",
                           centeredOn=0, 
@@ -48,6 +78,10 @@ map.diverge.color <- function(data,
 
 
 
+
+## ____ FUNCTION ____
+# to evaluate world sigma
+#
 map.normal.color <- function(data,
                              pal_choice = "OrRd",
                              my_ramps = 9,
@@ -67,9 +101,24 @@ return(list(cuts,rc1))
 
 
 
+
+## ____ FUNCTION ____
+# to retrieve the best layout option for the
+# number of maps to plot.
+#
 get_map_plots_layout <- function(nplots = 2){
   
-  
+  #___________________
+  if(nplots==1){
+    
+    my_layout = layout(matrix(c(1,1,1,1),
+                              nrow=1,
+                              ncol=1), 
+                       widths=c(4), 
+                       heights=c(2), 
+                       TRUE) 
+    return(my_layout)
+  } 
   
   #___________________
   if(nplots==2){
@@ -145,7 +194,7 @@ multiple_map_plotter <- function(plot_this_list){
   
   
   #layout that
-  my_layout = get_map_plots_layout(length(plot_this_list$elements))
+  my_layout = get_map_plots_layout(length(plot_this_list))
 
   # plot each plot
   
@@ -186,7 +235,55 @@ multiple_map_plotter <- function(plot_this_list){
 
 
 
+#extract legend
+#https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
+get_plotlegend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
 
 
+
+RICEx.plot.map <- function(  data 
+                            ,legend 
+                            ,title 
+                            ,palette  
+                            ,shape    
+                            ,min_data 
+                            ,max_data 
+                            ){
+ggplot() +
+      
+      # data
+      geom_sf(data =  merge(  shape,
+                              data,
+                              by =c("n"))) + 
+      aes(fill = value) + 
+      
+      # appearance
+      scale_fill_gradientn(colors = palette
+                           ,breaks=c( min_data
+                                      ,0.5*min_data        
+                                      #,0.2*min_data 
+                                      ,0       
+                                      #,0.2*max_data
+                                      ,0.5*max_data
+                                      ,max_data
+                                      )
+                           ,labels=c( paste0(round(min_data,digits = 2))
+                                     ,paste0(round(0.5*min_data,digits = 2))
+                                     #,paste0(round(0.2*min_data,digits = 2))
+                                     ,0
+                                     #,paste0(round(0.2*max_data,digits = 2))
+                                     ,paste0(round(0.5*max_data,digits = 2))
+                                     ,paste0(round(max_data,digits = 2))
+                                     )
+                           #,limits=c(min_data, max_data) # symmetric scale (0 in the middle)
+      ) +
+      
+      labs (fill = legend) + 
+      ggtitle(title)
+}
 
 
