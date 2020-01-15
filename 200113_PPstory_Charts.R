@@ -11,17 +11,10 @@
 
 
 source("RICEx_datamng/RICEx_50_experiments_data_central_hub.R")
-source("OTHER_datamng/HIST_emissions_data.R")
 source("RICEx_utils/RICEx_10_regions_mappings.R")
 
-source("RICEx_plots/RICEx_plots.R")
+invisible(source("RICEx_plots/RICEx_plots.R"))
 
-require_package("conflicted")
-conflict_prefer("filter", "dplyr")
-conflict_prefer("select", "dplyr")
-
-
-#<<<<< DICE values
 
 
 
@@ -42,12 +35,31 @@ EXPssp2_noncoop   = EXP$ssp2$noncoop_pop
 EXPssp2_coopngsh  = EXP$ssp2$coop_negishi
 
 
+
+
+
+
+##------------- Additional data needed for plotting --------------------
+
+
+source("OTHER_datamng/HIST_emissions_data.R")
+# DICE values 
+source("OTHER_datamng/DICE_results_management.R")
+# (available in "DICEresults" list)
+
+
+
+## Add today values to historical for continuity
+E_hist_PRIMAP_world_y = rbind(E_hist_PRIMAP_world_y, data.frame(year=2015, value= 35.04)) 
+
+
+
 #=========================================================================##
-## ---------------- ——————————   LINE CHARTS   ————————————  ------------
+## ------------ _____________   LINE CHARTS  _____________  ------------
 #=========================================================================##
 
 
-## -----------------  World EMISSIONS — BURKE SR varying COOPERATION  -------------------
+## -----------------  World EMISSIONS - SSP2 - BURKE SR varying COOPERATION  -------------------
 
 
 
@@ -61,85 +73,397 @@ EXPssp2_coopngsh  = EXP$ssp2$coop_negishi
 # COSA Migliorare
 # Historical nere + BAU nere (e grigie se altre presenti)
 
-RICEx.plot.lineplot(
+plottigat <- RICEx.plot.lineplot(
   
   EXPdata   = list(
     
-    "Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000) %>% mutate(unit = "GtCO2/year")
-    ,"BAU nodmg" = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAU$get_world_EMIffi_ty
-    
-    ,"CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
-    ,"CBA coop ngsh"    = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
-    ,"CBA noncoop"      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
 
-  )
+     "CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"CBA coop ngsh"    = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"CBA noncoop"      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+
+    
+    ,"DICE16 BAU"       = DICEresults$DICE2016R_091916ap_BAU_vanilla_results$get_VARIABLE_ty("EIND")  %>% mutate(unit = "GtCO2/year")
+    ,"DICE16 CBA"       = DICEresults$DICE2016R_091916ap_OPT_vanilla_results$get_VARIABLE_ty("EIND")  %>% mutate(unit = "GtCO2/year")
+  
+    ,"Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000) %>% mutate(unit = "GtCO2/year")
+    ,"BAU nodmg" = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$BAU$get_world_EMIffi_ty
+    
+    )
   ,title  = "World FFI Emissions SSP2 - BURKESR - Different cooperation"
   ,yLabel = "Emissions [GtCO2/year]"
   ,legend = "Scenarios"
-)
+  ,categories = 3
+  ,colors_per_category = 3
+); plottigat
+
+
+## -----------------  World Carbon Intensity - SSP2 - BURKE SR varying COOPERATION  -------------------
 
 
 
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# I want to compare optimal carbon intensity trends under 
+# different cooperation scenarios.
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-## -----------------  World EMISSIONS — BURKE SR varying COOPERATION  +  DICE profiles -------------------
+
+plottigat <- RICEx.plot.lineplot(
+  
+  EXPdata   = list(
+    
+    
+    "CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_CIntensity_ty
+    ,"CBA coop ngsh"    = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_CIntensity_ty
+    ,"CBA noncoop"      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_CIntensity_ty
+    
+    
+    ,"DICE16 BAU"       = merge(DICEresults$DICE2016R_091916ap_BAU_vanilla_results$get_VARIABLE_ty("EIND") %>% rename(eind = value),  
+                                DICEresults$DICE2016R_091916ap_BAU_vanilla_results$get_VARIABLE_ty("YGROSS") %>% rename(ygross  = value), 
+                                by = c("t","year"))   %>%  mutate(value = eind/ygross)   %>%   dplyr::select(t,year,value)%>%  mutate(unit = "kgCO2/USD")
+    
+    ,"DICE16 CBA"       = merge(DICEresults$DICE2016R_091916ap_OPT_vanilla_results$get_VARIABLE_ty("EIND") %>% rename(eind = value),  
+                                DICEresults$DICE2016R_091916ap_OPT_vanilla_results$get_VARIABLE_ty("YGROSS") %>% rename(ygross  = value), 
+                                by = c("t","year"))   %>%  mutate(value = eind/ygross)   %>%   dplyr::select(t,year,value)%>%  mutate(unit = "kgCO2/USD")
+    
+    ,"BAU nodmg" = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$BAU$get_world_CIntensity_ty
+    
+  )
+  ,title  = "World Carbon Intensity - SSP2 - Burke SR - Different cooperation"
+  ,yLabel = "Carbon Intensity [kgCO2/$]"
+  ,legend = "Scenarios"
+  ,categories = 3
+  ,colors_per_category = 3
+); plottigat
+
+
+
+## -----------------  World EMISSIONS - SSP2 - Different BURKE func  -------------------
 
 
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++
 # I want to compare optimal emissions trends under 
-# different cooperation scenarios.
+# different BURKE fun specs.
 #++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-# >>> RICEx.plot.lineplot.world_emissions?
-# COSA Migliorare
-# Historical nere + BAU nere (e grigie se altre presenti)
+RICEx.plot.lineplot(
+  
+  EXPdata   = list(
+    
+
+    "Coop SR "      = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Coop SRdiff"  = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SRdiff$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Coop LR"      = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57LR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Coop LRdiff"  = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57LRdiff$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    
+    ,"Noncoop SR "     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Noncoop SRdiff"  = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SRdiff$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Noncoop LR"      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Noncoop LRdiff"  = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LRdiff$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    
+    
+    ,"Historical"  = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000) %>% mutate(unit = "GtCO2/year")
+    ,"BAU nodmg"   = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$BAU$get_world_EMIffi_ty
+        
+)
+  ,title  = "World FFI Emissions SSP2 - CBAs with different BURKE function"
+  ,yLabel = "Emissions [GtCO2/year]"
+  ,legend = "Scenarios"
+  ,categories = 3
+  ,colors_per_category = 4
+)
+
+
+## -----------------  World DAMAGES - SSP2 - Different BURKE func  -------------------
+
+
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+# I want to compare optimal damages trends under 
+# different BURKE fun specs.
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 RICEx.plot.lineplot(
   
   EXPdata   = list(
     
-    "Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000) %>% mutate(unit = "GtCO2/year")
-    ,"BAU nodmg" = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAU$get_world_EMIffi_ty
     
-    ,"CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
-    ,"CBA coop ngsh"    = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
-    ,"CBA noncoop"      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    "Coop SR "      = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Coop SRdiff"  = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SRdiff$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Coop LR"      = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57LR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Coop LRdiff"  = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57LRdiff$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
     
+    ,"Noncoop SR "     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Noncoop SRdiff"  = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SRdiff$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Noncoop LR"      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Noncoop LRdiff"  = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LRdiff$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    
+  
   )
-  ,title  = "World FFI Emissions SSP2 - BURKESR - Different cooperation"
-  ,yLabel = "Emissions [GtCO2/year]"
+  ,title  = "World DAMAGES - SSP2 - CBAs with different BURKE function"
+  ,yLabel = "Damages [% GDP]"
   ,legend = "Scenarios"
+  ,categories = 3
+  ,colors_per_category = 4
 )
 
 
 
+## -----------------  World EMISSIONS - SSP2 - Different IMPACT func  -------------------
 
 
-## -----------------  DAMAGES COMPARED  -------------------
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+# I want to compare optimal emissions trends under 
+# different IMPACT specs.
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-RICEx.plot.lineplot(
+plottigat = RICEx.plot.lineplot(
   
   EXPdata   = list(
     
-     "CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
-    ,"CBA coop ngsh"    = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
-    ,"CBA noncoop"      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
     
-    ,"CBA noncoop BurkeLRdiff"      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LRdiff$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    "Coop BURKE SR "  = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Coop KAHN"      = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_KAHNn$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Coop DJO"       = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_DJOn$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Coop DICEreg"   = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_DICEreg$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    
+    ,"Noncoop BURKE SR " = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Noncoop KAHN"      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_KAHNn$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Noncoop DJO"       = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_DJOn$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Noncoop DICEreg"   = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_DICEreg$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    
+    ,"DICE16 CBA"  = DICEresults$DICE2016R_091916ap_OPT_vanilla_results$get_VARIABLE_ty("EIND")  %>% mutate(unit = "GtCO2/year")
+    ,"Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000) %>% mutate(unit = "GtCO2/year")
+    ,"BAU nodmg" = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$BAU$get_world_EMIffi_ty
+    
+  )
+  ,title  = "World FFI Emissions SSP2 - CBAs with different IMPACT functions"
+  ,yLabel = "Emissions [GtCO2/year]"
+  ,legend = "Scenarios"
+  ,categories = 3
+  ,colors_per_category = 4
+  
+); plottigat
+
+
+
+
+
+
+## -----------------  World DAMAGES - SSP2 - Different IMPACT func  -------------------
+
+
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+# I want to compare optimal emissions trends under 
+# different IMPACT specs.
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+plottigat = RICEx.plot.lineplot(
+  
+  EXPdata   = list(
+    
+    
+    "Coop BURKE SR "  = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Coop KAHN"      = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_KAHNn$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Coop DJO"       = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_DJOn$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Coop DICEreg"   = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_DICEreg$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    
+    ,"Noncoop BURKE SR " = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Noncoop KAHN"      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_KAHNn$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Noncoop DJO"       = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_DJOn$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Noncoop DICEreg"   = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_DICEreg$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    
+    ,"DICE16 CBA"  = DICEresults$DICE2016R_091916ap_OPT_vanilla_results$get_VARIABLE_ty("DAMFRAC") %>% mutate(value = value*(-1)) %>% mutate(unit = "GtCO2/year")
+
+  )
+  ,title  = "World DAMAGES - SSP2 - CBAs with different IMPACT functions"
+  ,yLabel = "Damages [% GDP]"
+  ,legend = "Scenarios"
+  ,categories = 3
+  ,colors_per_category = 4
+  
+); plottigat
+
+
+
+
+# -----------------  World EMISSIONS - BURKE SR - Different SSPs  -------------------
+
+
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+# I want to compare optimal emissions trends under 
+# different SSP specs.
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+plottigat = RICEx.plot.lineplot(
+  
+  EXPdata   = list(
+    
+    
+    "Coop SSP1 "  = PPstory$v1x00$OPTIM$ed57$ssp1$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Coop SSP2"  = PPstory$v1x00$OPTIM$ed57$ssp2$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Coop SSP3"  = PPstory$v1x00$OPTIM$ed57$ssp3$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Coop SSP4"  = PPstory$v1x00$OPTIM$ed57$ssp4$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Coop SSP5"  = PPstory$v1x00$OPTIM$ed57$ssp5$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    
+    
+    ,"Noncoop SSP1 " = PPstory$v1x00$OPTIM$ed57$ssp1$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Noncoop SSP2"  = PPstory$v1x00$OPTIM$ed57$ssp2$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Noncoop SSP3"  = PPstory$v1x00$OPTIM$ed57$ssp3$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Noncoop SSP4"  = PPstory$v1x00$OPTIM$ed57$ssp4$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    ,"Noncoop SSP5"  = PPstory$v1x00$OPTIM$ed57$ssp5$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    
+    
+    
+    
+    
+    #,"DICE16 CBA"  = DICEresults$DICE2016R_091916ap_OPT_vanilla_results$get_VARIABLE_ty("EIND")  %>% mutate(unit = "GtCO2/year")
+    ,"Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000) %>% mutate(unit = "GtCO2/year")
+
+  )
+  ,title  = "World FFI Emissions - BURKE SR - CBAs with different SSPs "
+  ,yLabel = "Emissions [GtCO2/year]"
+  ,legend = "Scenarios"
+  ,categories = 3
+  ,colors_per_category = 5
+); plottigat
+
+
+
+
+
+
+## -----------------  World DAMAGES - BURKE SR - Different SSPs  -------------------
+
+
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+# I want to compare optimal emissions trends under 
+# different SSP specs.
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+plottigat = RICEx.plot.lineplot(
+  
+  EXPdata   = list(
+    
+    
+    "Coop SSP1 "  = PPstory$v1x00$OPTIM$ed57$ssp1$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Coop SSP2"  = PPstory$v1x00$OPTIM$ed57$ssp2$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Coop SSP3"  = PPstory$v1x00$OPTIM$ed57$ssp3$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Coop SSP4"  = PPstory$v1x00$OPTIM$ed57$ssp4$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Coop SSP5"  = PPstory$v1x00$OPTIM$ed57$ssp5$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    
+    
+    ,"Noncoop SSP1 " = PPstory$v1x00$OPTIM$ed57$ssp1$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Noncoop SSP2"  = PPstory$v1x00$OPTIM$ed57$ssp2$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Noncoop SSP3"  = PPstory$v1x00$OPTIM$ed57$ssp3$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Noncoop SSP4"  = PPstory$v1x00$OPTIM$ed57$ssp4$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    ,"Noncoop SSP5"  = PPstory$v1x00$OPTIM$ed57$ssp5$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
+    
     
     
     
   )
-  ,title  = "World FFI Emissions SSP2 - BURKESR - Different cooperation"
-  ,yLabel = "Emissions [GtCO2/year]"
+  ,title  = "World DAMAGES - BURKE SR - CBAs with different SSPs "
+  ,yLabel = "Damages [% GDP]"
   ,legend = "Scenarios"
-)
+  ,categories = 3
+  ,colors_per_category = 5
+); plottigat
 
 
 
+## -----------------  World TATM - BURKE SR - Different SSPs  -------------------
+
+
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+# I want to compare optimal emissions trends under 
+# different SSP specs.
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+plottigat = RICEx.plot.lineplot(
+  
+  EXPdata   = list(
+    
+    
+    "Coop SSP1 "  = PPstory$v1x00$OPTIM$ed57$ssp1$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TATM_ty
+    ,"Coop SSP2"  = PPstory$v1x00$OPTIM$ed57$ssp2$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TATM_ty
+    ,"Coop SSP3"  = PPstory$v1x00$OPTIM$ed57$ssp3$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TATM_ty
+    ,"Coop SSP4"  = PPstory$v1x00$OPTIM$ed57$ssp4$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TATM_ty
+    ,"Coop SSP5"  = PPstory$v1x00$OPTIM$ed57$ssp5$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TATM_ty
+    
+    
+    ,"Noncoop SSP1 " = PPstory$v1x00$OPTIM$ed57$ssp1$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TATM_ty
+    ,"Noncoop SSP2"  = PPstory$v1x00$OPTIM$ed57$ssp2$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TATM_ty
+    ,"Noncoop SSP3"  = PPstory$v1x00$OPTIM$ed57$ssp3$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TATM_ty
+    ,"Noncoop SSP4"  = PPstory$v1x00$OPTIM$ed57$ssp4$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TATM_ty
+    ,"Noncoop SSP5"  = PPstory$v1x00$OPTIM$ed57$ssp5$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TATM_ty
+    
+    
+    
+    
+  )
+  ,title  = "World TATM - BURKE SR - CBAs with different SSPs "
+  ,yLabel = "Temperature increase [�C]"
+  ,legend = "Scenarios"
+  ,categories = 3
+  ,colors_per_category = 5
+); plottigat
+
+
+
+
+## -----------------  World CIntensity - BURKE SR - Different SSPs  -------------------
+
+
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+# I want to compare optimal carbon intensity trends under 
+# different SSP specs.
+#++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+plottigat = RICEx.plot.lineplot(
+  
+  EXPdata   = list(
+    
+    
+    "Coop SSP1 "  = PPstory$v1x00$OPTIM$ed57$ssp1$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_CIntensity_ty
+    ,"Coop SSP2"  = PPstory$v1x00$OPTIM$ed57$ssp2$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_CIntensity_ty
+    ,"Coop SSP3"  = PPstory$v1x00$OPTIM$ed57$ssp3$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_CIntensity_ty
+    ,"Coop SSP4"  = PPstory$v1x00$OPTIM$ed57$ssp4$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_CIntensity_ty
+    ,"Coop SSP5"  = PPstory$v1x00$OPTIM$ed57$ssp5$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_CIntensity_ty
+    
+    
+    ,"Noncoop SSP1 " = PPstory$v1x00$OPTIM$ed57$ssp1$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_CIntensity_ty
+    ,"Noncoop SSP2"  = PPstory$v1x00$OPTIM$ed57$ssp2$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_CIntensity_ty
+    ,"Noncoop SSP3"  = PPstory$v1x00$OPTIM$ed57$ssp3$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_CIntensity_ty
+    ,"Noncoop SSP4"  = PPstory$v1x00$OPTIM$ed57$ssp4$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_CIntensity_ty
+    ,"Noncoop SSP5"  = PPstory$v1x00$OPTIM$ed57$ssp5$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_CIntensity_ty
+    
+    
+    
+    
+  )
+  ,title  = "World CARBON INTENSITY - Burke SR - CBAs with different SSPs "
+  ,yLabel = "Carbon Intensity [kgCO2/$]"
+  ,legend = "Scenarios"
+  ,categories = 3
+  ,colors_per_category = 5
+); plottigat
 
 
 
@@ -148,35 +472,36 @@ RICEx.plot.lineplot(
 
 
 #=========================================================================##
-## ---------------- ——————————   MAP CHARTS   ————————————  ------------
+## ---------------- _____________   MAP CHARTS   _____________  ------------
 #=========================================================================##
 
 
-## -----------------  Local DAMAGES — BURKE SR varying COOPERATION -----------
+## -----------------  Local DAMAGES - BURKE SR SSP2 - varying COOPERATION -----------
 
 myyear = 2100
 
 RICEx.plot.multimap(
   EXPdata   = list(
     
-     "BAU "             = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAU$get_DAMAGEperc_nty %>% filter(year == myyear)
+   #  "BAU "             = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$BAU$get_DAMAGEperc_nty %>% filter(year == myyear)
     
-    ,"CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
-    ,"CBA coop ngsh"    = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
-    ,"CBA noncoop"      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    "CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"CBA coop ngsh"   = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"CBA noncoop"     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"DICE16 CBA"      = DICEresults$DICE2016R_091916ap_OPT_vanilla_results$get_VARIABLE_ty("DAMFRAC") %>% filter(year == myyear) %>% mutate(value = value*(1)) %>% mutate(unit = "%") %>% mutate(n = "world")
     
-    
+   
   )
           
   ,title  = paste0("Burke SR Damages in ",myyear," - SSP2 under different cooperation")
-  ,legend = "Damages \n[% GDP]"
+  ,legend = "Damages \n[% GDP]" 
+
+  
 )
 
 
 
-
-
-## -----------------  Local DAMAGES —  NONCOOP varying BURKE Type -----------
+## -----------------  Local TEMPERATURE - BURKE SR SSP2 - varying Cooperation -----------
 
 myyear = 2100
 
@@ -184,19 +509,23 @@ myyear = 2100
 RICEx.plot.multimap(
   EXPdata   = list(
     
-    "BURKE SR "      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
-    ,"BURKE SRdiff " = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SRdiff$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
-    ,"BURKE LR "     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
-    ,"BURKE LRdiff " = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LRdiff$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    "CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TLOCALincr_nty  %>% rename(n= "ed57") %>% filter(year==myyear)
+    ,"CBA coop ngsh"    = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TLOCALincr_nty  %>% rename(n= "ed57") %>% filter(year==myyear)
+    ,"CBA noncoop"     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TLOCALincr_nty  %>% rename(n= "ed57") %>% filter(year==myyear)
 
   )
   
-  ,title  = paste0("Noncooperation Damages in ",myyear," — SSP2 under different BURKE functions")
-  ,legend = "Damages \n[% GDP]"
+  ,title  = paste0("Average local-temperature incease in ",myyear," - BURKE SR SSP2 - under different cooperation")
+  ,legend = "T Increase \n[+�C]"
+  ,palette =  RColorBrewer::brewer.pal(9, "OrRd") #RdBu|OrRd|PuBu|Greens|RdPu|Purples|Greys
+  ,min_data = 0
+  ,max_data = 2.4
+  
 )
 
 
-## -----------------  Local DAMAGES —  COOP varying BURKE Type -----------
+
+## -----------------  SCC - BURKE SR SSP2 - varying Cooperation -----------
 
 myyear = 2100
 
@@ -204,15 +533,43 @@ myyear = 2100
 RICEx.plot.multimap(
   EXPdata   = list(
     
-    "BURKE SR "      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
-    ,"BURKE SRdiff " = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SRdiff$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
-    ,"BURKE LR "     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
-    ,"BURKE LRdiff " = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LRdiff$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    "CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_SCC_nty   %>% filter(year==myyear)
+    ,"CBA coop ngsh"   = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_SCC_nty  %>% filter(year==myyear)
+    ,"CBA noncoop"     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_SCC_nty   %>% filter(year==myyear)
     
   )
   
-  ,title  = paste0("Noncooperation Damages in ",myyear," — SSP2 under different BURKE functions")
-  ,legend = "Damages \n[% GDP]"
+  ,title  = paste0("Social Cost of Carbon in ",myyear," - BURKE SR SSP2 - under different cooperation")
+  ,legend = "SCC \n[$/tCO2]"
+  ,palette =  RColorBrewer::brewer.pal(9, "OrRd") #RdBu|OrRd|PuBu|Greens|RdPu|Purples|Greys
+  ,min_data = -100 
+)
+
+
+
+## -----------------  Carbon Intensity - BURKE SR SSP2 - varying Cooperation -----------
+
+myyear = 2100
+
+
+RICEx.plot.multimap(
+  EXPdata   = list(
+    
+    "BAU "             = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$BAU$get_CIntensity_nty %>% filter(year == myyear)
+    ,"CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_CIntensity_nty %>% filter(year == myyear)
+    ,"CBA coop ngsh"   = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_CIntensity_nty %>% filter(year == myyear)
+    ,"CBA noncoop"     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_CIntensity_nty %>% filter(year == myyear)
+    #,"DICE16 CBA"      = DICEresults$DICE2016R_091916ap_OPT_vanilla_results$get_VARIABLE_ty("DAMFRAC") %>% filter(year == myyear) %>% mutate(value = value*(1)) %>% mutate(unit = "%") %>% mutate(n = "world")
+    
+    
+  )
+  
+  ,title  = paste0("Carbon Intensity in ",myyear," - BURKE SR SSP2 - Under different cooperation")
+  ,legend = "Carbon Intensity \n[kgCO2/$]"
+  ,palette =  RColorBrewer::brewer.pal(9, "OrRd") #RdBu|OrRd|PuBu|Greens|RdPu|Purples|Greys
+  ,min_data = -0.1
+  ,max_data = 0.58
+
 )
 
 
@@ -220,39 +577,104 @@ RICEx.plot.multimap(
 
 
 
-##    DAMAGES DISTRIBUTED -  DIFFERENT REGIONS    ------------------------------------------------------------------------------
-#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+## -----------------  Local DAMAGES - NONCOOP - varying BURKE Type -----------
+
+myyear = 2100
+
+
+RICEx.plot.multimap(
+  EXPdata   = list(
+    
+    "BURKE SR "      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"BURKE SRdiff " = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SRdiff$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"BURKE LR "     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"BURKE LRdiff " = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LRdiff$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+
+  )
+  
+  ,title  = paste0("NONCOOPERATION Damages in ",myyear," - SSP2 under different BURKE functions")
+  ,legend = "Damages \n[% GDP]"
+)
+
+
+## -----------------  Local DAMAGES - COOP - varying BURKE Type -----------
+
+myyear = 2100
+
+
+RICEx.plot.multimap(
+  EXPdata   = list(
+    
+    "BURKE SR "      = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"BURKE SRdiff " = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SRdiff$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"BURKE LR "     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57LR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"BURKE LRdiff " = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57LRdiff$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    
+  )
+  
+  ,title  = paste0("COOPERATION Damages in ",myyear," - SSP2 under different BURKE functions")
+  ,legend = "Damages \n[% GDP]"
+  , min_data = -0.19
+  , max_data = 0.19
+)
 
 
 
-dam_pal <- rev(RColorBrewer::brewer.pal(9, "RdBu"))
-#RdBu  OrRd  PuBu  Greens RdPu Purples  Greys
+
+## -----------------  Local DAMAGES - NONCOOP - varying IMPACT FUntion -----------
+
+myyear = 2100
+
+
+RICEx.plot.multimap(
+  EXPdata   = list(
+    
+    "BURKE SR "      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"KAHN "         = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_KAHNn$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"DICEreg (uniform)" = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_DICEreg$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"DJO"           = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_DJOn$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    
+  )
+  
+  ,title  = paste0("NONCOOPERATION Damages in ",myyear," - SSP2 under different IMPACT functions")
+  ,legend = "Damages \n[% GDP]"
+
+)
 
 
 
-# min/max scale: 57r the maximum gap? 
-max_data = max((REGICEexp$kaliQUARTZ$enerdata56$ssp2$coopngsw$clWITCHco2$damBURKESR$polCBA$get_Variable_nty("DAMFRAC")  %>% filter( year == 2100))$value)
-min_data = min((REGICEexp$kaliQUARTZ$enerdata56$ssp2$coopngsw$clWITCHco2$damBURKESR$polCBA$get_Variable_nty("DAMFRAC")  %>% filter( year == 2100))$value)
+
+## -----------------  Local DAMAGES - COOP - varying IMPACT FUntion -----------
+
+myyear = 2100
+
+
+RICEx.plot.multimap(
+  EXPdata   = list(
+    
+    "BURKE SR "      = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"KAHN "         = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_KAHNn$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"DICEreg (uniform)" = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_DICEreg$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"DJO"           = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_DJOn$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    
+
+    )
+  
+  ,title  = paste0("COOPERATION Damages in ",myyear," - SSP2 under different IMPACT functions")
+  ,legend = "Damages \n[% GDP]"
+  , min_data = -0.2
+  , max_data = 0.2
+)
 
 
 
-#::::::::::::::::   ED57   ::::::::::::::::::::
-
-my_data = REGICEexp$kaliQUARTZ$enerdata56$ssp2$coopngsw$clWITCHco2$damBURKESR$polCBA$get_Variable_nty("DAMFRAC") %>% filter( year == 2100)
 
 
-# plot 
-ggplot() +
-  geom_sf(data =  merge(  ed57shp,
-                          my_data,
-                          by =c("n"))) + 
-  aes(fill = value) + 
-  scale_fill_gradientn(colors = dam_pal
-                       ,breaks=c(-0.4,-0.2,0,0.2,0.4)
-                       ,labels=c(-0.4,-0.2,0,0.2,0.4)
-                       ,limits=c(min(c(min_data, -max_data)),max(max_data, abs(min_data))) #symmetric scale (0 in the middle)
-  ) +
-  labs (fill = "Damages in 2100 \n[%GDP]") + 
-  ggtitle("57 Regions")
+
+
+
+
+
 
 

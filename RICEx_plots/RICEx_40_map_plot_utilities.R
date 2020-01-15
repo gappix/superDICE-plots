@@ -264,22 +264,26 @@ ggplot() +
       # appearance
       scale_fill_gradientn(colors = palette
                            ,breaks=c( min_data
-                                      ,0.5*min_data        
-                                      #,0.2*min_data 
+                                      # ,0.75*min_data
+                                      # ,0.5*min_data        
+                                      # ,0.25*min_data 
                                       ,0       
-                                      #,0.2*max_data
+                                      ,0.25*max_data
                                       ,0.5*max_data
+                                      ,0.75*max_data
                                       ,max_data
                                       )
                            ,labels=c( paste0(round(min_data,digits = 2))
-                                     ,paste0(round(0.5*min_data,digits = 2))
-                                     #,paste0(round(0.2*min_data,digits = 2))
+                                    #  ,paste0(round(0.75*min_data,digits = 2))
+                                    #  ,paste0(round(0.5*min_data,digits = 2))
+                                    #  ,paste0(round(0.25*min_data,digits = 2))
                                      ,0
-                                     #,paste0(round(0.2*max_data,digits = 2))
+                                     ,paste0(round(0.25*max_data,digits = 2))
                                      ,paste0(round(0.5*max_data,digits = 2))
+                                     ,paste0(round(0.75*max_data,digits = 2))
                                      ,paste0(round(max_data,digits = 2))
                                      )
-                           #,limits=c(min_data, max_data) # symmetric scale (0 in the middle)
+                           ,limits=c(min_data, max_data) # symmetric scale (0 in the middle)
       ) +
       
       labs (fill = legend) + 

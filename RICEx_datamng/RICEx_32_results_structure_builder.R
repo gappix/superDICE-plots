@@ -1,5 +1,5 @@
 
-source("RICEx_datamng/RICEx_20_RICEclass.R")
+source("RICEx_datamng/RICEx_20_RICExclass.R")
 
 
 

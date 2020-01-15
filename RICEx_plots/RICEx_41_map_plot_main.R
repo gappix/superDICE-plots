@@ -35,18 +35,7 @@ RICEx.plot.multimap <- function( EXPdata
   myTitle   =  title
   myLegend  =  legend
   
-  myShape   =  shape
-  # stupid guessing for most used shape mappings
-  if(is.null(myShape)){ 
-    regions = nrow(EXPdata[[1]]%>%select(n)%>%distinct())
-    if (regions > 50) myShape = ed57shp 
-    else if(regions >30) myShape = ed35shp 
-    else if(regions == 17) myShape = wt17shp 
-    else if(regions == 5) myShape = r5shp 
-    else if(regions == 1) myShape = global1shp 
-    else stop("please specify shape mapping for regions!")
-  }
-  
+  myShape   =  shape  
   
   myPalette =  palette 
   # Default palette adopted
@@ -84,9 +73,21 @@ RICEx.plot.multimap <- function( EXPdata
 
   
   for(p in c(1:length(EXPdata))){
+  
     
     message( paste0("preparing plot < ",names(EXPdata)[p]," > ...") )
   
+
+    # stupid guessing for most used shape mappings
+    if(is.null(myShape)){ 
+      regions = nrow(EXPdata[[p]]%>%select(n)%>%distinct())
+      if (regions > 50)         myShape = ed57shp  
+      else if(regions >30)    myShape = ed35shp 
+           else   if(regions > 16)  myShape = wt17shp 
+                  else    if(regions > 4)   myShape = r5shp   
+                          else  if(regions < 2)   myShape = global1shp 
+                                else stop(paste0("please specify shape mapping for ", names(EXPdata)[p], " regions!")) 
+    }
     # Plottigat ...........................
     plottigat = RICEx.plot.map( data     = EXPdata[[p]]
                                ,title    = names(EXPdata)[p]
@@ -98,16 +99,17 @@ RICEx.plot.multimap <- function( EXPdata
       
     # if(p == 1){plotlegend <- get_plotlegend(plottigat)} 
     plotlist[[p]] <- local(print(plottigat  + theme(legend.position="none")))
+    myShape = NULL 
   }
   
   message( paste0("putting all together (maps are an hard job, it may take some MINUTES!)") )
-  nCol = floor(sqrt(nplots))
-  nRow = ceiling(nplots/nCol)
-  
+  nRow = ceiling(nplots/2)
+  nCol = ceiling(nplots/nRow)
+
   annotate_figure(do.call("ggarrange", c(plotlist, ncol=nCol, nrow=nRow,  common.legend = TRUE, legend="right")) 
                   ,top =  text_grob(myTitle, face = "bold", size = 16)
   )
   
-
+                            
 
 }

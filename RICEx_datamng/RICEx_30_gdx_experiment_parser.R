@@ -2,7 +2,7 @@
 
 
 ## Dependencies
-source("RICEx_datamng/RICEx_20_RICEclass.R")
+source("RICEx_datamng/RICEx_20_RICExclass.R")
 
 require_package("purrr")
 require_package("stringr")

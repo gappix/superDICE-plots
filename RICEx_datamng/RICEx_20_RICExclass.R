@@ -232,13 +232,18 @@ RICEx <- function(gdx_file_with_path){
   
   my_EMI_nty             =  my_getVariable_nty("E",            unit = "GtCO2/year"          )
   my_EIND_nty            =  my_getVariable_nty("EIND",         unit = "GtCO2/year"          )
+  my_ELAND_nty           =  my_getVariable_nty("ELAND",        unit = "GtCO2/year"          )
   
   my_MIU_nty             =  my_getVariable_nty("MIU",          unit = "%"                   )
   
   my_SCC_nty             =  my_getParameter_nty("scc",         unit = "USD/tCO2eq"          )
 
-  my_TLOCAL_nty          =  my_getVariable_nty("T_LOCAL",      unit = "avg C degrees"       )
+  my_TLOCALabs_nty       =  my_getVariable_nty("T_LOCAL",      unit = "avg C degrees"       )
 
+  
+  my_TLOCALincr_nty      =  merge( my_TLOCALabs_nty %>% rename(tlocalnow = value),
+                                   my_TLOCALabs_nty %>% filter(year == 2015) %>% rename(tlocalstart  = value) %>% select(-c("t","year","unit")),
+                                   all.x = TRUE )  %>% mutate(value = tlocalnow-tlocalstart) %>% dplyr::select(-c("tlocalnow","tlocalstart")) %>% mutate(unit = "+C degrees")
   
   # world data
   my_world_ABATECOST_ty   =  my_VAR_WORLDsum_ntyTOty("ABATECOST",  unit = "Trill 2005 USD/year" )
@@ -425,9 +430,11 @@ RICEx <- function(gdx_file_with_path){
       get_DAMAGEperc_nty                 = my_DAMAGEperc_nty, 
       get_EMI_nty                        = my_EMI_nty,
       get_EIND_nty                       = my_EIND_nty,
+      get_ELAND_nty                      = my_ELAND_nty,
       get_MIU_nty                        = my_MIU_nty,
       get_SCC_nty                        = my_SCC_nty,
-      get_TLOCAL_nty                     = my_TLOCAL_nty,
+      get_TLOCALabs_nty                  = my_TLOCALabs_nty,
+      get_TLOCALincr_nty                 = my_TLOCALincr_nty,
       get_TATM_ty                        = my_TATM_ty,
 
       get_world_ABATECOST_ty              = my_world_ABATECOST_ty,

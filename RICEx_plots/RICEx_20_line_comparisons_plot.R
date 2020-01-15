@@ -29,19 +29,20 @@ RICEx.plot.lineplot  <- function( EXPdata,
   # Create legend names and colors associated
   if(is.null(categories)){ncolors = length(EXPdata)}else{ncolors=NULL}
   
-  my_legend_elements_with_colors = c("grey","black","black",  
-                                     i_want_pollos_colors( howmany_colors      = ncolors,
-                                                           howmany_categories  = categories,
-                                                           colors_per_category = colors_per_category ))
-
-  names(my_legend_elements_with_colors) = c("ADVANCE","MEDIAN","historical",names(EXPdata))
+  # my_legend_elements_with_colors = c("grey","black","black",  
+  #                                    i_want_pollos_colors( howmany_colors      = ncolors,
+  #                                                          howmany_categories  = categories,
+  #                                                          colors_per_category = colors_per_category ))
+  # 
+  # names(my_legend_elements_with_colors) = c("ADVANCE","MEDIAN","Historical",names(EXPdata))
+  # 
   
-  my_legend_elements_with_colors = c("black",
+  my_legend_elements_with_colors = c("black","black","#505050", "#383838",
                                    i_want_pollos_colors( howmany_colors      = ncolors,
                                                          howmany_categories  = categories,
                                                          colors_per_category = colors_per_category ))
 
-  names(my_legend_elements_with_colors) = c("BAU",names(EXPdata))
+  names(my_legend_elements_with_colors) = c("BAU","BAU nodmg","BAU dmg","Historical", names(EXPdata))
   
   
   # Plotter .......................
