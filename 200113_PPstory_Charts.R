@@ -55,7 +55,7 @@ E_hist_PRIMAP_world_y = rbind(E_hist_PRIMAP_world_y, data.frame(year=2015, value
 
 
 #=========================================================================##
-## ------------ _____________   LINE CHARTS  _____________  ------------
+## ----------------- _____________   LINE CHARTS  _____________  ------------
 #=========================================================================##
 
 
@@ -472,7 +472,7 @@ plottigat = RICEx.plot.lineplot(
 
 
 #=========================================================================##
-## ---------------- _____________   MAP CHARTS   _____________  ------------
+## ----------------- _____________   MAP CHARTS   _____________  ------------
 #=========================================================================##
 
 
@@ -525,7 +525,7 @@ RICEx.plot.multimap(
 
 
 
-## -----------------  SCC - BURKE SR SSP2 - varying Cooperation -----------
+## -----------------  MIU - BURKE SR SSP2 - varying Cooperation -----------
 
 myyear = 2100
 
@@ -533,17 +533,39 @@ myyear = 2100
 RICEx.plot.multimap(
   EXPdata   = list(
     
-    "CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_SCC_nty   %>% filter(year==myyear)
-    ,"CBA coop ngsh"   = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_SCC_nty  %>% filter(year==myyear)
-    ,"CBA noncoop"     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_SCC_nty   %>% filter(year==myyear)
+    "CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_MIU_nty   %>% filter(year==myyear)
+    ,"CBA coop ngsh"   = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_MIU_nty  %>% filter(year==myyear)
+    ,"CBA noncoop"     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_MIU_nty   %>% filter(year==myyear)
+    ,"DICE16 CBA"      = DICEresults$DICE2016R_091916ap_OPT_vanilla_results$get_VARIABLE_ty("MIU") %>% filter(year == myyear) %>% mutate(value = value*(1)) %>% mutate(unit = "%") %>% mutate(n = "world")
     
   )
   
-  ,title  = paste0("Social Cost of Carbon in ",myyear," - BURKE SR SSP2 - under different cooperation")
-  ,legend = "SCC \n[$/tCO2]"
+  ,title  = paste0("Mitigation in ",myyear," - BURKE SR SSP2 - under different cooperation")
+  ,legend = "MIU \n[% BAU]"
   ,palette =  RColorBrewer::brewer.pal(9, "OrRd") #RdBu|OrRd|PuBu|Greens|RdPu|Purples|Greys
-  ,min_data = -100 
+  ,min_data = 0 
 )
+
+
+## -----------------  Region Weights - BURKE SR SSP2  -----------
+
+
+RICEx.plot.multimap(
+  EXPdata   = list(
+    
+    "NWeights 2015"     = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_PARAMETER_nty("nweights")  %>% filter(year==2015)  %>% select(-year)
+    ,"NWeights 2050"     = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_PARAMETER_nty("nweights")  %>% filter(year==2050) %>% select(-year)
+    ,"NWeights 2075"     = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_PARAMETER_nty("nweights")  %>% filter(year==2075) %>% select(-year)
+    ,"NWeights 2100"     = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_PARAMETER_nty("nweights")  %>% filter(year==2100) %>% select(-year)
+  )
+  
+  ,title  = paste0("Negishi Weights - BURKE SR SSP2")
+  ,legend = "Weight"
+  ,palette =  RColorBrewer::brewer.pal(9, "OrRd") #RdBu|OrRd|PuBu|Greens|RdPu|Purples|Greys
+  ,min_data = 0 
+)
+
+
 
 
 
