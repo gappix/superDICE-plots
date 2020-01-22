@@ -218,7 +218,7 @@ pollos_colors <- tribble(
   ,"#cf6b00"   ,"candy brown"         ,15           ,"Q5"        ,3             ,"Q4"        ,5             ,"Warm"         ,9           ,"Q3Neutral"     ,4                                     
   ,"#007c82"   ,"petroleum"           ,16           ,"Q3"        ,3             ,"Q3"        ,4             ,"Cold"         ,7           ,"Q2Cold"        ,8                                   
   ,"#00a61c"   ,"ireland"             ,17           ,"Q3"        ,4             ,"Q3"        ,5             ,"Cold"         ,8           ,"Q2Cold"        ,9                                 
-  ,"#000000"   ,"black"               ,18           ,"Q5"        ,4             ,"Q1"        ,5             ,"Warm"         ,9           ,"Q3Neutral"     ,5                               
+  ,"#000000"   ,"black"               ,18           ,"Q5"        ,4             ,"Q2"        ,4             ,"Warm"         ,9           ,"Q3Neutral"     ,5                               
   
 )
 

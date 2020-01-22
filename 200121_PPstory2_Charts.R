@@ -77,19 +77,19 @@ plottigat <- RICEx.plot.lineplot(
   
   EXPdata   = list(
     
-
-     "CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
+    
+    "CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
     ,"CBA coop ngsh"    = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
     ,"CBA noncoop"      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
-
+    
     
     ,"DICE16 BAU"       = DICEresults$DICE2016R_091916ap_BAU_vanilla_results$get_VARIABLE_ty("EIND")  %>% mutate(unit = "GtCO2/year")
     ,"DICE16 CBA"       = DICEresults$DICE2016R_091916ap_OPT_vanilla_results$get_VARIABLE_ty("EIND")  %>% mutate(unit = "GtCO2/year")
-  
+    
     ,"Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000) %>% mutate(unit = "GtCO2/year")
     ,"BAU nodmg" = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$BAU$get_world_EMIffi_ty
     
-    )
+  )
   ,title  = "World FFI Emissions SSP2 - BURKESR - Different cooperation"
   ,yLabel = "Emissions [GtCO2/year]"
   ,legend = "Scenarios"
@@ -153,7 +153,7 @@ RICEx.plot.lineplot(
   
   EXPdata   = list(
     
-
+    
     "Coop SR "      = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
     ,"Coop SRdiff"  = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SRdiff$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
     ,"Coop LR"      = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57LR$welfare_DICE$savings_fixed_converging$CBA$get_world_EMIffi_ty
@@ -167,8 +167,8 @@ RICEx.plot.lineplot(
     
     ,"Historical"  = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000) %>% mutate(unit = "GtCO2/year")
     ,"BAU nodmg"   = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$BAU$get_world_EMIffi_ty
-        
-)
+    
+  )
   ,title  = "World FFI Emissions SSP2 - CBAs with different BURKE function"
   ,yLabel = "Emissions [GtCO2/year]"
   ,legend = "Scenarios"
@@ -202,7 +202,7 @@ RICEx.plot.lineplot(
     ,"Noncoop LR"      = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LR$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
     ,"Noncoop LRdiff"  = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LRdiff$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
     
-  
+    
   )
   ,title  = "World DAMAGES - SSP2 - CBAs with different BURKE function"
   ,yLabel = "Damages [% GDP]"
@@ -282,7 +282,7 @@ plottigat = RICEx.plot.lineplot(
     ,"Noncoop DICEreg"   = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_DICEreg$welfare_DICE$savings_fixed_converging$CBA$get_world_DAMAGEperc_ty
     
     ,"DICE16 CBA"  = DICEresults$DICE2016R_091916ap_OPT_vanilla_results$get_VARIABLE_ty("DAMFRAC") %>% mutate(value = value*(-1)) %>% mutate(unit = "GtCO2/year")
-
+    
   )
   ,title  = "World DAMAGES - SSP2 - CBAs with different IMPACT functions"
   ,yLabel = "Damages [% GDP]"
@@ -329,7 +329,7 @@ plottigat = RICEx.plot.lineplot(
     
     #,"DICE16 CBA"  = DICEresults$DICE2016R_091916ap_OPT_vanilla_results$get_VARIABLE_ty("EIND")  %>% mutate(unit = "GtCO2/year")
     ,"Historical" = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000) %>% mutate(unit = "GtCO2/year")
-
+    
   )
   ,title  = "World FFI Emissions - BURKE SR - CBAs with different SSPs "
   ,yLabel = "Emissions [GtCO2/year]"
@@ -481,7 +481,7 @@ p1 = ggplot() +
   # graphic details
   
   scale_color_manual(  values= colorize_regions("ed57") ) + 
-
+  
   guides(colour=guide_legend(ncol=3)) +
   
   theme( plot.title = element_text(size=18),
@@ -670,7 +670,7 @@ p4 = ggplot() +
   
   #scale_color_manual(  values= colorize_regions("ed57") ) + 
   
-
+  
   
   theme( legend.position="none",
          plot.title = element_text(size=18),
@@ -708,19 +708,19 @@ myyear = 2100
 RICEx.plot.multimap(
   EXPdata   = list(
     
-   #  "BAU "             = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$BAU$get_DAMAGEperc_nty %>% filter(year == myyear)
+    #  "BAU "             = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$BAU$get_DAMAGEperc_nty %>% filter(year == myyear)
     
     "CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
     ,"CBA coop ngsh"   = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
     ,"CBA noncoop"     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
     ,"DICE16 CBA"      = DICEresults$DICE2016R_091916ap_OPT_vanilla_results$get_VARIABLE_ty("DAMFRAC") %>% filter(year == myyear) %>% mutate(value = value*(1)) %>% mutate(unit = "%") %>% mutate(n = "world")
     
-   
+    
   )
-          
+  
   ,title  = paste0("Burke SR Damages in ",myyear," - SSP2 under different cooperation")
   ,legend = "Damages \n[% GDP]" 
-
+  
   
 )
 
@@ -737,7 +737,7 @@ RICEx.plot.multimap(
     "CBA coop pop"     = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TLOCALincr_nty  %>% rename(n= "ed57") %>% filter(year==myyear)
     ,"CBA coop ngsh"    = EXPssp2_coopngsh$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TLOCALincr_nty  %>% rename(n= "ed57") %>% filter(year==myyear)
     ,"CBA noncoop"     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TLOCALincr_nty  %>% rename(n= "ed57") %>% filter(year==myyear)
-
+    
   )
   
   ,title  = paste0("Average local-temperature incease in ",myyear," - BURKE SR SSP2 - under different cooperation")
@@ -816,7 +816,7 @@ RICEx.plot.multimap(
   ,palette =  RColorBrewer::brewer.pal(9, "OrRd") #RdBu|OrRd|PuBu|Greens|RdPu|Purples|Greys
   ,min_data = -0.1
   ,max_data = 0.58
-
+  
 )
 
 
@@ -837,7 +837,7 @@ RICEx.plot.multimap(
     ,"BURKE SRdiff " = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SRdiff$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
     ,"BURKE LR "     = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
     ,"BURKE LRdiff " = EXPssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57LRdiff$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
-
+    
   )
   
   ,title  = paste0("NONCOOPERATION Damages in ",myyear," - SSP2 under different BURKE functions")
@@ -886,7 +886,7 @@ RICEx.plot.multimap(
   
   ,title  = paste0("NONCOOPERATION Damages in ",myyear," - SSP2 under different IMPACT functions")
   ,legend = "Damages \n[% GDP]"
-
+  
 )
 
 
@@ -905,8 +905,8 @@ RICEx.plot.multimap(
     ,"DICEreg (uniform)" = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_DICEreg$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
     ,"DJO"           = EXPssp2_cooppop$mcEDct4$climate_WITCHco2$damages_DJOn$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
     
-
-    )
+    
+  )
   
   ,title  = paste0("COOPERATION Damages in ",myyear," - SSP2 under different IMPACT functions")
   ,legend = "Damages \n[% GDP]"
