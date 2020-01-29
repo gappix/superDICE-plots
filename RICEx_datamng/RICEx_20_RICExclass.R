@@ -150,7 +150,7 @@ RICEx <- function(gdx_file_with_path){
   }
 
 
-  my_VAR_WORLDsum_ntyTOty  <- function(  variable_name, 
+  my_VAR_WORLDagg_ntyTOty  <- function(  variable_name, 
                                          year_start = 0,
                                          unit = NULL,
                                          year_limit = RICEx_default_time_horizon){
@@ -185,7 +185,7 @@ RICEx <- function(gdx_file_with_path){
   my_VAR_dsagg_ntyTOiso3ty <- function(   variable_name, 
                                           unit = NULL,
                                           year_start = 0,
-                                          year_limit = 2200 ){
+                                          year_limit = RICEx_default_time_horizon ){
 
       getGDX_Variable_dsagg_ntyTOiso3ty(  variable_name,                            
                                           gdx_file = my_gdx,
@@ -200,7 +200,7 @@ RICEx <- function(gdx_file_with_path){
   my_PAR_dsagg_ntyTOiso3ty <- function(   parameter_name, 
                                           unit = NULL,
                                           year_start = 0,
-                                          year_limit = 2200 ){
+                                          year_limit = RICEx_default_time_horizon ){
 
       getGDX_Parameter_dsagg_ntyTOiso3ty( parameter_name,                            
                                           gdx_file = my_gdx,
@@ -245,25 +245,31 @@ RICEx <- function(gdx_file_with_path){
                                    my_TLOCALabs_nty %>% filter(year == 2015) %>% rename(tlocalstart  = value) %>% select(-c("t","year","unit")),
                                    all.x = TRUE )  %>% mutate(value = tlocalnow-tlocalstart) %>% dplyr::select(-c("tlocalnow","tlocalstart")) %>% mutate(unit = "+C degrees")
   
-  # world data
-  my_world_ABATECOST_ty   =  my_VAR_WORLDsum_ntyTOty("ABATECOST",  unit = "Trill 2005 USD/year" )
-  my_world_ABATEDEMI_ty   =  my_VAR_WORLDsum_ntyTOty("ABATEDEMI",  unit = "GtCO2/year"          )
+
+  my_POPshare_nty        = merge(my_getParameter_nty("pop")  %>% rename(regionpop  = value) ,
+                                 my_PAR_WORLDagg_ntyTOty("pop")  %>% rename(worldpop  = value), 
+                                 all.x = TRUE) %>% mutate(value = regionpop/worldpop) %>% dplyr::select(-c("worldpop","regionpop")) %>% mutate(unit = "%")
   
-  my_world_CONSUMPTION_ty =  my_VAR_WORLDsum_ntyTOty("C",       unit = "Trill 2005 USD/year" )
-  my_world_EMItot_ty      =  my_VAR_WORLDsum_ntyTOty("E",       unit = "GtCO2/year"          )
-  my_world_EMIffi_ty      =  my_VAR_WORLDsum_ntyTOty("EIND",    unit = "GtCO2/year"          )
+
+  # world data
+  my_world_ABATECOST_ty   =  my_VAR_WORLDagg_ntyTOty("ABATECOST",  unit = "Trill 2005 USD/year" )
+  my_world_ABATEDEMI_ty   =  my_VAR_WORLDagg_ntyTOty("ABATEDEMI",  unit = "GtCO2/year"          )
+  
+  my_world_CONSUMPTION_ty =  my_VAR_WORLDagg_ntyTOty("C",       unit = "Trill 2005 USD/year" )
+  my_world_EMItot_ty      =  my_VAR_WORLDagg_ntyTOty("E",       unit = "GtCO2/year"          )
+  my_world_EMIffi_ty      =  my_VAR_WORLDagg_ntyTOty("EIND",    unit = "GtCO2/year"          )
   
     
-  my_world_DAMAGEabs_ty   =  my_VAR_WORLDsum_ntyTOty("DAMAGES", unit = "Trill 2005 USD/year" ) %>% mutate(value = value * (-1)) 
+  my_world_DAMAGEabs_ty   =  my_VAR_WORLDagg_ntyTOty("DAMAGES", unit = "Trill 2005 USD/year" ) %>% mutate(value = value * (-1)) 
   
-  my_world_DAMAGEperc_ty  =  merge(   my_VAR_WORLDsum_ntyTOty("DAMAGES" ) %>% rename(damages = value),
-                                     my_VAR_WORLDsum_ntyTOty("YGROSS"  ) %>% rename(ygross  = value), 
+  my_world_DAMAGEperc_ty  =  merge(   my_VAR_WORLDagg_ntyTOty("DAMAGES" ) %>% rename(damages = value),
+                                     my_VAR_WORLDagg_ntyTOty("YGROSS"  ) %>% rename(ygross  = value), 
                                      by = c("t","year")
                                   )  %>% mutate(value = -damages/ygross) %>% dplyr::select(t,year,value) %>% mutate(unit = "%") 
   
   
-  my_world_CIntensity_ty  = merge(   my_VAR_WORLDsum_ntyTOty("EIND"    ) %>% rename(eind    = value),
-                                    my_VAR_WORLDsum_ntyTOty("YGROSS"  ) %>% rename(ygross  = value), 
+  my_world_CIntensity_ty  = merge(   my_VAR_WORLDagg_ntyTOty("EIND"    ) %>% rename(eind    = value),
+                                    my_VAR_WORLDagg_ntyTOty("YGROSS"  ) %>% rename(ygross  = value), 
                                     by = c("t","year")
                                  )  %>% mutate(value = eind/ygross) %>% dplyr::select(t,year,value) %>% mutate(unit = "kgCO2/USD") 
                               
@@ -273,7 +279,64 @@ RICEx <- function(gdx_file_with_path){
 
   ## .............:  SPECIFIC EVALUATED GETTERS  :--------------------
 
-  my_CUML5y_EMISSIONS_n      <- function( year_start = 0,
+  
+
+  # Evaluates percentage DAMAGES [%GDP], 
+  # per each region, associated to reference temperature
+  #
+  my_DAMAGESperc_for_TATM_n <- function( TATM_to_check = NULL){
+    
+    
+    # get closest TATM to reference point 
+    my_tatm         <- my_getVariable_ty("TATM",year_limit = 2300)
+    my_closest_tatm <- my_tatm[which.min(abs(my_tatm$value-TATM_to_check)),]
+    
+    message(paste0("Closest temperature to <",TATM_to_check, "> is: <",my_closest_tatm$value,">,"))
+    # time when it is reached
+    t_tatm_reached  <- my_closest_tatm$t
+    message(paste0("reached in t <",t_tatm_reached, ">, year <",my_closest_tatm$year,">"))
+    # associated damages in GDP percentage
+    associated_damages <- my_getVariable_nty("DAMFRAC",year_limit = 2300) %>% filter(t == t_tatm_reached)
+    
+    return(associated_damages)
+    
+  }
+  
+
+  
+  # Evaluates absolute DAMAGES [Trill USD], 
+  # per each region, associated to reference temperature
+  #
+  my_DAMAGESabs_for_TATM_n <- function( TATM_to_check = NULL){
+    
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+    # ## TEST
+    # my_tatm = PP3ssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$CBA$get_TATM_ty
+    # TATM_to_check = 2
+    #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+    # get closest TATM to reference point 
+    my_tatm         <- my_getVariable_ty("TATM",year_limit = 2300)
+    my_closest_tatm <- my_tatm[which.min(abs(my_tatm$value-TATM_to_check)),]
+    
+    message(paste0("Closest temperature to <",TATM_to_check, "> is: <",my_closest_tatm$value,">,"))
+    # time when it is reached
+    t_tatm_reached  <- my_closest_tatm$t
+    message(paste0("reached in t <",t_tatm_reached, ">, year <",my_closest_tatm$year,">"))
+    # associated damages in GDP percentage
+    associated_damages <-  my_getVariable_nty("DAMAGES",year_limit = 2300) %>% filter(t == t_tatm_reached)
+    
+    return(associated_damages)
+    
+  }
+  
+  
+
+  # Evaluates absolute EMISSIONS [GtCO2], 
+  # per each region, from start_year to end_year. 
+  # (both variables are multiplied 5 times each timestamp value)
+  #
+  my_CUML5y_EMItot_n      <- function( year_start = 0,
                                           year_limit = RICEx_default_time_horizon){
       
       my_VAR_CUML5y_n( variable_name = "E", 
@@ -282,11 +345,11 @@ RICEx <- function(gdx_file_with_path){
   }
 
     
-  # Evaluates total abatement costs [%cmlGDP] per each region
-  # from start_year to end_year 
-  # (abatecosts and gdp are multiplied 5 times each timestamp value)
+  # Evaluates cumulated EMISSIONS, normalized by cumulated GDPgross, 
+  # per each region, from start_year to end_year. 
+  # (both variables are multiplied 5 times each timestamp value)
   #
-  my_CUML5y_EMISSIONSperc_n      <- function(year_start = 0,
+  my_CUML5y_EMItot_on_YGROSS_n      <- function(year_start = 0,
                                              year_limit = RICEx_default_time_horizon){
 
 
@@ -305,12 +368,35 @@ RICEx <- function(gdx_file_with_path){
   }
 
 
+  # Evaluates cumulated EMISSIONS, normalized by cumulated BAU-Emissions, 
+  # per each region, from start_year to end_year. 
+  # (both variables are multiplied 5 times each timestamp value)
+  #
+  my_CUML5y_EMItot_on_EMIbau_n      <- function(year_start = 0,
+                                             year_limit = RICEx_default_time_horizon){
+
+
+    cum_emi        = my_VAR_CUML5y_n( variable_name = "E", 
+                                      year_start,
+                                      year_limit) %>%  rename("emissions" = "value") 
+    
+    
+    cum_bau        = my_VAR_CUML5y_n( variable_name = "emi_bau_co2", 
+                                      year_start,
+                                      year_limit) %>%  rename("emi_bau" = "value") 
+    
+    merge(cum_emi,cum_bau, by = c("n")) %>% mutate(value = emissions/emi_bau) %>% dplyr::select(n,value)
+    
+    
+  }
+
+
   
     
   
-  # Evaluates total damages [Trill USD] per each region
-  # from start_year to end_year 
-  # multiplying 5 times each timestamp value
+  # Evaluates cumulated absolute DAMAGES [Trill USD], 
+  # per each region, from start_year to end_year. 
+  # (both variables are multiplied 5 times each timestamp value)
   #
   my_CUML5y_DAMAGES_n      <- function( year_start = 0,
                                         year_limit = RICEx_default_time_horizon){
@@ -320,12 +406,12 @@ RICEx <- function(gdx_file_with_path){
                        year_limit  )
   }
 
-
-  # Evaluates total abatement costs [%cmlGDP] per each region
-  # from start_year to end_year 
-  # (abatecosts and gdp are multiplied 5 times each timestamp value)
+  
+  # Evaluates cumulated DAMAGES, normalized by cumulated GDPgross, 
+  # per each region, from start_year to end_year. 
+  # (both variables are multiplied 5 times each timestamp value)
   #
-  my_CUML5y_DAMAGESperc_n      <-  function(year_start = 0,
+  my_CUML5y_DAMAGES_on_YGROSS_n      <-  function(year_start = 0,
                                              year_limit = RICEx_default_time_horizon){
 
 
@@ -350,9 +436,10 @@ RICEx <- function(gdx_file_with_path){
 
   
   
-  # Evaluates total abatement costs [Trill USD] per each region
-  # from start_year to end_year 
-  # multiplying 5 times each timestamp value
+  # Evaluates cumulated absolute ABATECOSTS [Trill USD], 
+  # per each region, from start_year to end_year. 
+  # (both variables are multiplied 5 times each timestamp value)
+  #
   my_CUML5y_ABATECOST_n      <- function( year_start = 0,
                                           year_limit = RICEx_default_time_horizon){
       
@@ -365,12 +452,12 @@ RICEx <- function(gdx_file_with_path){
 
 
 
-  # Evaluates total abatement costs [%cmlGDP] per each region
-  # from start_year to end_year 
-  # (abatecosts and gdp are multiplied 5 times each timestamp value)
+  # Evaluates cumulated ABATECOSTS, normalized by cumulated GDPgross, 
+  # per each region, from start_year to end_year. 
+  # (both variables are multiplied 5 times each timestamp value)
   #
-  my_CUML5y_ABATECOSTperc_n      <- function(year_start = 0,
-                                             year_limit = RICEx_default_time_horizon){
+  my_CUML5y_ABATECOST_on_YGROSS_n      <- function( year_start = 0,
+                                                    year_limit = RICEx_default_time_horizon){
 
 
     cum_abatecosts = my_VAR_CUML5y_n( variable_name = "ABATECOST", 
@@ -433,6 +520,7 @@ RICEx <- function(gdx_file_with_path){
       get_ELAND_nty                      = my_ELAND_nty,
       get_MIU_nty                        = my_MIU_nty,
       get_SCC_nty                        = my_SCC_nty,
+      get_POPshare_nty                 = my_POPshare_nty,
       get_TLOCALabs_nty                  = my_TLOCALabs_nty,
       get_TLOCALincr_nty                 = my_TLOCALincr_nty,
       get_TATM_ty                        = my_TATM_ty,
@@ -445,14 +533,19 @@ RICEx <- function(gdx_file_with_path){
       get_world_DAMAGEperc_ty             = my_world_DAMAGEperc_ty, 
       get_world_CIntensity_ty             = my_world_CIntensity_ty,
       get_world_CONSUMPTION_ty            = my_world_CONSUMPTION_ty,
+      
       # specific evaluated getters
 
-      get_CUML5y_EMISSIONS_n             = my_CUML5y_EMISSIONS_n,     
-      get_CUML5y_EMISSIONSperc_n         = my_CUML5y_EMISSIONSperc_n,  
-      get_CUML5y_DAMAGES_n               = my_CUML5y_DAMAGES_n,
-      get_CUML5y_DAMAGESperc_n           = my_CUML5y_DAMAGESperc_n, 
-      get_CUML5y_ABATECOST_n             = my_CUML5y_ABATECOST_n,
-      get_CUML5y_ABATECOST_perc_n        = my_CUML5y_ABATECOSTperc_n,   
+      get_CUML5y_EMItot_n                 = my_CUML5y_EMItot_n,     
+      get_CUML5y_EMItot_on_YGROSS_n       = my_CUML5y_EMItot_on_YGROSS_n,  
+      get_CUML5y_EMItot_on_EMIbau_n       = my_CUML5y_EMItot_on_EMIbau_n,
+      get_CUML5y_DAMAGES_n                = my_CUML5y_DAMAGES_n, 
+      get_CUML5y_DAMAGES_on_YGROSS_n      = my_CUML5y_DAMAGES_on_YGROSS_n,
+      get_CUML5y_ABATECOST_n              = my_CUML5y_ABATECOST_n,   
+      get_CUML5y_ABATECOST_on_YGROSS_n    = my_CUML5y_ABATECOST_on_YGROSS_n,
+      
+      get_DAMAGESperc_for_TATM_n          = my_DAMAGESperc_for_TATM_n,
+      get_DAMAGESabs_for_TATM_n           = my_DAMAGESabs_for_TATM_n,
 
 
       # disaggregating functions
@@ -463,7 +556,7 @@ RICEx <- function(gdx_file_with_path){
       # aggregating functions
 
       get_PARAMETER_WORLDagg_ntyTOty    =  my_PAR_WORLDagg_ntyTOty,
-      get_VARIABLE_WORLDagg_ntyTOty     =  my_VAR_WORLDsum_ntyTOty,
+      get_VARIABLE_WORLDagg_ntyTOty     =  my_VAR_WORLDagg_ntyTOty,
       get_VARIABLE_CUML5y_n              = my_VAR_CUML5y_n,   
 
 

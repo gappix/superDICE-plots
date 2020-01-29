@@ -26,6 +26,8 @@ RICEx.plot.multimap <- function( EXPdata
                                 ,shape    = NULL 
                                 ,min_data = NULL 
                                 ,max_data = NULL 
+                                ,legend_symmetric = TRUE
+                                ,legend_centre    = 0
                             ){
 
 
@@ -45,10 +47,19 @@ RICEx.plot.multimap <- function( EXPdata
   mydf  <- cbind(cat=rep(names(EXPdata),sapply(EXPdata,nrow)),do.call(rbind,EXPdata))
   min_measure = min(mydf$value)
   max_measure = max(mydf$value)
-  if(is.null(min_data)){ min_data = min(c(min_measure, -max_measure)) }
-  if(is.null(max_data)){ max_data = max(c(max_measure, -min_measure)) }
+
+  if(is.null(min_data)){ 
+    if(legend_symmetric){ min_data = min(c(min_measure, legend_centre-max_measure))
+    }else{  min_data = min_measure   }
+  }
+  if(is.null(max_data)){ 
+      if(legend_symmetric){ max_data = max(c(max_measure+legend_centre, -min_measure))
+    }else{ max_data = max_measure  }   
+  }  
+
+  if(!legend_symmetric){ legend_centre = (abs(max_measure)-abs(min_measure))/2 }
   # Check df correctness
-  if("year" %in% colnames(mydf)) if(nrow(mydf %>% dplyr::select("year") %>% distinct() ) > 1) stop("More than one year found! No temporal dimension in maps!")
+  #if("year" %in% colnames(mydf)) if(nrow(mydf %>% dplyr::select("year") %>% distinct() ) > 1) stop("More than one year found! No temporal dimension in maps!")
    
   
   # Get number of plots 
@@ -95,7 +106,8 @@ RICEx.plot.multimap <- function( EXPdata
                                ,legend   = myLegend 
                                ,palette  = myPalette                     
                                ,min_data = min_data
-                               ,max_data = max_data )
+                               ,max_data = max_data
+                               ,centre_data = legend_centre )
       
     # if(p == 1){plotlegend <- get_plotlegend(plottigat)} 
     plotlist[[p]] <- local(print(plottigat  + theme(legend.position="none")))

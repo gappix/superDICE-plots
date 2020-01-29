@@ -252,7 +252,10 @@ RICEx.plot.map <- function(  data
                             ,shape    
                             ,min_data 
                             ,max_data 
+                            ,centre_data
                             ){
+
+                          
 ggplot() +
       
       # data
@@ -264,26 +267,28 @@ ggplot() +
       # appearance
       scale_fill_gradientn(colors = palette
                            ,breaks=c( min_data
-                                      # ,0.75*min_data
-                                      # ,0.5*min_data        
-                                      # ,0.25*min_data 
-                                      ,0       
-                                      ,0.25*max_data
-                                      ,0.5*max_data
-                                      ,0.75*max_data
+                                      ,(centre_data - 0.75 * abs(min_data-centre_data))
+                                      ,(centre_data - 0.5  * abs(min_data-centre_data))        
+                                      ,(centre_data - 0.25 * abs(min_data-centre_data)) 
+                                      ,centre_data       
+                                      ,(centre_data + 0.25 * abs(centre_data-max_data))
+                                      ,(centre_data + 0.5  * abs(centre_data-max_data))
+                                      ,(centre_data + 0.75 * abs(centre_data-max_data))
                                       ,max_data
                                       )
                            ,labels=c( paste0(round(min_data,digits = 2))
-                                    #  ,paste0(round(0.75*min_data,digits = 2))
-                                    #  ,paste0(round(0.5*min_data,digits = 2))
-                                    #  ,paste0(round(0.25*min_data,digits = 2))
-                                     ,0
-                                     ,paste0(round(0.25*max_data,digits = 2))
-                                     ,paste0(round(0.5*max_data,digits = 2))
-                                     ,paste0(round(0.75*max_data,digits = 2))
-                                     ,paste0(round(max_data,digits = 2))
+                                      ,paste0(round((centre_data - 0.75 * abs(min_data-centre_data)),digits = 2))
+                                      ,paste0(round((centre_data - 0.5  * abs(min_data-centre_data)),digits = 2))
+                                      ,paste0(round((centre_data - 0.25 * abs(min_data-centre_data)),digits = 2))
+
+                                      ,paste0(round(centre_data,digits = 2))
+ 
+                                      ,paste0(round((centre_data + 0.25 *  abs(centre_data-max_data)),digits = 2))
+                                      ,paste0(round((centre_data + 0.5  *  abs(centre_data-max_data)),digits = 2))
+                                      ,paste0(round((centre_data + 0.75 *  abs(centre_data-max_data)),digits = 2))
+                                      ,paste0(round(max_data,digits = 2))
                                      )
-                           ,limits=c(min_data, max_data) # symmetric scale (0 in the middle)
+                           ,limits=c(min_data, max_data) #linear scale
       ) +
       
       labs (fill = legend) + 

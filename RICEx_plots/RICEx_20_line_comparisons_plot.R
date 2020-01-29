@@ -42,7 +42,7 @@ RICEx.plot.lineplot  <- function( EXPdata,
                                                          howmany_categories  = categories,
                                                          colors_per_category = colors_per_category ))
 
-  names(my_legend_elements_with_colors) = c("BAU","BAU nodmg","BAU dmg","Historical", names(EXPdata))
+  names(my_legend_elements_with_colors) = c("BAU","BAU nodmg","BAU dmg","Historical", names(EXPdata)[!names(EXPdata) %in% c("BAU","BAU nodmg","BAU dmg","Historical")])
   
   
   # Plotter .......................

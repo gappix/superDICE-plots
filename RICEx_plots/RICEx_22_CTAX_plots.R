@@ -31,7 +31,7 @@ RICEx.plot.lineplot.CTAX  <- function(   EXPdata
                                                            howmany_categories  = categories,
                                                            colors_per_category = colors_per_category ))
   
-  names(my_legend_elements_with_colors) = c("ADVANCE","MEDIAN","Historical",names(EXPdata))
+  names(my_legend_elements_with_colors) = c("ADVANCE","MEDIAN","Historical",names(EXPdata)[!names(EXPdata) %in% c("ADVANCE","MEDIAN","Historical")])
   
   
   # Plotter .......................
