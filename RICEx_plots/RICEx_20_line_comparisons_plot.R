@@ -1,13 +1,14 @@
 
 source("RICEx_plots/RICEx_00_colors_settings.R")
 require_package("ggplot2")
-
+require_package("latex2exp")
 
 RICEx.plot.lineplot  <- function( EXPdata, 
                                   title,
                                   legend,
                                   yLabel,
                                   xLabel = "Year",
+                                  LaTeX_text = FALSE,
                                   categories = NULL, 
                                   colors_per_category=NULL ){
   
@@ -37,13 +38,14 @@ RICEx.plot.lineplot  <- function( EXPdata,
   # names(my_legend_elements_with_colors) = c("ADVANCE","MEDIAN","Historical",names(EXPdata))
   # 
   
-  my_legend_elements_with_colors = c("black","black","#505050", "#383838",
+  my_legend_elements_with_colors = c("black","black","#707070", "#996633",
                                    i_want_pollos_colors( howmany_colors      = ncolors,
                                                          howmany_categories  = categories,
                                                          colors_per_category = colors_per_category ))
 
-  names(my_legend_elements_with_colors) = c("BAU","BAU nodmg","BAU dmg","Historical", names(EXPdata)[!names(EXPdata) %in% c("BAU","BAU nodmg","BAU dmg","Historical")])
+  names(my_legend_elements_with_colors) = c("BAU","BAU no-dmg","BAU dmg","Historical", names(EXPdata)[!names(EXPdata) %in% c("BAU","BAU nodmg","BAU dmg","Historical")])
   
+  my_legend_elements_with_colors = my_legend_elements_with_colors[names(EXPdata) ]
   
   # Plotter .......................
   
@@ -53,29 +55,58 @@ RICEx.plot.lineplot  <- function( EXPdata,
     
     # MY DATA
     
-    geom_line(data = mydf, aes(year,value, color=cat), size = 1.2)  +  
+    geom_line(data = mydf, aes(year,value, color=cat), size = 1.2)   
     
     
     # graphic details
-    
-    guides(colour=guide_legend(ncol=legendColumns)) +
+    if(LaTeX_text){ 
+      plottigat = plottigat +
 
-    scale_color_manual( breaks = names(my_legend_elements_with_colors),
-                        values = my_legend_elements_with_colors ) +
+      scale_color_manual( breaks = names(my_legend_elements_with_colors),
+                          labels = lapply(names(my_legend_elements_with_colors),TeX),
+                          values = my_legend_elements_with_colors ) +  
+      
+      labs (color = TeX(myLegend)) + 
+      ggtitle(TeX(mytitle)) + 
+      xlab(TeX(myXlabel)) +
+      ylab(TeX(myYlabel))  
 
-    theme( legend.text   = element_text(size = 13, margin = margin(t = 10)),
-           #legend.spacing.y = unit(10.0, 'mm'),
-           legend.title  = element_text(size = 16),
-           plot.title    = element_text(size = 16),
-           axis.title.x  = element_text(size = 16),
-           axis.text.x   = element_text(size = 14),
-           axis.title.y  = element_text(size = 16)  ) +
-    
-    labs (color = myLegend) + 
-    ggtitle(mytitle) + 
-    xlab(myXlabel) +
-    ylab(myYlabel)  ; 
-  
+    }else{
+
+      plottigat = plottigat +
+
+      scale_color_manual( breaks = names(my_legend_elements_with_colors),
+                          labels = names(my_legend_elements_with_colors),
+                          values = my_legend_elements_with_colors ) +
+
+
+
+      
+      
+      labs (color = myLegend) + 
+      ggtitle(mytitle) + 
+      xlab(myXlabel) +
+      ylab(myYlabel) 
+
+
+    } 
+
+  # Aestetics
+  plottigat = plottigat +
+
+        guides(colour=guide_legend(ncol=legendColumns)) +
+
+        theme( legend.text   = element_text(size = 13),# margin = margin(t = 10)),
+            legend.spacing.y = unit(10.0, 'mm'),
+            legend.key.size = unit(1.5,"line"),
+            legend.text.align = 0,
+            legend.title  = element_text(size = 16),
+            plot.title    = element_text(size = 16),
+            axis.title.x  = element_text(size = 16),
+            axis.text.x   = element_text(size = 14),
+            axis.title.y  = element_text(size = 16)  ) 
+
+             
   return(plottigat)
 }
 

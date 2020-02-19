@@ -28,6 +28,7 @@ RICEx.plot.multimap <- function( EXPdata
                                 ,max_data = NULL 
                                 ,legend_symmetric = TRUE
                                 ,legend_centre    = 0
+                                ,LaTeX_text = FALSE
                             ){
 
 
@@ -102,6 +103,7 @@ RICEx.plot.multimap <- function( EXPdata
     # Plottigat ...........................
     plottigat = RICEx.plot.map( data     = EXPdata[[p]]
                                ,title    = names(EXPdata)[p]
+                               ,LaTeX_text = LaTeX_text
                                ,shape    = myShape
                                ,legend   = myLegend 
                                ,palette  = myPalette                     

@@ -2,8 +2,9 @@
 source("RICEx_utils/RICEx_00_package_retriever.R")
 require_package("purrr")
 require_package("stringr")
-
-
+require_package("xlsx")
+require_package("tidyr")
+#conflict_prefer("select", "dplyr")
 dir_data_ssp <- here("../RICEx-Data/ssp/")
 
 
@@ -17,6 +18,7 @@ csv_sspDB_IAM_native_regions_CO2_ffi        <- tbl_df(read.csv(file.path(dir_dat
                                                   rename(Model = MODEL, Scenario = SCENARIO, Region = REGION, Variable = VARIABLE, Unit = UNIT)  %>% 
                                                   as.data.frame()
                                                 
+xlsx_sspDB_total_forcing           <- tbl_df(read.xlsx(file.path(dir_data_ssp, "", "SSPworld_total_forcing.xlsx"), 1)) %>% select(-Notes) %>% as.data.frame()
 
 
 ## FUNCTION 
@@ -77,7 +79,7 @@ sspDB_all_baseline_CO2_ffi         <- cleanIIASAdata(xlsx_sspDB_all_baseline_CO2
 sspDB_r5regions_baseline_CO2_ffi   <- cleanIIASAdata(xlsx_sspDB_all_regions_baseline_CO2_ffi)
 sspDB_IAM_native_regions_CO2_ffi   <- cleanIIASAdata(csv_sspDB_IAM_native_regions_CO2_ffi)
 
-
+sspDB_total_forcing                <- cleanIIASAdata(xlsx_sspDB_total_forcing) %>% mutate(value = value*1000)%>% mutate(unit = "W/m2")
 
 # check dataframe classes are correct
 #sapply(sspDB_r5regions_baseline_CO2_ffi, class)

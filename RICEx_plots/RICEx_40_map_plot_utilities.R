@@ -8,6 +8,8 @@ require_package("conflicted")
 conflict_prefer("filter", "dplyr")
 conflict_prefer("select", "dplyr")
 
+require_package("latex2exp")
+
 ##---------:  IMPORT REGIONS SHP   :-------------------------------------------------------------------------------------------------
 
 capture.output({
@@ -253,10 +255,11 @@ RICEx.plot.map <- function(  data
                             ,min_data 
                             ,max_data 
                             ,centre_data
+                            ,LaTeX_text = FALSE
                             ){
 
                           
-ggplot() +
+plottigat = ggplot() +
       
       # data
       geom_sf(data =  merge(  shape,
@@ -291,8 +294,23 @@ ggplot() +
                            ,limits=c(min_data, max_data) #linear scale
       ) +
       
-      labs (fill = legend) + 
-      ggtitle(title)
+      labs (fill = legend) 
+
+
+          # graphic details
+    if(LaTeX_text){ 
+      plottigat = plottigat + ggtitle(TeX(title))
+
+
+    }else{
+
+      plottigat = plottigat +ggtitle(title)
+
+
+
+    } 
+      
+ return(plottigat)
 }
 
 
