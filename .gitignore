@@ -36,6 +36,9 @@ vignettes/*.pdf
 rsconnect/
 .Rproj.user
 
+#PowerBI Folder
+PowerBI
 
 #LEGACY FOLDER
 __LEGACY/*
+__LEGACY
