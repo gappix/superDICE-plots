@@ -228,13 +228,13 @@ RICEx <- function(gdx_file_with_path){
   my_CPRICE_nty          =  my_getVariable_nty("CPRICE",       unit = "USD/tCO2"            )
   
   my_DAMAGEabs_nty       =  my_getVariable_nty("DAMAGES",      unit = "Trill 2005 USD/year" )
-  my_DAMAGEperc_nty      =  my_getVariable_nty("DAMFRAC",      unit = "%"                   )
+  my_DAMAGEperc_nty      =  my_getVariable_nty("DAMFRAC",      unit = "%"                   ) %>% mutate(value = value * 100)
   
   my_EMI_nty             =  my_getVariable_nty("E",            unit = "GtCO2/year"          )
   my_EIND_nty            =  my_getVariable_nty("EIND",         unit = "GtCO2/year"          )
   my_ELAND_nty           =  my_getVariable_nty("ELAND",        unit = "GtCO2/year"          )
   
-  my_MIU_nty             =  my_getVariable_nty("MIU",          unit = "%"                   )
+  my_MIU_nty             =  my_getVariable_nty("MIU",          unit = "%"                   ) %>% mutate(value = value * 100)
   
   my_SCC_nty             =  my_getParameter_nty("scc",         unit = "USD/tCO2eq"          )
 
@@ -265,7 +265,7 @@ RICEx <- function(gdx_file_with_path){
   my_world_DAMAGEperc_ty  =  merge(   my_VAR_WORLDagg_ntyTOty("DAMAGES" ) %>% rename(damages = value),
                                      my_VAR_WORLDagg_ntyTOty("YGROSS"  ) %>% rename(ygross  = value), 
                                      by = c("t","year")
-                                  )  %>% mutate(value = -damages/ygross) %>% dplyr::select(t,year,value) %>% mutate(unit = "%") 
+                                  )  %>% mutate(value = -damages/ygross * 100) %>% dplyr::select(t,year,value) %>% mutate(unit = "%") 
   
   
   my_world_CIntensity_ty  = merge(   my_VAR_WORLDagg_ntyTOty("EIND"    ) %>% rename(eind    = value),
