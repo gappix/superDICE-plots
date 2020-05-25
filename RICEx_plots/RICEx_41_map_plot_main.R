@@ -11,7 +11,160 @@
 
 source("RICEx_plots/RICEx_40_map_plot_utilities.R")
 # library(gridExtra)
-library(ggpubr)
+require_package("ggpubr")
+
+
+
+
+
+
+
+
+
+
+## ____ FUNCTION ____
+RICExplot.lineplot_nty <- function(EXPdata 
+                                  , title = "RICEx nty lineplot"
+                                  , y_label = "Value"
+                                  , x_label = "Year"
+                                  , legend_columns = NULL
+                                  , region_code = "ed57"
+                                  , LaTeX_text = FALSE
+                                  , no_legend = FALSE   
+                                ){
+  
+  ## Data preparation 
+  mydata = EXPdata
+  mytitle = title
+  myylabel = y_label
+  myxlabel = x_label
+  myregioncode = region_code
+
+
+  # number of columns needed to show all legends
+  if(is.null(legend_columns)){   mylegendcolumns = ifelse(length(EXPdata) < 14, 1, 2) 
+  } else { mylegendcolumns = legend_columns }
+  
+
+
+
+  ## Plotter
+  plottigat = ggplot() + 
+    
+    
+    geom_line(data= mydata,
+              aes( x=year, y=value, group=n, color =n ),
+              size = 1.1) + 
+    
+
+    scale_color_manual( values = colorize_regions(myregioncode)  ) + 
+    
+
+    guides( colour = guide_legend(ncol=mylegendcolumns), 
+            fill   = guide_legend(ncol=mylegendcolumns)  ) +
+    
+
+    theme( legend.position=if(no_legend){"none"} else {"right"} ,
+           plot.title = element_text(size=12),
+           axis.title.x = element_text(size = 12),
+           axis.text.x = element_text(size = 12),
+           axis.title.y = element_text(size = 12))   
+    
+
+
+  # graphic details
+  if(LaTeX_text){   plottigat = plottigat +       
+                                  ggtitle(TeX(mytitle)) +
+                                  xlab(TeX(myxlabel))   +
+                                  ylab(TeX(myylabel))   
+  
+  }else{  plottigat = plottigat +     
+                        ggtitle(mytitle) + 
+                        xlab(myxlabel)   +
+                        ylab(myylabel) 
+  } 
+     
+    
+    
+ 
+
+
+  return(plottigat)
+}
+
+
+
+
+
+
+
+
+
+
+## ____ FUNCTION ____
+RICExplot.combo.lineplot_nty <- function( EXPdata
+                                        , title = "RICEx nty lineplot" 
+                                        , y_label = "Value"
+                                        , x_label = "Year"
+                                        , region_code = "ed57"
+                                        , legend_columns = NULL
+                                        , no_legend = FALSE
+                                        , LaTeX_text = FALSE
+                                        , columns  = NULL 
+                                        , y_lim = NULL
+                                        , x_lim = NULL
+                                    ){
+  
+
+
+
+  if(LaTeX_text){  mytitle = TeX(title)  } else {  mytitle = title   } 
+
+  ## Prepare single plots
+  plotlist    = list()
+
+  for(p in c(1:length(EXPdata))){
+    
+
+    message( paste0("preparing plot < ",names(EXPdata)[p]," > ...") )
+    
+    plottigat = RICExplot.lineplot_nty(  EXPdata = EXPdata[[p]] 
+                                        , title = names(EXPdata)[p] 
+                                        , y_label = y_label
+                                        , x_label = x_label
+                                        , region_code = region_code
+                                        , legend_columns = legend_columns
+                                        , LaTeX_text = LaTeX_text
+                                    ) 
+    
+#    if(!is.null(y_lim)) plottigat = plottigat + ylim(y_lim[1], y_lim[2])
+ #   if(!is.null(x_lim)) plottigat = plottigat + xlim(x_lim[1], x_lim[2])
+    
+    plotlist[[p]] <- local(print(plottigat + theme(legend.position="none") ))
+    
+  }
+
+
+
+  ## Combine plots 
+  message( paste0("putting all together..") )
+
+
+
+  if(!is.null(columns)){    nCol = columns
+                            nRow = ceiling(length(EXPdata)/nCol)
+
+  } else {    nCol = ceiling(length(EXPdata)/2)
+              nRow = ceiling(length(EXPdata)/nCol)  }
+
+
+  plottigat = annotate_figure( do.call("ggarrange", c(plotlist, ncol=nCol, nrow=nRow,  common.legend = TRUE, legend="right") ) 
+                               , top =  text_grob( mytitle, face = "bold", size = 16)
+                              )                               
+
+  return(plottigat)
+
+}
 
 
 
@@ -19,13 +172,14 @@ library(ggpubr)
 ## ____ FUNCTION ____
 # to evaluate multiple MAPS sharing the same dimensions and legend
 # on the same chart
-RICEx.plot.multimap <- function( EXPdata 
+RICExplot.combo.map <- function( EXPdata 
                                 ,legend 
                                 ,title
                                 ,palette  = NULL 
                                 ,shape    = NULL 
                                 ,min_data = NULL 
                                 ,max_data = NULL 
+                                ,columns  = NULL
                                 ,legend_symmetric = TRUE
                                 ,legend_centre    = 0
                                 ,LaTeX_text = FALSE
@@ -119,6 +273,13 @@ RICEx.plot.multimap <- function( EXPdata
   message( paste0("putting all together (maps are an hard job, it may take some MINUTES!)") )
   nRow = ceiling(nplots/2)
   nCol = ceiling(nplots/nRow)
+
+  if(!is.null(columns)){
+
+    nCol = columns
+    nRow = ceiling(nplots/nCol)
+
+  }
 
   annotate_figure(do.call("ggarrange", c(plotlist, ncol=nCol, nrow=nRow,  common.legend = TRUE, legend="right")) 
                   ,top =  text_grob(myTitle, face = "bold", size = 16)

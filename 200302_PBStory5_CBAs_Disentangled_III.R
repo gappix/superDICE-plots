@@ -73,7 +73,7 @@ plottigat <- RICEx.plot.lineplot(
   
   EXPdata   = list(
     
-    "CBA $\\gamma = 0$"    = PP5$ssp2$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_disentangled$savings_fixed_converging$CBA__gamma0$get_world_EMIffi_ty
+    "CBA $\\gamma = 0$"     = PP5$ssp2$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_disentangled$savings_fixed_converging$CBA__gamma0$get_world_EMIffi_ty
     ,"CBA $\\gamma = 0.5$"  = PP5$ssp2$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_disentangled$savings_fixed_converging$CBA__gamma0x5$get_world_EMIffi_ty
     ,"CBA $\\gamma = 1.45$" = PP5$ssp2$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_disentangled$savings_fixed_converging$CBA__gamma1x45$get_world_EMIffi_ty
     ,"CBA $\\gamma = 2$"    = PP5$ssp2$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_disentangled$savings_fixed_converging$CBA__gamma2$get_world_EMIffi_ty
@@ -1090,7 +1090,7 @@ ggsave(filename = "./plots/worldDMG_diff_Gammas_SSPs.png",plot = plottigat, dpi=
       
     )
     ,title  = "$\\gamma = 0$"
-    ,yLabel = "Temperature increase $\\[ºC\\]$"
+    ,yLabel = "Temperature increase $\\[?C\\]$"
     ,legend = "Scenarios"
     ,categories = 5
     ,colors_per_category = 1
@@ -1116,7 +1116,7 @@ ggsave(filename = "./plots/worldDMG_diff_Gammas_SSPs.png",plot = plottigat, dpi=
       
     )
     ,title  = "$\\gamma = 0.5$"
-    ,yLabel = "Temperature increase $\\[ ºC\\]$"
+    ,yLabel = "Temperature increase $\\[ ?C\\]$"
     ,legend = "Scenarios"
     ,categories = 5
     ,colors_per_category = 1
@@ -1141,7 +1141,7 @@ ggsave(filename = "./plots/worldDMG_diff_Gammas_SSPs.png",plot = plottigat, dpi=
       
     )
     ,title  = "$\\gamma = 1.45$"
-    ,yLabel = "Temperature increase $\\[ ºC\\]$"
+    ,yLabel = "Temperature increase $\\[ ?C\\]$"
     ,legend = "Scenarios"
     ,categories = 5
     ,colors_per_category = 1
@@ -1165,7 +1165,7 @@ ggsave(filename = "./plots/worldDMG_diff_Gammas_SSPs.png",plot = plottigat, dpi=
       
     )
     ,title  = "$\\gamma = 2$"
-    ,yLabel = "Temperature increase $\\[ ºC\\]$"
+    ,yLabel = "Temperature increase $\\[ ?C\\]$"
     ,legend = "Scenarios"
     ,categories = 5
     ,colors_per_category = 1
@@ -1981,7 +1981,7 @@ RICEx.plot.multimap(
   )
   
   ,title  = paste0("Average local-temperature incease in ",myyear," - BURKE SR SSP2 - under different cooperation")
-  ,legend = "T Increase \n[+ºC]"
+  ,legend = "T Increase \n[+?C]"
   ,palette =  RColorBrewer::brewer.pal(9, "OrRd") #RdBu|OrRd|PuBu|Greens|RdPu|Purples|Greys
   ,min_data = 0
   ,max_data = 2.45
@@ -2009,7 +2009,7 @@ RICEx.plot.multimap(
   
   
   ,title  = paste0("Local avg Temperature increase in different years - SSP2 with Inequality Gamma 0.5")
-  ,legend = "TLocal Increase \n[+ºC]" 
+  ,legend = "TLocal Increase \n[+?C]" 
   ,palette =  RColorBrewer::brewer.pal(9, "OrRd") #RdBu|OrRd|PuBu|Greens|RdPu|Purples|Greys
   ,min_data = 0
   
@@ -2369,3 +2369,67 @@ RICEx.plot.multimap(
 
 
 
+
+#=========================================================================##
+## -------------- _____________   STATISTICS   _____________  ------------
+#=========================================================================##
+
+
+mydata  = PPstory5$v1x00$OPTIM$ed57$ssp2$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+
+boxplot(mydata$value)
+mean(mydata$value)
+
+#----- REGIONAL DAMAGES DISTRIBUTION -------
+
+myyear = 2100 
+
+
+
+plottigat <- RICEx.plot.boxplot(
+
+  EXPdata   = list(
+    
+    "Reference"      = PPstory5$v1x00$OPTIM$ed57$ssp2$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAU$get_DAMAGEperc_nty %>% filter(year == myyear) %>% mutate(value = 0)
+    ,"Reference dmg" = PPstory5$v1x00$SIMUL$ed57$ssp2$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAUdam$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"Noncoop"       = PPstory5$v1x00$OPTIM$ed57$ssp2$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"Coop dis0"     = PP5$ssp2$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_disentangled$savings_fixed_converging$CBA__gamma0$get_DAMAGEperc_nty %>% filter(year == myyear)
+    ,"Coop dis2"     = PP5$ssp2$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_disentangled$savings_fixed_converging$CBA__gamma2$get_DAMAGEperc_nty %>% filter(year == myyear)
+    
+  )
+  ,title  = "Regional Damages distribution"
+  ,yLabel = "Damages [%GDP]"
+  ,legend = "Scenarios"
+  ,categories = 1
+  ,colors_per_category = 4
+  ,LaTeX_text = FALSE
+  
+) ; plottigat
+
+PPstory5$v1x00$SIMUL$ed57$ssp2$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAUdam$get_VARIABLE_ty("FORC") 
+
+#----- REGIONAL TEMPERATURES DISTRIBUTION -------
+
+
+myyear = 2100 
+
+
+plottigat <- RICEx.plot.boxplot(
+  
+  EXPdata   = list(
+    
+    "Reference"      = PPstory5$v1x00$OPTIM$ed57$ssp2$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAU$get_TLOCALincr_nty %>% filter(year == myyear)
+    ,"Reference dmg" = PPstory5$v1x00$SIMUL$ed57$ssp2$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAUdam$get_TLOCALincr_nty %>% filter(year == myyear)
+    ,"Noncoop"       = PPstory5$v1x00$OPTIM$ed57$ssp2$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$CBA$get_TLOCALincr_nty %>% filter(year == myyear)
+    ,"Coop dis0"     = PP5$ssp2$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_disentangled$savings_fixed_converging$CBA__gamma0$get_TLOCALincr_nty %>% filter(year == myyear)
+    ,"Coop dis2"     = PP5$ssp2$coop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_disentangled$savings_fixed_converging$CBA__gamma2$get_TLOCALincr_nty %>% filter(year == myyear)
+    
+  )
+  ,title  = "Regional Temperatures distribution"
+  ,yLabel = "Local temperature increase [Â°C]"
+  ,legend = "Scenarios"
+  ,categories = 1
+  ,colors_per_category = 5
+  ,LaTeX_text = FALSE
+  
+) ; plottigat

@@ -10,7 +10,7 @@
 
 
 
-## -----------------   Source files   ---------------------------------
+#####  Source files   ---------------------------------
 
 
 source("RICEx_datamng/RICEx_50_experiments_data_central_hub.R")
@@ -22,7 +22,7 @@ invisible(source("RICEx_plots/RICEx_plots.R"))
 
 
 
-## -----------------   EXPERIMENTS   -----------------------------------
+#####  EXPERIMENTS   -----------------------------------
 
 # Retrieve experiments fom automated procedure
 
@@ -38,6 +38,95 @@ original     = BKmatch$v1x00$SIMUL$ed57$ssp5$noncoop_pop$mcEDct4$climate_WITCHco
 
 
 
+#####  BURKE DATA  -------------------
+
+
+BurkeCC <- read.csv("../BURKE 2015 - Replication/data/input/CCprojections/CountryTempChange_RCP85.csv")
+BurkeCC = BurkeCC %>% rename(n = GMI_CNTRY, value = Tchg) %>% select(n,value) 
+
+
+### DRAW  ---------------------------------
+
+
+# __FUNCTION__
+# To evauate damage across two different baselines
+#
+Build_Damage_DF_nty = function(YNETdam, YGROSSnodam, Tlocal_dam, Experiment = "SSP3 - BURKE SR"){
+  
+  ## TEST +++++++++++++++++++++++++
+  # YNETdam     = GDPssp5SR
+  # YGROSSnodam = GDPssp5nodam
+  # TATMdam     = TATMssp5SR
+  #++++++++++++++++++++++++++++++++
+  
+  BKdam = merge(YNETdam,YGROSSnodam, by = c("t","year","n")) %>% 
+    rename(YNETdam = value.x, YGROSSnodam = value.y) %>% 
+    mutate(BKdamage =  -100 * (YNETdam - YGROSSnodam )/YGROSSnodam )
+  
+  return( merge(BKdam, Tlocal_dam, by = c("t","year","n")) %>% 
+            rename(Tlocal = value) %>% 
+            mutate("Experiment" = Experiment )
+          )
+  
+}
+
+
+BKdf_Exogen = Build_Damage_DF_nty( YNETdam      = TLOCALexogen$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAUdam__cutoffMedian$get_VARIABLE_nty("YNET",year_limit = 2200, unit = "Trill USD")
+                                   ,YGROSSnodam = TLOCALexogen$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAU__cutoffMedian$get_VARIABLE_nty(variable_name = "YGROSS", year_limit = 2200, unit = "Trill USD")
+                                   ,Tlocal_dam  = TLOCALexogen$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAUdam__cutoffMedian$get_TLOCALincr_nty %>% filter(year <= 2200)
+                                   ,"SSP5 - Burke SR - Exogen TLOCAL - cutoff Median"    )
+
+
+BKdf_Endogen = Build_Damage_DF_nty( YNETdam      = original$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAUdam__cutoffMedian$get_VARIABLE_nty("YNET",year_limit = 2200, unit = "Trill USD")
+                                   ,YGROSSnodam  = original$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAU__cutoffMedian$get_VARIABLE_nty(variable_name = "YGROSS", year_limit = 2200, unit = "Trill USD")
+                                   ,Tlocal_dam   = original$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAUdam__cutoffMedian$get_TLOCALincr_nty %>% filter(year <= 2200)
+                                   ,"SSP5 - Burke SR - Endogen TLOCAL - cutoff Median"    )
+
+
+# Regional Damages Consistency ---------------------
+
+myyear = 2100
+
+plottigat = RICEx.plot.multimap(
+  EXPdata   = list(
+    
+    #  "BAU "             = PP3ssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAU$get_DAMAGEperc_nty %>% filter(year == myyear)
+    
+    "Exogenous Temp"    = BKdf_Exogen  %>% select("n","t","year", "BKdamage") %>% filter(year == myyear) %>% rename( value= BKdamage)
+    ,"Endogenous Temp"  = BKdf_Endogen %>% select("n","t","year", "BKdamage") %>% filter(year == myyear) %>% rename( value= BKdamage)
+    
+  )
+  
+  ,title  = paste0("Burke SR Damages compared in 2100")
+  ,legend = "Damages \n[% GDP]" 
+  ,max_data = 100
+  ,min_data = -100
+  
+  
+)
+plottigat
+
+
+# Regional Damages Consistency ---------------------
+
+myyear = 2100
+
+plottigat = RICEx.plot.multimap(
+  EXPdata   = list(
+    
+    #  "BAU "             = PP3ssp2_noncoop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAU$get_DAMAGEperc_nty %>% filter(year == myyear)
+    
+    "Exogenous Temp"    = TLOCALexogen$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAU__cutoffMedian$get_DAMAGEperc_nty %>% filter(year == myyear) 
+    ,"Endogenous Temp"  = original$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAU__cutoffMedian$get_DAMAGEperc_nty %>% filter(year == myyear)
+    
+  )
+  
+  ,title  = paste0("Burke SR Damages compared in 2100")
+  ,legend = "Damages \n[% GDP]" 
+  
+  
+)
+plottigat
 
 
 
@@ -811,24 +900,65 @@ RICEx.plot.lineplot(
 )   + xlim(2015,2110)
 
 
+####  TLOCAL 2100 - Burke Map  ----------------
+
+iso3shp   <- st_read("qgis/shape_outfile/geo_iso3/geo_iso3.shp")    %>% rename(n= ISO3)
+
+
+BurkeMap = RICEx.plot.map(   
+  data = BurkeCC
+  ,legend = "Tlocal \nincrease [+?C]"
+  ,title = "Burke (2015) country-level avg temperature increase"
+  ,palette = (RColorBrewer::brewer.pal(9, "OrRd"))
+  ,shape = iso3shp
+  ,min_data = 0
+  ,max_data = 7  
+  ,centre_data = 3.5  )
 
 
 
-## TLocal in 2100 ------
+
+####  TLOCAL 2100 - Burke/RICEx comparison   ----------------
+
+
+myyear = 2100
+
+plottigat <- RICEx.plot.boxplot(
+  
+  EXPdata   = list(
+    
+    "Burke"       = BurkeCC
+    ,"RICEx SSP5 ref" = PPstory5$v1x00$SIMUL$ed57$ssp5$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAUdam$get_TLOCALincr_nty %>% filter(year == myyear) %>% select(n,value)
+    ,"RICEx SSP3 ref" = PPstory5$v1x00$SIMUL$ed57$ssp3$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAUdam$get_TLOCALincr_nty %>% filter(year == myyear) %>% select(n,value)  
+    ,"RICEx Exogen Temp" = BKdf_Exogen  %>% select("n","year", "Tlocal") %>% filter(year == myyear) %>% rename( value= Tlocal) %>% select(-year)
+    )
+
+  ,title  = "Regional Temperature distribution"
+  ,yLabel = "Local Temp increase [+ C deg]"
+  ,legend = "Scenarios"
+  ,categories = 1
+  ,colors_per_category = 4
+  ,LaTeX_text = FALSE
+  
+) ; plottigat
+
+
+
+
+
+####   TLocal in 2100   ----------------------
 
 myyear = 2115
 
 # shapefiles
 ed57shp   <- st_read("qgis/shape_outfile/geo_ene57/geo_ene57.shp")        %>% rename(n= REG_NAME) %>% mutate(region_key = paste0("ed57_",n))
-iso3shp   <- st_read("qgis/shape_outfile/geo_iso3/geo_iso3.shp")    %>% rename(n= ISO3)
-
 
 
 
 map1 = RICEx.plot.map( 
   
   data    = PPstory5$v1x00$OPTIM$ed57$ssp5$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKEnSR$welfare_DICE$savings_fixed_converging$BAU$get_TLOCALincr_nty%>% filter(year == myyear)
-  ,legend   = "T Increase \n[+ºC]"
+  ,legend   = "T Increase \n[+?C]"
   ,title    = paste0("AFTER UPDATE - Average local-temperature increase in ",myyear)
   ,palette  = RColorBrewer::brewer.pal(9, "OrRd") 
   ,min_data = 0
@@ -841,7 +971,7 @@ map1 = RICEx.plot.map(
 map2 = RICEx.plot.map( 
   
   data    = PPstory4$v1x00$OPTIM$ed57$ssp5$noncoop_pop$mcEDct4$climate_WITCHco2$damages_BURKE57SR$welfare_DICE$savings_fixed_converging$BAU$get_TLOCALincr_nty%>% filter(year == myyear) %>% rename(n="ed57")
-  ,legend   = "T Increase \n[+ºC]"
+  ,legend   = "T Increase \n[+?C]"
   ,title    = paste0("BEFORE UPDATE - Average local-temperature increase in ",myyear)
   ,palette  = RColorBrewer::brewer.pal(9, "OrRd") 
   ,min_data = 0
@@ -854,13 +984,9 @@ map2 = RICEx.plot.map(
 
 
 
-BurkeCC <- read.csv("../BURKE 2015 - Replication/data/input/CCprojections/CountryTempChange_RCP85.csv")
-BurkeCC = BurkeCC %>% rename(n = GMI_CNTRY, value = Tchg) %>% select(n,value) 
-
-
 map3 = RICEx.plot.map(   
   data = BurkeCC
-  ,legend = "Tlocal \nincrease [+ºC]"
+  ,legend = "Tlocal \nincrease [+?C]"
   ,title = "Burke (2015) country-level avg temperature increase"
   ,palette = (RColorBrewer::brewer.pal(9, "OrRd"))
   ,shape = iso3shp

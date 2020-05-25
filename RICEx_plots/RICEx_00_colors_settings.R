@@ -199,27 +199,27 @@ require_package("dplyr")
 
 pollos_colors <- tribble(
   
-  ~color_code, ~description     ,~q1_priority  ,~q5_cluster  ,~q5_priority ,~q4_cluster  ,~q4_priority  ,~q2_cluster  ,~q2_priority  ,~q3_cluster  ,~q3_priority                      
+  ~color_code, ~description     ,~q1_priority  ,~q6_cluster  ,~q6_priority, ~q5_cluster  ,~q5_priority ,~q4_cluster  ,~q4_priority  ,~q2_cluster  ,~q2_priority  ,~q3_cluster  ,~q3_priority                      
   
-  ,"#FF0000"   ,"Red vero"            ,1            ,"Q1"        ,1             ,"Q1"        ,1             ,"Q1_Warm"         ,1      ,"Q1_Warm"        ,1                               
-  ,"#00A08A"   ,"Green Tiffany"       ,2            ,"Q3"        ,1             ,"Q3"        ,1             ,"Q2_Cold"         ,1      ,"Q2_Cold"        ,1                           
-  ,"#F2AD00"   ,"Yellow DettoFatto"   ,3            ,"Q4"        ,1             ,"Q4"        ,1             ,"Q1_Warm"         ,3      ,"Q1_Warm"        ,3                           
-  ,"#F98400"   ,"Orange Rugby Varese" ,4            ,"Q4"        ,2             ,"Q4"        ,2             ,"Q1_Warm"         ,2      ,"Q1_Warm"        ,2                           
-  ,"#5BBCD6"   ,"Light Blue Cielo"    ,5            ,"Q2"        ,1             ,"Q2"        ,1             ,"Q2_Cold"         ,2      ,"Q2_Cold"        ,2                           
-  ,"#5bbf13"   ,"Green DettoFatto"    ,6            ,"Q3"        ,2             ,"Q3"        ,2             ,"Q2_Cold"         ,3      ,"Q2_Cold"        ,3                                          
-  ,"#ff03f2"   ,"Pink"                ,7            ,"Q1"        ,2             ,"Q1"        ,2             ,"Q1_Warm"         ,4      ,"Q1_Warm"        ,4                             
-  ,"#6b43e0"   ,"Violet EveryBody "   ,8            ,"Q2"        ,2             ,"Q2"        ,2             ,"Q2_Cold"         ,5      ,"Q2_Cold"        ,5                                          
-  ,"#0374ff"   ,"Intense blue"        ,9            ,"Q2"        ,3             ,"Q2"        ,3             ,"Q2_Cold"         ,4      ,"Q2_Cold"        ,4                                    
-  ,"#d93830"   ,"Coral bella storia"  ,10           ,"Q1"        ,3             ,"Q1"        ,3             ,"Q1_Warm"         ,6      ,"Q1_Warm"        ,5                                         
-  ,"#800000"   ,"shitty bordeaux"     ,11           ,"Q1"        ,4             ,"Q1"        ,4             ,"Q1_Warm"         ,5      ,"Q3_Neutral"     ,1                                       
-  ,"#03ff79"   ,"shy green"           ,12           ,"Q4"        ,3             ,"Q3"        ,4             ,"Q2_Cold"         ,6      ,"Q2_Cold"        ,8                                 
-  ,"#695006"   ,"real brown"          ,13           ,"Q5"        ,1             ,"Q4"        ,4             ,"Q1_Warm"         ,7      ,"Q3_Neutral"     ,2                                    
-  ,"#696506"   ,"what is this?"       ,14           ,"Q5"        ,2             ,"Q3"        ,6             ,"Q1_Warm"         ,8      ,"Q3_Neutral"     ,3                                       
-  ,"#cf6b00"   ,"candy brown"         ,15           ,"Q5"        ,3             ,"Q4"        ,3             ,"Q1_Warm"         ,9      ,"Q3_Neutral"     ,4                                     
-  ,"#007c82"   ,"petroleum"           ,16           ,"Q3"        ,3             ,"Q3"        ,5             ,"Q2_Cold"         ,7      ,"Q2_Cold"        ,7                                   
-  ,"#00b003"   ,"ireland"             ,17           ,"Q3"        ,4             ,"Q3"        ,3             ,"Q2_Cold"         ,8      ,"Q2_Cold"        ,6                                 
-  ,"#000000"   ,"black"               ,18           ,"Q5"        ,4             ,"Q2"        ,5             ,"Q1_Warm"         ,9      ,"Q3_Neutral"     ,5                               
-  ,"#7fffff"   ,"azzurrissimo"        ,19           ,"Q2"        ,4             ,"Q2"        ,4             ,"Q2_Cold"         ,9      ,"Q2_Cold"        ,9                                    
+  ,"#FF0000"   ,"Red vero"            ,1            ,"Q1"        ,1            ,"Q1"        ,1             ,"Q1"        ,1             ,"Q1_Warm"         ,1      ,"Q1_Warm"        ,1                               
+  ,"#00A08A"   ,"Green Tiffany"       ,2            ,"Q3"        ,1            ,"Q3"        ,1             ,"Q3"        ,1             ,"Q2_Cold"         ,1      ,"Q2_Cold"        ,1                           
+  ,"#F2AD00"   ,"Yellow DettoFatto"   ,3            ,"Q4"        ,1            ,"Q4"        ,1             ,"Q4"        ,1             ,"Q1_Warm"         ,3      ,"Q1_Warm"        ,3                           
+  ,"#F98400"   ,"Orange Rugby Varese" ,4            ,"Q4"        ,2            ,"Q4"        ,2             ,"Q4"        ,2             ,"Q1_Warm"         ,2      ,"Q1_Warm"        ,2                           
+  ,"#5BBCD6"   ,"Light Blue Cielo"    ,5            ,"Q2"        ,1            ,"Q2"        ,1             ,"Q2"        ,1             ,"Q2_Cold"         ,2      ,"Q2_Cold"        ,2                           
+  ,"#5bbf13"   ,"Green DettoFatto"    ,6            ,"Q3"        ,2            ,"Q3"        ,2             ,"Q3"        ,2             ,"Q2_Cold"         ,3      ,"Q2_Cold"        ,3                                          
+  ,"#ff03f2"   ,"Pink"                ,7            ,"Q1"        ,2            ,"Q1"        ,2             ,"Q1"        ,2             ,"Q1_Warm"         ,4      ,"Q1_Warm"        ,4                             
+  ,"#6b43e0"   ,"Violet EveryBody "   ,8            ,"Q2"        ,2            ,"Q2"        ,2             ,"Q2"        ,2             ,"Q2_Cold"         ,5      ,"Q2_Cold"        ,5                                          
+  ,"#0374ff"   ,"Intense blue"        ,9            ,"Q2"        ,3            ,"Q2"        ,3             ,"Q2"        ,3             ,"Q2_Cold"         ,4      ,"Q2_Cold"        ,4                                    
+  ,"#d93830"   ,"Coral bella storia"  ,10           ,"Q1"        ,3            ,"Q1"        ,3             ,"Q1"        ,3             ,"Q1_Warm"         ,6      ,"Q1_Warm"        ,5                                         
+  ,"#800000"   ,"shitty bordeaux"     ,11           ,"Q1"        ,4            ,"Q1"        ,4             ,"Q1"        ,4             ,"Q1_Warm"         ,5      ,"Q3_Neutral"     ,1                                       
+  ,"#03ff79"   ,"shy green"           ,12           ,"Q6"        ,2            ,"Q5"        ,4             ,"Q3"        ,4             ,"Q2_Cold"         ,6      ,"Q2_Cold"        ,8                                 
+  ,"#695006"   ,"real brown"          ,13           ,"Q5"        ,1            ,"Q5"        ,1             ,"Q4"        ,4             ,"Q1_Warm"         ,7      ,"Q3_Neutral"     ,2                                    
+  ,"#696506"   ,"what is this?"       ,14           ,"Q5"        ,2            ,"Q5"        ,2             ,"Q3"        ,6             ,"Q1_Warm"         ,8      ,"Q3_Neutral"     ,3                                       
+  ,"#cf6b00"   ,"candy brown"         ,15           ,"Q6"        ,1            ,"Q5"        ,3             ,"Q4"        ,3             ,"Q1_Warm"         ,9      ,"Q3_Neutral"     ,4                                     
+  ,"#007c82"   ,"petroleum"           ,16           ,"Q3"        ,3            ,"Q3"        ,3             ,"Q3"        ,5             ,"Q2_Cold"         ,7      ,"Q2_Cold"        ,7                                   
+  ,"#00b003"   ,"ireland"             ,17           ,"Q3"        ,4            ,"Q3"        ,4             ,"Q3"        ,3             ,"Q2_Cold"         ,8      ,"Q2_Cold"        ,6                                 
+  ,"#000000"   ,"black"               ,18           ,"Q4"        ,3            ,"Q4"        ,3             ,"Q2"        ,5             ,"Q1_Warm"         ,9      ,"Q3_Neutral"     ,5                               
+  ,"#7fffff"   ,"azzurrissimo"        ,19           ,"Q2"        ,4            ,"Q2"        ,4             ,"Q2"        ,4             ,"Q2_Cold"         ,9      ,"Q2_Cold"        ,9                                    
 
   )
 

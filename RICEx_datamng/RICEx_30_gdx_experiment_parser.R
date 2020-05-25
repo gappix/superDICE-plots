@@ -26,8 +26,8 @@ parse_experiment <- function(gdx_name_with_full_path){
     
     if(length(mystring) < 1) return(mystring) # empty value
     
-    if((mystring=='OPT') || (mystring=='OP')){return("OPTIM")}
-    else{return("SIMUL")}
+    if((mystring=='OPT') || (mystring=='OP')){return("OPT")}
+    else{return("SIM")}
   }
   
   sanitize_macc <- function(mystring){
@@ -57,10 +57,10 @@ parse_experiment <- function(gdx_name_with_full_path){
   sanitize_climate <- function(mystring){
     
     if(length(mystring) < 1) return(mystring) # empty value
-    if(toupper(mystring) =='CLWOGHG') return('climate_WITCHoghg')
-    if(toupper(mystring) =='CLWCO2' ) return('climate_WITCHco2')
-    if(toupper(mystring) =='CLSIMP' ) return('climate_SimpleClimate') 
-    if(toupper(mystring) =='CLDCE16') return('climate_DICE2016') 
+    if(toupper(mystring) =='CLWOGHG') return('clWITCHoghg')
+    if(toupper(mystring) =='CLWCO2' ) return('clWITCHco2')
+    if(toupper(mystring) =='CLSIMP' ) return('clSimpleClimate') 
+    if(toupper(mystring) =='CLDCE16') return('clDICE2016') 
     #default/no match case
     return(mystring)
   }
@@ -70,16 +70,16 @@ parse_experiment <- function(gdx_name_with_full_path){
     if(length(mystring) < 1) return(mystring) # empty value
     if(length(grep("dmBK", mystring)) > 0 ) return(paste0("damages_BURKE",str_split(mystring, "dmBK")[[1]][2]))
     #default/no match case
-    return(paste0("damages_",str_split(mystring, "dm")[[1]][2]))
+    return(paste0("dmg",str_split(mystring, "dm")[[1]][2]))
   }
   
   sanitize_savings <- function(mystring){
     if(length(mystring) < 1) return(mystring) # empty value
 
-    if(toupper(mystring) =='SVFXFIX')  return('savings_fixed_2015')
-    if(toupper(mystring) =='SVFXCNV' ) return('savings_fixed_converging')
-    if(toupper(mystring) =='SVFXDCE' ) return('savings_fixed_DICEoptim') 
-    if(toupper(mystring) =='SVMOB')    return('savings_free') 
+    if(toupper(mystring) =='SVFXFIX')  return('sfx_2015')
+    if(toupper(mystring) =='SVFXCNV' ) return('sfx_conv')
+    if(toupper(mystring) =='SVFXDCE' ) return('sfx_dice') 
+    if(toupper(mystring) =='SVMOB')    return('sfree') 
     #default/no match case
     return(mystring)
   }
@@ -106,8 +106,8 @@ parse_experiment <- function(gdx_name_with_full_path){
     
     if(length(mystring) < 1) return(mystring) # empty value
     
-    if(toupper(mystring) =='WFDCE' ) return('welfare_DICE') 
-    if(toupper(mystring) =='WFDIS')  return('welfare_disentangled')
+    if(toupper(mystring) =='WFDCE' ) return('wf_dice') 
+    if(toupper(mystring) =='WFDIS')  return('wf_dsntg')
     #default/no match case
     return(mystring)
   }

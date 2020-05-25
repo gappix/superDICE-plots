@@ -216,7 +216,12 @@ RICEx <- function(gdx_file_with_path){
   
 
   # region data 
-  my_ABATECOST_nty       =  my_getVariable_nty("ABATECOST",    unit = "Trill 2005 USD/year" )
+  my_ABATECOSTabs_nty    =  my_getVariable_nty("ABATECOST",    unit = "Trill 2005 USD/year" )
+  my_ABATECOSTperc_nty   =  merge(   my_getVariable_nty("ABATECOST" ) %>% rename(abatecosts = value),
+                                     my_getVariable_nty("ykali"   )   %>% rename(ykali      = value), 
+                                     by = c("n","t","year")
+                                  )  %>% mutate(value = abatecosts/ykali * 100) %>% dplyr::select(n,t,year,value) %>% mutate(unit = "% baseline") 
+                                  
   my_ABATEDEMI_nty       =  my_getVariable_nty("ABATEDEMI",    unit = "GtCO2/year"          )
   
   my_CIntensity_nty      = merge(   my_getVariable_nty("EIND"    ) %>% rename(eind    = value),
@@ -228,7 +233,10 @@ RICEx <- function(gdx_file_with_path){
   my_CPRICE_nty          =  my_getVariable_nty("CPRICE",       unit = "USD/tCO2"            )
   
   my_DAMAGEabs_nty       =  my_getVariable_nty("DAMAGES",      unit = "Trill 2005 USD/year" )
-  my_DAMAGEperc_nty      =  my_getVariable_nty("DAMFRAC",      unit = "%"                   ) %>% mutate(value = value * 100)
+  my_DAMAGEperc_nty      =  merge(   my_getVariable_nty("YNET" ) %>% rename(ynet = value),
+                                     my_getVariable_nty("ykali") %>% rename(ykali   = value), 
+                                     by = c("n","t","year")
+                                  )  %>% mutate(value = (ynet-ykali)/ykali * 100) %>% dplyr::select(n,t,year,value) %>% mutate(unit = "% baseline") 
   
   my_EMI_nty             =  my_getVariable_nty("E",            unit = "GtCO2/year"          )
   my_EIND_nty            =  my_getVariable_nty("EIND",         unit = "GtCO2/year"          )
@@ -238,7 +246,7 @@ RICEx <- function(gdx_file_with_path){
   
   my_SCC_nty             =  my_getParameter_nty("scc",         unit = "USD/tCO2eq"          )
 
-  my_TLOCALabs_nty       =  my_getVariable_nty("T_LOCAL",      unit = "avg C degrees"       )
+  my_TLOCALabs_nty       =  my_getVariable_nty("TEMP_REGION",      unit = "avg C degrees"       )
 
   
   my_TLOCALincr_nty      =  merge( my_TLOCALabs_nty %>% rename(tlocalnow = value),
@@ -260,12 +268,12 @@ RICEx <- function(gdx_file_with_path){
   my_world_EMIffi_ty      =  my_VAR_WORLDagg_ntyTOty("EIND",    unit = "GtCO2/year"          )
   
     
-  my_world_DAMAGEabs_ty   =  my_VAR_WORLDagg_ntyTOty("DAMAGES", unit = "Trill 2005 USD/year" ) %>% mutate(value = value * (-1)) 
+  my_world_DAMAGEabs_ty   =  my_VAR_WORLDagg_ntyTOty("DAMAGES", unit = "Trill 2005 USD/year" ) %>% mutate(value = value *(-1) ) 
   
-  my_world_DAMAGEperc_ty  =  merge(   my_VAR_WORLDagg_ntyTOty("DAMAGES" ) %>% rename(damages = value),
-                                     my_VAR_WORLDagg_ntyTOty("YGROSS"  ) %>% rename(ygross  = value), 
+  my_world_DAMAGEperc_ty  =  merge(   my_VAR_WORLDagg_ntyTOty("YNET" )    %>% rename(ynet    = value),
+                                      my_VAR_WORLDagg_ntyTOty("ykali"   ) %>% rename(ykali   = value), 
                                      by = c("t","year")
-                                  )  %>% mutate(value = -damages/ygross * 100) %>% dplyr::select(t,year,value) %>% mutate(unit = "%") 
+                                  )  %>% mutate(value = (ynet-ykali)/ykali * 100) %>% dplyr::select(t,year,value) %>% mutate(unit = "% baseline") 
   
   
   my_world_CIntensity_ty  = merge(   my_VAR_WORLDagg_ntyTOty("EIND"    ) %>% rename(eind    = value),
@@ -508,7 +516,8 @@ RICEx <- function(gdx_file_with_path){
       # exposed specific values
       
  
-      get_ABATECOST_nty                  = my_ABATECOST_nty,
+      get_ABATECOSTabs_nty               = my_ABATECOSTabs_nty,
+      get_ABATECOSTperc_nty              = my_ABATECOSTperc_nty,
       get_ABATEDEMI_nty                  = my_ABATEDEMI_nty,
       get_CONSUMPTION_nty                = my_CONSUMPTION_nty,
       get_CIntensity_nty                 = my_CIntensity_nty,
