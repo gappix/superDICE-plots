@@ -67,6 +67,10 @@ import_new_results_as_table <- function( experiment_id,     # current experiment
                                          last_import_time   # sys time of last import (to detect new files)
 ){
   
+  ## TEST ....................................
+  experiment_id = "Paper"
+  last_import_time = 0
+  ##..........................................
   
   # Step1: find new results
   gdx_with_path_list  =  find_new_results(experiment_id, last_import_time)
@@ -82,8 +86,9 @@ import_new_results_as_table <- function( experiment_id,     # current experiment
     # Step2: extract and organize each new data-experiment
     for(gdx_path_element in gdx_with_path_list){ 
       
-      #TEST# 
+      #TEST :::::::::::::::::::::::::::::::::::
       #gdx_path_element = gdx_with_path_list[1]
+      
       
       cat(green(i, " Parsing: ", gdx_path_element ," \n"))
       

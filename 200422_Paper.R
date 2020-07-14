@@ -5,7 +5,7 @@
 source("RICEx_datamng/RICEx_50_experiments_data_central_hub.R")
 source("RICEx_utils/RICEx_10_regions_mappings.R")
 invisible(source("RICEx_plots/RICEx_plots.R"))
-
+require_package("tidyr")
 
 
 
@@ -54,14 +54,29 @@ flatTreeRec <- function( x ){
 }
 
 fullXPX = list()
-fullXPX = experiments_load_as_list(fullXPX,"Paper")
+fullXPX = experiments_load_as_list(fullXPX,"PaperII")
 
 
-XPX =flatTreeRec( fullXPX )
+XPX =flatTreeRec( fullXPX$v1x00 )
+
 
 INTRM = list()
 INTRM = experiments_load_as_list(INTRM, "SensGamma")
 INTRM = flatTreeRec(INTRM$v1x00)
+
+
+
+resNDCS = list()
+resNDCS = experiments_load_as_list(resNDCS, "NDCS")
+
+
+
+discRT = list()
+discRT = experiments_load_as_list(discRT, "Paper_tdiscount")
+discRT = flatTreeRec(discRT$v1x00)
+
+
+
 
 
 ##------------- Additional data: Emissions --------------------
@@ -80,64 +95,54 @@ E_hist_PRIMAP_world_y = rbind(E_hist_PRIMAP_world_y, data.frame(year=2015, value
 
 
 
-##------------- Additional data: PBL NDCS --------------------
+##------------- Additional data: PBL/WITCH NDCS --------------------
 
 # if it is present a gdx in plot folder
-ndcs_iso3_gdx = gdx("./OTHER_datamng/data_ndcs_ed57.gdx")
-# view content
-ndcs_iso3_gdx$parameters
+ndcs_ed57_pbl_gdx   = gdx("./OTHER_datamng/pbl_ed57_ndcs.gdx")
+ndcs_ed57_witch_gdx = gdx("./OTHER_datamng/witch_ed57_ndcs.gdx")
+
+
 
 ## PBLs 
-ndcs_iso3_pbl_2030_uncond = ndcs_iso3_gdx["pbl_uncond_2030"]  %>% rename(iso3 = V1)
-ndcs_iso3_pbl_2030_cond   = ndcs_iso3_gdx["pbl_cond_2030"] %>% rename(iso3 = V1)
-ndcs_iso3_pbl_2025_uncond = ndcs_iso3_gdx["pbl_uncond_2025"] %>% rename(iso3 = V1)
-ndcs_iso3_pbl_2025_cond   = ndcs_iso3_gdx["pbl_cond_2025"] %>% rename(iso3 = V1)
+pbl_ed57_miu_2030  = spread(merge( ndcs_ed57_pbl_gdx["pbl_ed57_miu_2030"]  %>% mutate(value = value *100)
+                                   ,ed57 %>% rename(n=ed57) %>% select(n)
+                                   , by = "n")
+                            , pol
+                            , value)
+pbl_ed57_miu_2025  = spread( ndcs_ed57_pbl_gdx["pbl_ed57_miu_2025"]  %>% mutate(value = value *100) , pol, value)
+
+pbl_ed57_miu_2030[is.na(pbl_ed57_miu_2030)] = 0
+pbl_ed57_miu_2025[is.na(pbl_ed57_miu_2025)] = 0
+
+pbl_ed57_miu_2030 = gather(pbl_ed57_miu_2030,pol, value,c("cond", "uncond"))
+pbl_ed57_miu_2025 = gather(pbl_ed57_miu_2025,pol, value,c("cond", "uncond"))
+
+pbl_ed57_emi_cap_2030  = ndcs_ed57_pbl_gdx["pbl_ed57_emi_cap_2030"] 
+pbl_ed57_emi_cap_2025  = ndcs_ed57_pbl_gdx["pbl_ed57_emi_cap_2025"] 
 
 
-library(witchtools)
-convert_witchtools_co2 <- function(df){
-return( witchtools::convert_region(.x = df, 
-                                from_reg ="iso3", 
-                                to_reg = "enerdata56",
-                                agg_weight = witchtools::default_weights$co2,
-                                agg_operator = "mean", 
-                                agg_missing = "zero" 
-                                
-) %>% rename(n=enerdata56) %>% mutate(value = value * 100)
-
-)
-}
 
 
-convert_witchtools_sum <- function(df){
-  return( witchtools::convert_region(.x = df, 
-                                     from_reg ="iso3", 
-                                     to_reg = "enerdata56",
-                                     agg_weight = witchtools::default_weights$cst,
-                                     agg_operator = "sum", 
-                                     agg_missing = "zero" 
-                                     
-  ) %>% rename(n=enerdata56)
-  
-  )
-}
 
-ed57regions = XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSR$CBA$get_MIU_nty %>%  select("n") %>% distinct()
+# merge(pbl_ed57_miu_2030, ed57%>% select(ed57) %>% rename(n = ed57) , by = "n") 
+# ndcs_witch_absolutel_emi_2030_n = merge(convert_witchtools_sum(ndcs_witch_absolutel_emi_2030_iso3   ), ed57regions  , by = "n", all=TRUE) %>% mutate(t = 4, year = 2030)
+# ndcs_witch_absoluteh_emi_2030_n = merge(convert_witchtools_sum(ndcs_witch_absoluteh_emi_2030_iso3   ), ed57regions  , by = "n", all=TRUE) %>% mutate(t = 4, year = 2030)
+# 
 
-  ndcs_ed57_pbl_2030_uncond =  merge(convert_witchtools_co2(ndcs_iso3_pbl_2030_uncond ), ed57regions  , by = "n", all=TRUE) %>% mutate(t = 4, year = 2030) 
-  ndcs_ed57_pbl_2030_cond   =  merge(convert_witchtools_co2(ndcs_iso3_pbl_2030_cond   ), ed57regions  , by = "n", all=TRUE) %>% mutate(t = 4, year = 2030)
-  ndcs_ed57_pbl_2025_uncond =  merge(convert_witchtools_co2(ndcs_iso3_pbl_2025_uncond ), ed57regions  , by = "n", all=TRUE) %>% mutate(t = 3, year = 2025)
-  ndcs_ed57_pbl_2025_cond   =  merge(convert_witchtools_co2(ndcs_iso3_pbl_2025_cond   ), ed57regions  , by = "n", all=TRUE) %>% mutate(t = 3, year = 2025)
+## WITCH
+
+completeness = gather(as.data.frame(ed57) %>% rename(n=ed57) %>% select(n) %>% mutate("uncond" = 0,  "cond" = 1), pol, value, uncond:cond) %>% select(-value)
 
 
-  ndcs_ed57_pbl_2030_uncond[is.na(ndcs_ed57_pbl_2030_uncond)]  = 0
-  ndcs_ed57_pbl_2030_cond[is.na(ndcs_ed57_pbl_2030_cond)]  = 0   
-  ndcs_ed57_pbl_2025_uncond[is.na(ndcs_ed57_pbl_2025_uncond)]  = 0 
-  ndcs_ed57_pbl_2025_cond[is.na(ndcs_ed57_pbl_2025_cond)]  = 0   
+witch_ed57_miu_2030  = merge( ndcs_ed57_witch_gdx["witch_ed57_miu_2030"]  %>% mutate(value = value *100)
+                              ,completeness
+                              , by = c("n","pol"), all.y = TRUE)
+witch_ed57_miu_2030[is.na(witch_ed57_miu_2030)] = 0
+witch_ed57_miu_2030 = witch_ed57_miu_2030 %>% mutate(value = ifelse(value <0, 0, value))
+
+witch_ed57_emi_cap_2030  = ndcs_ed57_witch_gdx["witch_ed57_emi_cap_2030"] 
 
 
-  
-  
 ##------------- Additional data: WITCH NDCS --------------------
   
   
@@ -1520,6 +1525,211 @@ plottigat
 
 
 
+# --------------- (c) W EMI .. SSP2 IMPACT .. #COOP #DISCOUNTRATE ◄---------------------------
+
+
+#.....BHM SR....................
+
+p1 <- RICExplot.lineplot(
+  
+  EXPdata   = list(
+    
+    
+
+    "Coop $\\ro = 0.15$"     = XPX$OPT$ssp2$coop_pop$damages_BURKEnSR$CBA__gamma0x5$get_world_EMIffi_ty
+   ,"Coop $\\ro = 0.01$"    =  XPX$OPT$ssp2$coop_pop$damages_BURKEnSR$CBA__gamma0x5_discrt_0x001$get_world_EMIffi_ty
+   ,"Coop $\\ro = 0.3$"     =  XPX$OPT$ssp2$coop_pop$damages_BURKEnSR$CBA__gamma0x5_discrt_0x03$get_world_EMIffi_ty
+    
+    ,"Noncoop $\\ro = 0.15$"       = XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSR$CBA$get_world_EMIffi_ty
+    ,"Noncoop $\\ro = 0.01$"   = discRT$ssp2$noncoop_pop$damages_BURKEnSR$CBA__discrt_0x001$get_world_EMIffi_ty
+    ,"Noncoop $\\ro = 0.3$"    = discRT$ssp2$noncoop_pop$damages_BURKEnSR$CBA__discrt_0x03$get_world_EMIffi_ty
+  
+    ,"Historical"  = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000) %>% mutate(unit = "GtCO2/year")
+    ,"BAU nodmg"  =  XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSR$BAU$get_world_EMIffi_ty
+    ,"BAU dmg"    =  XPX$SIM$ssp2$damages_BURKEnSR$BAUdam$get_world_EMIffi_ty
+  )
+  ,title  = "BHM-SR"
+  ,yLabel = "$\\[GtCO_2/Year\\]$"
+  ,legend = "Scenarios"
+  ,categories = 2
+  ,colors_per_category = 3
+  ,LaTeX_text = TRUE
+  
+) + xlim(2000,2150); p1
+
+#.....BHM LR....................
+
+p2 <- RICExplot.lineplot(
+  
+  EXPdata   = list(
+    
+    
+    "Coop $\\ro = 0.15$"     = XPX$OPT$ssp2$coop_pop$damages_BURKEnLR$CBA__gamma0x5$get_world_EMIffi_ty
+    ,"Coop $\\ro = 0.01$"     = discRT$ssp2$coop_pop$damages_BURKEnLR$CBA__gamma0x5_discrt_0x001$get_world_EMIffi_ty
+    ,"Coop $\\ro = 0.3$"      = discRT$ssp2$coop_pop$damages_BURKEnLR$CBA__gamma0x5_discrt_0x03$get_world_EMIffi_ty
+    
+    ,"Noncoop $\\ro = 0.15$"   = XPX$OPT$ssp2$noncoop_pop$damages_BURKEnLR$CBA$get_world_EMIffi_ty
+    ,"Noncoop $\\ro = 0.01$"    = discRT$ssp2$noncoop_pop$damages_BURKEnLR$CBA__discrt_0x001$get_world_EMIffi_ty
+    ,"Noncoop $\\ro = 0.3$"     = discRT$ssp2$noncoop_pop$damages_BURKEnLR$CBA__discrt_0x03$get_world_EMIffi_ty
+    
+    ,"Historical"  = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000) %>% mutate(unit = "GtCO2/year")
+
+    ,"BAU nodmg"  =  XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSR$BAU$get_world_EMIffi_ty
+    ,"BAU dmg"    =  XPX$SIM$ssp2$damages_BURKEnLR$BAUdam$get_world_EMIffi_ty
+  )
+  ,title  = "BHM-LR"
+  ,yLabel = "$\\[GtCO_2/Year\\]$"
+  ,legend = "Scenarios"
+  ,categories = 2
+  ,colors_per_category = 3
+  ,LaTeX_text = TRUE
+  
+) + xlim(2000,2150); p2
+
+
+#.....DJO....................
+
+p3 <- RICExplot.lineplot(
+  
+  EXPdata   = list(
+    
+    
+    "Coop $\\ro = 0.15$"     = XPX$OPT$ssp2$coop_pop$dmgDJOn$CBA__gamma0x5$get_world_EMIffi_ty
+    ,"Coop $\\ro = 0.01$"     = discRT$ssp2$coop_pop$dmgDJOn$CBA__gamma0x5_discrt_0x001$get_world_EMIffi_ty
+    ,"Coop $\\ro = 0.3$"      = discRT$ssp2$coop_pop$dmgDJOn$CBA__gamma0x5_discrt_0x03$get_world_EMIffi_ty
+    
+    ,"Noncoop $\\ro = 0.15$"   = XPX$OPT$ssp2$noncoop_pop$dmgDJOn$CBA$get_world_EMIffi_ty
+    ,"Noncoop $\\ro = 0.01$"    = discRT$ssp2$noncoop_pop$dmgDJOn$CBA__discrt_0x001$get_world_EMIffi_ty
+    ,"Noncoop $\\ro = 0.3$"     = discRT$ssp2$noncoop_pop$dmgDJOn$CBA__discrt_0x03$get_world_EMIffi_ty
+    
+    ,"Historical"  = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000) %>% mutate(unit = "GtCO2/year")
+    
+    ,"BAU nodmg"  =  XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSR$BAU$get_world_EMIffi_ty
+    ,"BAU dmg"    =  XPX$SIM$ssp2$dmgDJOn$BAUdam$get_world_EMIffi_ty
+  )
+  ,title  = "DJO"
+  ,yLabel = "$\\[GtCO_2/Year\\]$"
+  ,legend = "Scenarios"
+  ,categories = 2
+  ,colors_per_category = 3
+  ,LaTeX_text = TRUE
+  
+) + xlim(2000,2150); p3
+
+
+
+
+#.....KAHN ....................
+
+p4 <- RICExplot.lineplot(
+  
+  EXPdata   = list(
+    
+    
+    "Coop $\\ro = 0.15$"     = XPX$OPT$ssp2$coop_pop$dmgKAHNn$CBA__gamma0x5$get_world_EMIffi_ty
+    ,"Coop $\\ro = 0.01$"     = discRT$ssp2$coop_pop$dmgKAHNn$CBA__gamma0x5_discrt_0x001$get_world_EMIffi_ty
+    ,"Coop $\\ro = 0.3$"      = discRT$ssp2$coop_pop$dmgKAHNn$CBA__gamma0x5_discrt_0x03$get_world_EMIffi_ty
+    
+    ,"Noncoop $\\ro = 0.15$"   = XPX$OPT$ssp2$noncoop_pop$dmgKAHNn$CBA$get_world_EMIffi_ty
+    ,"Noncoop $\\ro = 0.01$"    = discRT$ssp2$noncoop_pop$dmgKAHNn$CBA__discrt_0x001$get_world_EMIffi_ty
+    ,"Noncoop $\\ro = 0.3$"     = discRT$ssp2$noncoop_pop$dmgKAHNn$CBA__discrt_0x03$get_world_EMIffi_ty
+    
+    ,"Historical"  = E_hist_PRIMAP_world_y %>% mutate(t=(year-2010)/5) %>% filter(year >=2000) %>% mutate(unit = "GtCO2/year")
+    
+    ,"BAU nodmg"  =  XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSR$BAU$get_world_EMIffi_ty
+    ,"BAU dmg"    =  XPX$SIM$ssp2$dmgKAHNn$BAUdam$get_world_EMIffi_ty
+  )
+  ,title  = "KAHN"
+  ,yLabel = "$\\[GtCO_2/Year\\]$"
+  ,legend = "Scenarios"
+  ,categories = 2
+  ,colors_per_category = 3
+  ,LaTeX_text = TRUE
+  
+) + xlim(2000,2150); p4
+
+
+
+#.....BHM SRdiff....................
+
+p5 <- RICExplot.lineplot(
+  
+  EXPdata   = list(
+    
+    "Coop $\\ro = 0.15$"     = XPX$OPT$ssp2$coop_pop$damages_BURKEnSRdiff$CBA__gamma0x5$get_world_EMIffi_ty
+    ,"Coop $\\ro = 0.01$"     = discRT$ssp2$coop_pop$damages_BURKEnSRdiff$CBA__gamma0x5_discrt_0x001$get_world_EMIffi_ty
+    ,"Coop $\\ro = 0.3$"      = discRT$ssp2$coop_pop$damages_BURKEnSRdiff$CBA__gamma0x5_discrt_0x03$get_world_EMIffi_ty
+    
+    ,"Noncoop $\\ro = 0.15$"   = XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSRdiff$CBA$get_world_EMIffi_ty
+    ,"Noncoop $\\ro = 0.01$"    = discRT$ssp2$noncoop_pop$damages_BURKEnSRdiff$CBA__discrt_0x001$get_world_EMIffi_ty
+    ,"Noncoop $\\ro = 0.3$"     = discRT$ssp2$noncoop_pop$damages_BURKEnSRdiff$CBA__discrt_0x03$get_world_EMIffi_ty
+    
+    ,"BAU nodmg"  =  XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSR$BAU$get_world_EMIffi_ty
+    ,"BAU dmg"    =  XPX$SIM$ssp2$damages_BURKEnSRdiff$BAUdam$get_world_EMIffi_ty
+  )
+  ,title  = "BHM-SRdiff"
+  ,yLabel = "$\\[GtCO_2/Year\\]$"
+  ,legend = "Scenarios"
+  ,categories = 2
+  ,colors_per_category = 3
+  ,LaTeX_text = TRUE
+  
+) + xlim(2000,2150); p5
+
+
+
+#.....BHM LRdiff....................
+
+p6 <- RICExplot.lineplot(
+  
+  EXPdata   = list(
+    
+    
+    "Coop $\\ro = 0.15$"     = XPX$OPT$ssp2$coop_pop$damages_BURKEnLRdiff$CBA__gamma0x5$get_world_EMIffi_ty
+    ,"Coop $\\ro = 0.01$"     = discRT$ssp2$coop_pop$damages_BURKEnLRdiff$CBA__gamma0x5_discrt_0x001$get_world_EMIffi_ty
+    ,"Coop $\\ro = 0.3$"      = discRT$ssp2$coop_pop$damages_BURKEnLRdiff$CBA__gamma0x5_discrt_0x03$get_world_EMIffi_ty
+    
+    ,"Noncoop $\\ro = 0.15$"   = XPX$OPT$ssp2$noncoop_pop$damages_BURKEnLRdiff$CBA$get_world_EMIffi_ty
+    ,"Noncoop $\\ro = 0.01$"    = discRT$ssp2$noncoop_pop$damages_BURKEnLRdiff$CBA__discrt_0x001$get_world_EMIffi_ty
+    ,"Noncoop $\\ro = 0.3$"     = discRT$ssp2$noncoop_pop$damages_BURKEnLRdiff$CBA__discrt_0x03$get_world_EMIffi_ty
+    
+    ,"BAU nodmg"  =  XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSR$BAU$get_world_EMIffi_ty
+    ,"BAU dmg"    =  XPX$SIM$ssp2$damages_BURKEnLRdiff$BAUdam$get_world_EMIffi_ty
+  )
+  ,title  = "BHM-LRdiff"
+  ,yLabel = "$\\[GtCO_2/Year\\]$"
+  ,legend = "Scenarios"
+  ,categories = 2
+  ,colors_per_category = 3
+  ,LaTeX_text = TRUE
+  
+) + xlim(2000,2150); p6
+
+
+#.....COMBINE.......................
+plottigat = RICExplot.combo.fast_combine( plotlist = list(
+  
+  "BHM-SR"     = p1
+  ,"BHM-LR"    = p2
+  ,"DJO"       = p3
+  ,"KAHN"      = p4
+  ,"BHM-SRdiff"= p5
+  ,"BHM-LRdiff"= p6
+)
+,title = "World FFI Emissions - Discount Rate effect"
+,columns = 2
+,common_legend = TRUE
+)
+
+plottigat
+
+
+
+
+
+
+
+
 
 
 
@@ -1715,25 +1925,25 @@ plottigat
 
 
 
-# --------------- (c) W DAMFRACagg .. SSP2  .. #COOP #IMPACT ◄---------------------------
+# --------------- (c) W DAMFRACagg .. SSP5  .. #COOP #IMPACT ◄---------------------------
 
 
 #.....BHM SR....................
 
-p1 <- RICExplot.lineplot(
+RICExplot.lineplot(
   
   EXPdata   = list(
     
     
-    "Coop $\\gamma = 0$"       = XPX$OPT$ssp2$coop_pop$damages_BURKEnSR$CBA__gamma0$get_world_DAMAGEperc_ty
-    ,"Coop $\\gamma = 0.5$"     = XPX$OPT$ssp2$coop_pop$damages_BURKEnSR$CBA__gamma0x5$get_world_DAMAGEperc_ty
-    ,"Coop $\\gamma = 1.45$"    = XPX$OPT$ssp2$coop_pop$damages_BURKEnSR$CBA__gamma1x45$get_world_DAMAGEperc_ty
-    ,"Coop $\\gamma = 2$"       = XPX$OPT$ssp2$coop_pop$damages_BURKEnSR$CBA__gamma2$get_world_DAMAGEperc_ty
+    "Coop $\\gamma = 0$"       = XPX$OPT$ssp5$coop_pop$damages_BURKEnSR$CBA__gamma0$get_world_DAMAGEperc_ty
+    ,"Coop $\\gamma = 0.5$"     = XPX$OPT$ssp5$coop_pop$damages_BURKEnSR$CBA__gamma0x5$get_world_DAMAGEperc_ty
+    ,"Coop $\\gamma = 1.45$"    = XPX$OPT$ssp5$coop_pop$damages_BURKEnSR$CBA__gamma1x45$get_world_DAMAGEperc_ty
+    ,"Coop $\\gamma = 2$"       = XPX$OPT$ssp5$coop_pop$damages_BURKEnSR$CBA__gamma2$get_world_DAMAGEperc_ty
     
-    ,"Noncoop"       = XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSR$CBA$get_world_DAMAGEperc_ty
+    ,"Noncoop"       = XPX$OPT$ssp5$noncoop_pop$damages_BURKEnSR$CBA$get_world_DAMAGEperc_ty
     
-    ,"BAU nodmg"  =  XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSR$BAU$get_world_DAMAGEperc_ty
-    ,"BAU dmg"    =  XPX$SIM$ssp2$damages_BURKEnSR$BAUdam$get_world_DAMAGEperc_ty
+    ,"BAU nodmg"  =  XPX$OPT$ssp5$noncoop_pop$damages_BURKEnSR$BAU$get_world_DAMAGEperc_ty
+    ,"BAU dmg"    =  XPX$SIM$ssp2$damages_BURKEnSR$BAUdam$get_TATM_ty
   )
   ,title  = "BHM-SR"
   ,yLabel = "$\\[% baseline\\]$"
@@ -1742,7 +1952,7 @@ p1 <- RICExplot.lineplot(
   ,colors_per_category = 4
   ,LaTeX_text = TRUE
   
-) + xlim(2080,2120); p1
+) + xlim(2010,2100); 
 
 #.....BHM LR....................
 
@@ -1940,7 +2150,7 @@ plottigat <- RICExplot.boxplot(
   
 
 
-# ---------------  W EMI .. ssp2 / bhmSR .. #COOP ◄---------------------------
+# ---------------  W EMI with UNCERTAINTY .. ssp2 / bhmSR .. #COOP ◄---------------------------
 
 
 
@@ -1950,26 +2160,36 @@ coop_gamma0x5 <- add_confidence_from_data_ty( main_exp = XPX$OPT$ssp2$coop_pop$d
                                                  XPX$OPT$ssp2$coop_pop$damages_BURKEnLR$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp2$coop_pop$damages_BURKEnLRdiff$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp2$coop_pop$damages_BURKEnSRdiff$CBA__gamma0x5$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp2$coop_pop$dmgDJOn$CBA__gamma0x5$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp2$coop_pop$dmgKAHNn$CBA__gamma0x5$get_world_EMIffi_ty
                                                 
                                                 ,XPX$OPT$ssp1$coop_pop$damages_BURKEnSR$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp1$coop_pop$damages_BURKEnLR$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp1$coop_pop$damages_BURKEnLRdiff$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp1$coop_pop$damages_BURKEnSRdiff$CBA__gamma0x5$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp1$coop_pop$dmgDJOn$CBA__gamma0x5$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp1$coop_pop$dmgKAHNn$CBA__gamma0x5$get_world_EMIffi_ty
                                                 
                                                 ,XPX$OPT$ssp3$coop_pop$damages_BURKEnSR$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp3$coop_pop$damages_BURKEnLR$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp3$coop_pop$damages_BURKEnLRdiff$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp3$coop_pop$damages_BURKEnSRdiff$CBA__gamma0x5$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp3$coop_pop$dmgDJOn$CBA__gamma0x5$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp3$coop_pop$dmgKAHNn$CBA__gamma0x5$get_world_EMIffi_ty
                                                 
                                                 ,XPX$OPT$ssp4$coop_pop$damages_BURKEnSR$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp4$coop_pop$damages_BURKEnLR$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp4$coop_pop$damages_BURKEnLRdiff$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp4$coop_pop$damages_BURKEnSRdiff$CBA__gamma0x5$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp4$coop_pop$dmgDJOn$CBA__gamma0x5$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp4$coop_pop$dmgKAHNn$CBA__gamma0x5$get_world_EMIffi_ty
                                                 
                                                 ,XPX$OPT$ssp5$coop_pop$damages_BURKEnSR$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp5$coop_pop$damages_BURKEnLR$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp5$coop_pop$damages_BURKEnLRdiff$CBA__gamma0x5$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp5$coop_pop$damages_BURKEnSRdiff$CBA__gamma0x5$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp5$coop_pop$dmgDJOn$CBA__gamma0x5$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp5$coop_pop$dmgKAHNn$CBA__gamma0x5$get_world_EMIffi_ty
                                               ))
 
 noncoop <-       add_confidence_from_data_ty( main_exp = XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSR$CBA$get_world_EMIffi_ty,
@@ -1978,27 +2198,37 @@ noncoop <-       add_confidence_from_data_ty( main_exp = XPX$OPT$ssp2$noncoop_po
                                                  XPX$OPT$ssp2$noncoop_pop$damages_BURKEnLR$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp2$noncoop_pop$damages_BURKEnLRdiff$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSRdiff$CBA$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp2$noncoop_pop$dmgDJOn$CBA$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp2$noncoop_pop$dmgKAHNn$CBA$get_world_EMIffi_ty
                                                 
                                                 ,XPX$OPT$ssp1$noncoop_pop$damages_BURKEnSR$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp1$noncoop_pop$damages_BURKEnLR$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp1$noncoop_pop$damages_BURKEnLRdiff$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp1$noncoop_pop$damages_BURKEnSRdiff$CBA$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp1$noncoop_pop$dmgDJOn$CBA$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp1$noncoop_pop$dmgKAHNn$CBA$get_world_EMIffi_ty
                                                 
                                                 ,XPX$OPT$ssp3$noncoop_pop$damages_BURKEnSR$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp3$noncoop_pop$damages_BURKEnLR$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp3$noncoop_pop$damages_BURKEnLRdiff$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp3$noncoop_pop$damages_BURKEnSRdiff$CBA$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp3$noncoop_pop$dmgDJOn$CBA$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp3$noncoop_pop$dmgKAHNn$CBA$get_world_EMIffi_ty
                                                 
                                                 ,XPX$OPT$ssp4$noncoop_pop$damages_BURKEnSR$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp4$noncoop_pop$damages_BURKEnLR$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp4$noncoop_pop$damages_BURKEnLRdiff$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp4$noncoop_pop$damages_BURKEnSRdiff$CBA$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp4$noncoop_pop$dmgDJOn$CBA$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp4$noncoop_pop$dmgKAHNn$CBA$get_world_EMIffi_ty
                                                 
                                                 ,XPX$OPT$ssp5$noncoop_pop$damages_BURKEnSR$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp5$noncoop_pop$damages_BURKEnLR$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp5$noncoop_pop$damages_BURKEnLRdiff$CBA$get_world_EMIffi_ty
                                                 ,XPX$OPT$ssp5$noncoop_pop$damages_BURKEnSRdiff$CBA$get_world_EMIffi_ty
-                                              ))
+                                                ,XPX$OPT$ssp5$noncoop_pop$dmgDJOn$CBA$get_world_EMIffi_ty
+                                                ,XPX$OPT$ssp5$noncoop_pop$dmgKAHNn$CBA$get_world_EMIffi_ty
+                                                ))
 
 baudam <-       add_confidence_from_data_ty( main_exp = XPX$SIM$ssp2$damages_BURKEnSR$BAUdam$get_world_EMIffi_ty,
                                               rbinded_other_exp = rbind(
@@ -2006,26 +2236,36 @@ baudam <-       add_confidence_from_data_ty( main_exp = XPX$SIM$ssp2$damages_BUR
                                                 XPX$SIM$ssp2$damages_BURKEnLR$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp2$damages_BURKEnLRdiff$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp2$damages_BURKEnSRdiff$BAUdam$get_world_EMIffi_ty
+                                                ,XPX$SIM$ssp2$dmgDJOn$BAUdam$get_world_EMIffi_ty
+                                                ,XPX$SIM$ssp2$dmgKAHNn$BAUdam$get_world_EMIffi_ty
                                                 
                                                 ,XPX$SIM$ssp1$damages_BURKEnSR$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp1$damages_BURKEnLR$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp1$damages_BURKEnLRdiff$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp1$damages_BURKEnSRdiff$BAUdam$get_world_EMIffi_ty
+                                                ,XPX$SIM$ssp1$dmgDJOn$BAUdam$get_world_EMIffi_ty
+                                                ,XPX$SIM$ssp1$dmgKAHNn$BAUdam$get_world_EMIffi_ty
                                                 
                                                 ,XPX$SIM$ssp3$damages_BURKEnSR$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp3$damages_BURKEnLR$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp3$damages_BURKEnLRdiff$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp3$damages_BURKEnSRdiff$BAUdam$get_world_EMIffi_ty
+                                                ,XPX$SIM$ssp3$dmgDJOn$BAUdam$get_world_EMIffi_ty
+                                                ,XPX$SIM$ssp3$dmgKAHNn$BAUdam$get_world_EMIffi_ty
                                                 
                                                 ,XPX$SIM$ssp4$damages_BURKEnSR$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp4$damages_BURKEnLR$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp4$damages_BURKEnLRdiff$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp4$damages_BURKEnSRdiff$BAUdam$get_world_EMIffi_ty
+                                                ,XPX$SIM$ssp4$dmgDJOn$BAUdam$get_world_EMIffi_ty
+                                                ,XPX$SIM$ssp4$dmgKAHNn$BAUdam$get_world_EMIffi_ty
                                                 
                                                 ,XPX$SIM$ssp5$damages_BURKEnSR$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp5$damages_BURKEnLR$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp5$damages_BURKEnLRdiff$BAUdam$get_world_EMIffi_ty
                                                 ,XPX$SIM$ssp5$damages_BURKEnSRdiff$BAUdam$get_world_EMIffi_ty
+                                                ,XPX$SIM$ssp5$dmgDJOn$BAUdam$get_world_EMIffi_ty
+                                                ,XPX$SIM$ssp5$dmgKAHNn$BAUdam$get_world_EMIffi_ty
                                               ))
 
 
@@ -3963,8 +4203,8 @@ myyear = 2030
  
  myyear = 2030
  my_min_data    = 0
- my_max_data    = 120
- my_centre_data = 60
+ my_max_data    = 100
+ my_centre_data = 50
  
  # NONCOOp
  p1 = RICEx.plot.map(   data = XPX$OPT$ssp2$noncoop_pop$damages_BURKEnSR$CBA$get_MIU_nty    %>% filter(year == myyear) 
@@ -3981,7 +4221,7 @@ myyear = 2030
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  
  # NDCs PBL cond
- p3 = RICEx.plot.map(   data = ndcs_ed57_pbl_2030_cond
+ p3 = RICEx.plot.map(   data = pbl_ed57_miu_2030 %>% filter(pol == "cond") 
                         ,title       = "PBL NDCS Conditioned" 
                         ,LaTeX_text  = TRUE
                         ,shape       = ed57shp
@@ -3994,7 +4234,7 @@ myyear = 2030
  
  
  # NDCs PBL uncond
- p4 = RICEx.plot.map(   data = ndcs_ed57_pbl_2030_uncond
+ p4 = RICEx.plot.map(   data = pbl_ed57_miu_2030 %>% filter(pol == "uncond") 
                        ,title       = "PBL NDCS Unconditioned" 
                        ,LaTeX_text  = TRUE
                        ,shape       = ed57shp
@@ -4007,8 +4247,8 @@ myyear = 2030
  
  
  # NDCs WITCH l 
- p3 = RICEx.plot.map(   data = ndcs_witch_l_miu_2030_n
-                        ,title       = "WITCH NDCS L" 
+ p5 = RICEx.plot.map(   data =  witch_ed57_miu_2030   %>% filter(pol == "cond") 
+                        ,title       = "WITCH NDCS Cond" 
                         ,LaTeX_text  = TRUE
                         ,shape       = ed57shp
                         ,legend      = "Mitigation \n[% BAU]" 
@@ -4020,8 +4260,8 @@ myyear = 2030
  
  
  # NDCs WITCH h
- p4 = RICEx.plot.map(   data = ndcs_witch_h_miu_2030_n
-                        ,title       = "WITCH NDCS  H" 
+ p6 = RICEx.plot.map(   data =  witch_ed57_miu_2030 %>% filter(pol == "uncond") 
+                        ,title       = "WITCH NDCS Uncond" 
                         ,LaTeX_text  = TRUE
                         ,shape       = ed57shp
                         ,legend      = "Mitigation \n[% BAU]" 
@@ -4029,7 +4269,7 @@ myyear = 2030
                         ,min_data    = my_min_data   
                         ,max_data    = my_max_data   
                         ,centre_data = my_centre_data
- ); p4
+ ); 
  
  
  #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -4054,6 +4294,8 @@ myyear = 2030
                                                              ,"COOP, $\\gamma = 0.5$" = p2
                                                              ,  "NDCS Conditioned"    = p3
                                                              ,  "NDCS Unconditioned"  = p4
+                                                             , a = p5
+                                                             , b = p6
 
  )
  , title = paste0("Mitigation in ",myyear," - BHM-SR, SSP2")

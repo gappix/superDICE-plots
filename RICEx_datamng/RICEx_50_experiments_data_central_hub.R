@@ -7,11 +7,36 @@ source("RICEx_datamng/RICEx_40_new_experiments_import.R")
 source("RICEx_datamng/RICEx_41_specific_experiment_import.R")
 source("RICEx_datamng/RICEx_42_last_experiment_import.R")
 
+source("RICEx_datamng/40_new_experiments_import.R")
+
 
 
 last_exp_import_time = 0
 
 
+
+#' Load all experiments tagged by given id into a tidy list
+#' 
+#' @param exp_list list-structure to store experiments
+#' @param experiment_id current experiment codename
+#' @param save_import_time flag if want to keep track of current import-time (default FALSE)
+#'
+RICEx.load.experiments_as_list = function( exp_list, 
+                                           experiment_id, 
+                                           save_import_time = FALSE){
+  
+
+  exp_list = RICEx.import.new_results_as_list(experiment_id, 
+                                              exp_list, 
+                                              last_exp_import_time)
+  
+  if(save_import_time){last_exp_import_time <-  Sys.time()}
+  
+  return(exp_list)
+}
+
+
+#-------------------------- OLD ---------------------------------------
 
 ## LIST LOADER
 

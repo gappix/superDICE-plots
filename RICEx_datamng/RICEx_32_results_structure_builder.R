@@ -5,10 +5,10 @@ source("RICEx_datamng/RICEx_20_RICExclass.R")
 
 # Variables to put in result table (WATCH OUT COMPLEXITY GROWTH!)
 
-nty_variables_to_extract = c("ABATECOST","ABATECOST_ED","ABATECOST_PB","ABATEEMI","C","DAMAGES","DAMFRAC",
-                             "E","EIND","I","K","S","Y","YGROSS","L","scc", "photel") #nty parameter here as well
+nty_variables_to_extract = c("ABATECOST","C","DAMAGES","DAMFRAC",
+                             "E","EIND","I","K","S","Y","YGROSS","pop","scc") #nty parameter here as well
 
-ty_variables_to_extract  = c("FORC","TATM","TOCEAN")
+ty_variables_to_extract  = c("TATM")
 
 
 parameters_to_extract = c("dk","elasmu","prstp")
@@ -56,7 +56,7 @@ tide_new_experiment_as_table = function(experiment,
   
   
   
-  #TEST#
+  #TEST#:::::::::::
   #experiment = exp_data_and_info
   
   
@@ -77,7 +77,7 @@ tide_new_experiment_as_table = function(experiment,
              )
   # initialize n-t-y-dimensions with a null-by merge (MIU is one good choice)
   new_table = merge.data.frame(new_table,
-                               experiment$data$get_Variable_nty("MIU"), 
+                               experiment$data$get_VARIABLE_nty("MIU"), 
                                by= NULL )  %>% rename(MIU = value)
   
   
@@ -108,8 +108,8 @@ tide_new_experiment_as_table = function(experiment,
   new_table = new_table %>% 
     
     #WORLD_Emissions
-    merge.data.frame(experiment$data$get_WORLD_EmissionsTOT_ty,    
-                     by= c("t","year") ) %>% rename("WORLD_E" = value)
+    merge.data.frame(experiment$data$get_world_EMItot_ty,    
+                     by= c("t","year") )  %>% rename("WORLD_E" = value)
   
   
   
@@ -153,7 +153,7 @@ tide_new_experiment_as_table_nty = function(experiment,
   )
   
   # initialize n-t-y-dimensions with a null-by merge (MIU is one good choice)
-  new_table = data.frame(cbind(new_table, as.data.frame(experiment$data$get_Variable_nty("MIU"))) %>% rename(MIU = value))
+  new_table = data.frame(cbind(new_table, as.data.frame(experiment$data$get_VARIABLE_nty("MIU"))) %>% rename(MIU = value))
 
   
   
@@ -208,7 +208,7 @@ tide_new_experiment_as_table_ty <-  function(experiment,
     runmode               = experiment$runmode        
   )
   # initialize t-y-dimensions with a null-by merge (WORLD_E is one good choice)
-  new_table = cbind(new_table, as.data.frame(experiment$data$get_WORLD_EmissionsTOT_ty))  %>% rename(WORLD_E = value)
+  new_table = cbind(new_table, as.data.frame(experiment$data$get_world_EMItot_ty)) %>% rename(WORLD_E = value)
   
   
   
@@ -276,7 +276,7 @@ tide_new_experiment_as_table_pars <-  function(experiment,
   
   for(par in  parameters_to_extract ) {
     
-    par_value = experiment$data$get_Parameter(parameter_name = par)
+    par_value = experiment$data$get_PARAMETER(parameter_name = par)
     
     if(length(rownames(par_value)) > 0){   new_table[ , eval(par) := as.numeric(par_value[1])  ]
     } else {
@@ -367,7 +367,12 @@ add_experiment_to_general_structure = function(original_list,
 #
 add_nty_variable_to_table <- function(my_table, RICEx_S3data,  variable_name_nty){
   
-  new_df = RICEx_S3data$get_Variable_nty(variable_name_nty)
+  #TEST.......
+  #my_table = new_table
+  #RICEx_S3data = experiment$data
+  #variable_name_nty = nty_var
+  
+  new_df = RICEx_S3data$get_VARIABLE_nty(variable_name_nty)
   
   
   if(length(rownames(new_df)) > 0){
@@ -396,7 +401,7 @@ add_nty_variable_to_table <- function(my_table, RICEx_S3data,  variable_name_nty
 #
 add_ty_variable_to_table <- function(my_table, RICEx_S3data,  variable_name_ty){
   
-  new_df = RICEx_S3data$get_Variable_ty(variable_name_ty)
+  new_df = RICEx_S3data$get_VARIABLE_ty(variable_name_ty)
   
   
   if(length(rownames(new_df)) > 0){

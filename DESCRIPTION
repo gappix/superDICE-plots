@@ -1,0 +1,7 @@
+Package: RICExPlots
+Title: Plotting functions for RICEx Integrated Assessment Model
+Description: Plotting functions for RICEx Integrated Assessment Model
+Version: 0.0.1
+Author: Paolo Gazzotti paolo.gazzotti@cmcc.it
+Maintainer: Paolo Gazzotti paolo.gazzotti@cmcc.it
+License: apache-2.0

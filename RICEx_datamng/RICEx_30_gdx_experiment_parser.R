@@ -12,17 +12,19 @@ require_package("stringr")
 
 
 
+## OLD FUNCTION --------
+# Ready to become deprecated
 
-
-## FUNCTION
-# which parses gdx name and data and allocates values in a tidy list
-#
+#' Parses gdx name and data and extracts experiment informations
+#'
+#' @param gdx_name_with_full_path 
+#'
 parse_experiment <- function(gdx_name_with_full_path){
   
 
   ## SANITIZATION SUB-FUNCTION
   # to interpret and expand onfiguration parsed and make them human-readable
-  sanitize_runtype <- function(mystring){
+  old_sanitize_runtype <- function(mystring){
     
     if(length(mystring) < 1) return(mystring) # empty value
     
@@ -30,7 +32,7 @@ parse_experiment <- function(gdx_name_with_full_path){
     else{return("SIM")}
   }
   
-  sanitize_macc <- function(mystring){
+  old_sanitize_macc <- function(mystring){
     
     if(length(mystring) < 1) return(mystring) # empty value
     if(length(grep("mcED", mystring)) > 0 ){
@@ -45,7 +47,7 @@ parse_experiment <- function(gdx_name_with_full_path){
     return(mystring)
   }
   
-  sanitize_coop <- function(mystring){
+  old_sanitize_coop <- function(mystring){
     
     if(length(mystring) < 1) return(mystring) # empty value
     if(mystring=='coop'    | mystring=='cooppop' )                           return('coop_pop')
@@ -54,7 +56,7 @@ parse_experiment <- function(gdx_name_with_full_path){
     #default/no match case
     return(mystring)
   }
-  sanitize_climate <- function(mystring){
+  old_sanitize_climate <- function(mystring){
     
     if(length(mystring) < 1) return(mystring) # empty value
     if(toupper(mystring) =='CLWOGHG') return('clWITCHoghg')
@@ -65,7 +67,7 @@ parse_experiment <- function(gdx_name_with_full_path){
     return(mystring)
   }
   
-  sanitize_damages <- function(mystring){
+  old_sanitize_damages <- function(mystring){
     
     if(length(mystring) < 1) return(mystring) # empty value
     if(length(grep("dmBK", mystring)) > 0 ) return(paste0("damages_BURKE",str_split(mystring, "dmBK")[[1]][2]))
@@ -73,7 +75,7 @@ parse_experiment <- function(gdx_name_with_full_path){
     return(paste0("dmg",str_split(mystring, "dm")[[1]][2]))
   }
   
-  sanitize_savings <- function(mystring){
+  old_sanitize_savings <- function(mystring){
     if(length(mystring) < 1) return(mystring) # empty value
 
     if(toupper(mystring) =='SVFXFIX')  return('sfx_2015')
@@ -83,7 +85,7 @@ parse_experiment <- function(gdx_name_with_full_path){
     #default/no match case
     return(mystring)
   }
-  sanitize_runmode <- function(mystring){
+  old_sanitize_runmode <- function(mystring){
     
     if(length(mystring) < 1) return(mystring) # empty value
     if(toupper(mystring) =='RRBAU')     return('BAU')
@@ -95,14 +97,14 @@ parse_experiment <- function(gdx_name_with_full_path){
     return(mystring)
   }
   
-  sanitize_version <- function(mystring){ 
+  old_sanitize_version <- function(mystring){ 
     
     if(length(mystring) < 1) return(mystring) # empty value
     #turn it into a string
     return(paste0("v",mystring))
   }
   
-  sanitize_welfare <- function(mystring){ 
+  old_sanitize_welfare <- function(mystring){ 
     
     if(length(mystring) < 1) return(mystring) # empty value
     
@@ -154,17 +156,17 @@ parse_experiment <- function(gdx_name_with_full_path){
   #info parsing 
   experiment= list() 
   experiment$ssp             =                   exp_infos[grep( regex(regex_for_baseline),exp_infos )]
-  experiment$runtype         = sanitize_runtype( exp_infos[grep( regex(regex_for_runtype), exp_infos )] )
+  experiment$runtype         = old_sanitize_runtype( exp_infos[grep( regex(regex_for_runtype), exp_infos )] )
   experiment$regions         =                   exp_infos[grep( regex(regex_for_regions), exp_infos )]
-  experiment$macc            = sanitize_macc(    exp_infos[grep( regex(regex_for_macc),    exp_infos )] )
+  experiment$macc            = old_sanitize_macc(    exp_infos[grep( regex(regex_for_macc),    exp_infos )] )
   experiment$exp_id          =                   exp_infos[grep( regex(regex_for_expid),   exp_infos )]
-  experiment$version         = sanitize_version( exp_infos[grep( regex(regex_for_version), exp_infos )] )
-  experiment$cooperation     = sanitize_coop(    exp_infos[grep( regex(regex_for_coop),    exp_infos )] )
-  experiment$climateMod      = sanitize_climate( exp_infos[grep( regex(regex_for_climate), exp_infos )] )
-  experiment$damageFunction  = sanitize_damages( exp_infos[grep( regex(regex_for_damages), exp_infos )] )
-  experiment$savingRate      = sanitize_savings( exp_infos[grep( regex(regex_for_savings), exp_infos )] )
-  experiment$runmode         = sanitize_runmode( exp_infos[grep( regex(regex_for_runmode), exp_infos )] )
-  experiment$welfare         = sanitize_welfare( exp_infos[grep( regex(regex_for_welfare), exp_infos )] )
+  experiment$version         = old_sanitize_version( exp_infos[grep( regex(regex_for_version), exp_infos )] )
+  experiment$cooperation     = old_sanitize_coop(    exp_infos[grep( regex(regex_for_coop),    exp_infos )] )
+  experiment$climateMod      = old_sanitize_climate( exp_infos[grep( regex(regex_for_climate), exp_infos )] )
+  experiment$damageFunction  = old_sanitize_damages( exp_infos[grep( regex(regex_for_damages), exp_infos )] )
+  experiment$savingRate      = old_sanitize_savings( exp_infos[grep( regex(regex_for_savings), exp_infos )] )
+  experiment$runmode         = old_sanitize_runmode( exp_infos[grep( regex(regex_for_runmode), exp_infos )] )
+  experiment$welfare         = old_sanitize_welfare( exp_infos[grep( regex(regex_for_welfare), exp_infos )] )
   
   # if exeriment has variant string, append it to runmode info
   if(!is.na(variant)){
